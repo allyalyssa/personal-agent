@@ -5,9 +5,7 @@
   "scripts": {
     "start": "node --env-file-if-exists=.env server/index.ts",
     "dev": "node --watch --env-file-if-exists=.env server/index.ts",
-    "verify-rules": "node scripts/verify-rules.ts",
     "check-datasf": "node scripts/check-datasf.ts",
-    "eval": "node --env-file-if-exists=.env scripts/eval-extraction.ts",
     "test": "node --test tests/*.test.ts"
   },
   "engines": {
