@@ -1,0 +1,13 @@
+{
+  "id": "sf_311",
+  "title": "SF 311 service requests",
+  "jurisdiction": "San Francisco",
+  "rule": "Report street and sidewalk problems (garbage, potholes, broken streetlights, graffiti, blocked sidewalks) to SF 311 by phone, app or web. Every report is public on DataSF with its status and close date, so you and your neighbors can see if it is already reported and when it gets fixed.",
+  "params": { "dataset": "vw6y-z8j6" },
+  "source_url": "https://data.sf.gov/d/vw6y-z8j6",
+  "verify_phrase": "311",
+  "status": "verified",
+  "last_verified": "2026-10-24",
+  "confirm_with": "SF 311",
+  "notes": "Verified 2026-10-24 by querying the live 311 Cases dataset (updated the same day). Submitting reports goes through sf311.org; Handled prepares the report and you submit."
+}

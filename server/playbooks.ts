@@ -38,6 +38,7 @@ export type FollowupSpec = {
   wait: string
   check: string
   resolved_when: string
+  check_311?: string
   escalate?: Omit<ActionSpec, 'id'> & { id?: string }
 }
 
@@ -89,5 +90,6 @@ export const PACKS: Record<string, string> = {
   care: 'Caring for someone',
   business: 'Small business',
   newcomer: 'Newcomers',
+  city: 'Give back to the city',
   good: 'The good stuff'
 }

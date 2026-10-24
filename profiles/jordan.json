@@ -53,5 +53,7 @@
       "kind": "medical_billing",
       "phone": "+15555550104"
     }
-  ]
+  ],
+  "language": "en",
+  "persona": "SF renter for 3 years, tech worker, has a car and a mother nearby"
 }

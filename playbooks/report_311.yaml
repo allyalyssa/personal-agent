@@ -1,0 +1,43 @@
+id: report_311
+pack: city
+title: Fix it on my block (311)
+pitch: Snap the broken streetlight, pothole or dumped mattress. Handled checks what neighbors already reported, prepares the 311 report, and watches City data until it's closed.
+depth: standard
+triggers:
+  documents: [photo of street problem, photo of pothole, photo of dumped items]
+  phrases: [pothole, streetlight, street light, dumped, illegal dumping, mattress on the sidewalk, broken sidewalk, overflowing trash, graffiti on, 311, bache, basura en la calle, poste de luz, buraco na rua]
+required_fields:
+  problem: { type: string, label: What's wrong, get: extract or ask }
+  location: { type: string, label: Street address or nearest address, get: extract or ask, profile: address }
+  keyword: { type: string, label: One word for the problem (streetlight, pothole, graffiti, dumping, cleaning), get: extract, default: cleaning }
+  service_request_id: { type: string, label: 311 request number after you submit, get: ask, optional: true }
+rules: [sf_311]
+datasf: [nearby_311]
+guidance: >
+  Call query_datasf nearby_311 with location and keyword first. Tell the user how many reports are nearby, how many are
+  still open, and the median hours to close, citing the 311 Cases dataset. If an open report matches, say so; a new
+  report still helps the City see demand. Ask the user to paste the 311 request number after submitting, so Handled can
+  track it in City data.
+actions:
+  - id: report
+    tool: prepare_form
+    title: Prepare the 311 report for {{problem}}
+    needs_approval: true
+    due: today
+    waits_on_other_party: true
+    payload:
+      form_name: SF 311 service request
+      official_url: https://sf311.org/
+      fields:
+        Problem: "{{problem}}"
+        Location: "{{location}}"
+        Details: "Reported with Handled. Photo attached by the resident."
+      instructions: Submit on sf311.org or the SF311 app, attach your photo, then paste the request number into this case so Handled can track it.
+followups:
+  - after_action: report
+    wait: 3 days
+    check: Has the City closed the 311 report for {{problem}} at {{location}}?
+    resolved_when: The 311 case shows Closed in City data
+    check_311: service_request_id
+sample: |
+  There's a broken streetlight in front of 1000 Guerrero St, it's been out for a week and the block is really dark.

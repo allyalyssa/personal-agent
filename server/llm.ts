@@ -2,6 +2,16 @@ import Anthropic from '@anthropic-ai/sdk'
 
 export const client = new Anthropic()
 
+// Without a key Handled still runs: playbooks are routed by their trigger phrases and fields
+// come from a form. Claude adds reading photos, free-form understanding and drafting.
+export const hasClaude = () => Boolean(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN)
+
+export const LANGUAGES: Record<string, string> = { en: 'English', es: 'Spanish', pt: 'Portuguese', zh: 'Chinese', tl: 'Filipino', vi: 'Vietnamese', ru: 'Russian' }
+
+export function languageName(code?: string) {
+  return LANGUAGES[code ?? 'en'] ?? 'English'
+}
+
 export const MODEL = process.env.HANDLED_MODEL ?? 'claude-opus-5-5'
 export const EFFORT = (process.env.HANDLED_EFFORT ?? 'medium') as 'low' | 'medium' | 'high'
 

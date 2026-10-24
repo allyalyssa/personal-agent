@@ -8,9 +8,40 @@ let editing = new Set()
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
 const usd = n => `$${Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`
 const usd2 = n => `$${Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-const STATUS = { open: 'Open', waiting_on_other_party: 'Waiting on them', escalated: 'Escalated', resolved: 'Resolved' }
-const TOOL = { send_email: 'Email', send_sms: 'Text message', place_call: 'Phone call', create_calendar_event: 'Calendar', prepare_form: 'Form, ready for you to submit', open_url_prefilled: 'Link', schedule_followup: 'Follow-up' }
-const PACK_LABEL = { renter: 'Renter', car: 'Car', work: 'Work', everyday: 'Everyday', care: 'Care', business: 'Business', newcomer: 'Newcomer', good: 'Good stuff' }
+const STRINGS = {
+  en: {
+    open: 'Open', waiting_on_other_party: 'Waiting on them', escalated: 'Escalated', resolved: 'Resolved',
+    send_email: 'Email', send_sms: 'Text message', place_call: 'Phone call', create_calendar_event: 'Calendar', prepare_form: 'Form, ready for you to submit', open_url_prefilled: 'Link', schedule_followup: 'Follow-up',
+    next_deadline: 'Next deadline', nothing_due: 'Nothing due. Capture anything below.', at_stake: 'Money at stake', recovered: 'Recovered', cases: 'Cases',
+    approve: 'Ready for your approval', deadlines: 'Deadlines and check-ins', done: 'Done and in progress', rules: 'Rules and sources', timeline: 'Timeline', add: 'Add to this case',
+    needs: 'A few things Handled needs', send_answers: 'Send answers', photo: 'Photo', voice: 'Voice', type: 'Type', handle: 'Handle it', cancel: 'Cancel', send: 'Send',
+    intro_title: 'Life in SF comes with rules nobody explains.', intro: 'Tell Handled who you are, in any language. It finds the deadlines, the paperwork and the money, and does the follow-up.', intro_btn: 'Tell Handled about you',
+    for_you: 'What it says', i_did_it: 'I did it', what_they_said: 'What did they say? (price, date, reference number)', open_phone: 'Open on your phone', listening: 'Listening...'
+  },
+  es: {
+    open: 'Abierto', waiting_on_other_party: 'Esperando respuesta', escalated: 'Escalado', resolved: 'Resuelto',
+    send_email: 'Email', send_sms: 'Mensaje de texto', place_call: 'Llamada', create_calendar_event: 'Calendario', prepare_form: 'Formulario listo para que lo envíes', open_url_prefilled: 'Enlace', schedule_followup: 'Seguimiento',
+    next_deadline: 'Próximo plazo', nothing_due: 'Nada pendiente. Captura lo que sea abajo.', at_stake: 'Dinero en juego', recovered: 'Recuperado', cases: 'Casos',
+    approve: 'Listo para tu aprobación', deadlines: 'Plazos y seguimientos', done: 'Hecho y en curso', rules: 'Reglas y fuentes', timeline: 'Historial', add: 'Agregar a este caso',
+    needs: 'Handled necesita algunos datos', send_answers: 'Enviar respuestas', photo: 'Foto', voice: 'Voz', type: 'Escribir', handle: 'Resuélvelo', cancel: 'Cancelar', send: 'Enviar',
+    intro_title: 'Vivir en SF viene con reglas que nadie te explica.', intro: 'Cuéntale a Handled quién eres, en tu idioma. Encuentra los plazos, los trámites y el dinero, y hace el seguimiento.', intro_btn: 'Cuéntale a Handled sobre ti',
+    for_you: 'Lo que dice', i_did_it: 'Listo, lo hice', what_they_said: '¿Qué te dijeron? (precio, fecha, número de referencia)', open_phone: 'Abrir en tu teléfono', listening: 'Escuchando...'
+  },
+  pt: {
+    open: 'Aberto', waiting_on_other_party: 'Aguardando resposta', escalated: 'Escalado', resolved: 'Resolvido',
+    send_email: 'Email', send_sms: 'Mensagem de texto', place_call: 'Ligação', create_calendar_event: 'Calendário', prepare_form: 'Formulário pronto para você enviar', open_url_prefilled: 'Link', schedule_followup: 'Acompanhamento',
+    next_deadline: 'Próximo prazo', nothing_due: 'Nada pendente. Registre qualquer coisa abaixo.', at_stake: 'Dinheiro em jogo', recovered: 'Recuperado', cases: 'Casos',
+    approve: 'Pronto para sua aprovação', deadlines: 'Prazos e acompanhamentos', done: 'Feito e em andamento', rules: 'Regras e fontes', timeline: 'Histórico', add: 'Adicionar a este caso',
+    needs: 'O Handled precisa de alguns dados', send_answers: 'Enviar respostas', photo: 'Foto', voice: 'Voz', type: 'Escrever', handle: 'Resolver', cancel: 'Cancelar', send: 'Enviar',
+    intro_title: 'Morar em SF vem com regras que ninguém explica.', intro: 'Conte ao Handled quem você é, no seu idioma. Ele encontra os prazos, a papelada e o dinheiro, e faz o acompanhamento.', intro_btn: 'Conte ao Handled sobre você',
+    for_you: 'O que diz', i_did_it: 'Feito', what_they_said: 'O que disseram? (preço, data, número de referência)', open_phone: 'Abrir no seu telefone', listening: 'Ouvindo...'
+  }
+}
+const SPEECH_LANG = { en: 'en-US', es: 'es-US', pt: 'pt-BR', zh: 'zh-CN', tl: 'fil-PH', vi: 'vi-VN', ru: 'ru-RU' }
+const t = key => (STRINGS[state?.profile?.language] ?? STRINGS.en)[key] ?? STRINGS.en[key] ?? key
+const STATUS = new Proxy({}, { get: (_, k) => t(k) })
+const TOOL = new Proxy({}, { get: (_, k) => t(k) })
+const PACK_LABEL = { renter: 'Renter', car: 'Car', work: 'Work', everyday: 'Everyday', care: 'Care', business: 'Business', newcomer: 'Newcomer', city: 'City', good: 'Good stuff' }
 
 async function api(path, body) {
   const res = await fetch(path, body === undefined ? {} : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
@@ -81,6 +112,7 @@ async function render() {
   clearTimeout(caseTimer)
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', (t.dataset.go === 'home' && (route === '/' || route.startsWith('/case'))) || route === `/${t.dataset.go}`))
   if (!state) await refreshState()
+  translateChrome()
   if (route.startsWith('/case/')) return renderCase(route.split('/')[2])
   if (route === '/gallery') return renderGallery()
   if (route === '/settings') return renderSettings()
@@ -89,13 +121,24 @@ async function render() {
 
 function integrationWarning() {
   const i = state.integrations
-  const off = []
-  if (!i.claude) off.push('Claude (ANTHROPIC_API_KEY)')
-  if (!i.email) off.push('email (RESEND_API_KEY)')
-  if (!i.sms) off.push('texts (TWILIO_*)')
-  if (!i.calls) off.push('calls (VAPI_*)')
-  if (!off.length) return ''
-  return `<div class="card small" style="background:var(--warn-bg);color:var(--warn);margin-bottom:10px">Not connected yet: ${off.map(esc).join(', ')}. Add keys to .env and restart.</div>`
+  const notes = []
+  if (!i.claude) notes.push('Keyword mode: no Anthropic key, so Handled matches playbooks by keywords and asks with a form.')
+  if (i.free_mode) notes.push('Free mode: Handled drafts every email, text and call script; your phone sends the last tap.')
+  if (!notes.length) return ''
+  return `<div class="card small" style="background:var(--info-bg);margin-bottom:10px">${notes.map(esc).join('<br>')}</div>`
+}
+
+function translateChrome() {
+  document.documentElement.lang = state?.profile?.language ?? 'en'
+  const caps = document.querySelectorAll('.capture-bar .cap > span:last-child')
+  caps[0].textContent = t('photo')
+  caps[1].textContent = t('voice')
+  caps[2].textContent = t('type')
+  document.getElementById('sendText').textContent = t('handle')
+  document.getElementById('closeComposer').textContent = t('cancel')
+  document.getElementById('cancelVoice').textContent = t('cancel')
+  document.getElementById('sendVoice').textContent = t('send')
+  document.querySelector('[data-go="home"].tab').textContent = t('cases')
 }
 
 function renderHome() {
@@ -106,27 +149,34 @@ function renderHome() {
     ${integrationWarning()}
     ${next ? `
       <button class="banner ${soon ? 'soon' : ''}" data-case="${esc(next.case_id)}">
-        <div class="label">Next deadline, ${esc(relDay(next.due_at))}</div>
+        <div class="label">${esc(t('next_deadline'))}, ${esc(relDay(next.due_at))}</div>
         <div class="what">${esc(next.title)}</div>
         <div class="small" style="opacity:.85">${esc(prettyDate(next.due_at))} &middot; ${esc(next.case_title)}</div>
       </button>` : `
-      <div class="banner"><div class="label">Next deadline</div><div class="what">Nothing due. Capture anything below.</div></div>`}
+      <div class="banner"><div class="label">${esc(t('next_deadline'))}</div><div class="what">${esc(t('nothing_due'))}</div></div>`}
     <div class="totals">
-      <div class="card total"><div class="muted small">Money at stake</div><div class="n">${usd(s.totals.at_stake)}</div></div>
-      <div class="card total money"><div class="muted small">Recovered</div><div class="n">${usd(s.totals.recovered)}</div></div>
+      <div class="card total"><div class="muted small">${esc(t('at_stake'))}</div><div class="n">${usd(s.totals.at_stake)}</div></div>
+      <div class="card total money"><div class="muted small">${esc(t('recovered'))}</div><div class="n">${usd(s.totals.recovered)}</div></div>
     </div>
-    <h2>Cases <span class="muted small">${s.totals.open} open</span></h2>
+    <h2>${esc(t('cases'))} <span class="muted small">${s.totals.open}</span></h2>
     <div class="stack">
       ${s.cases.length ? s.cases.map(caseCard).join('') : `
         <div class="card empty">
-          <div class="big">Life in SF comes with rules nobody explains.</div>
-          <p class="muted">Snap a notice, bill or letter, forward an email, or say what happened. Handled finds the deadlines and the money, and does the follow-up.</p>
-          <button class="link" data-go-gallery>See what it can handle</button>
+          <div class="big">${esc(t('intro_title'))}</div>
+          <p class="muted">${esc(t('intro'))}</p>
+          <button class="primary" data-onboard>${esc(t('intro_btn'))}</button>
+          <p><button class="link" data-go-gallery>${playbookCount ?? ''} playbooks</button></p>
         </div>`}
     </div>`
   view.querySelectorAll('[data-case]').forEach(el => el.addEventListener('click', () => go(`/case/${el.dataset.case}`)))
   view.querySelector('[data-go-gallery]')?.addEventListener('click', () => go('/gallery'))
+  view.querySelector('[data-onboard]')?.addEventListener('click', () => startVoice('onboard'))
 }
+
+let playbookCount = null
+api('/api/playbooks').then(r => {
+  playbookCount = r.playbooks.length
+})
 
 function caseCard(c) {
   return `
@@ -233,8 +283,15 @@ function actionCard(a, events) {
         </div>
         ${!proposed ? `<span class="chip ${a.status === 'done' ? 'verified' : a.status === 'failed' ? 'alert' : ''}">${esc(a.status.replace('_', ' '))}</span>` : ''}
       </div>
+      ${a.payload.for_you ? `<div class="small" style="margin-top:8px;padding:8px 10px;border-radius:10px;background:var(--info-bg)"><strong>${esc(t('for_you'))}:</strong> ${esc(a.payload.for_you)}</div>` : ''}
       <div style="margin-top:8px">${actionBody(a, isEditing)}</div>
       ${a.status === 'failed' && a.result?.error ? `<p class="small" style="color:var(--danger)">${esc(a.result.error)}</p>` : ''}
+      ${a.status === 'handoff' ? `
+        <div class="stack" style="margin-top:10px">
+          <a class="primary" style="display:block;text-align:center;text-decoration:none" href="${esc(a.result.url)}">${esc(t('open_phone'))}</a>
+          ${a.tool === 'place_call' ? `<textarea data-notes="${a.id}" rows="3" placeholder="${esc(t('what_they_said'))}" style="width:100%;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:10px"></textarea>` : ''}
+          <button class="ghost" data-complete="${a.id}">${esc(t('i_did_it'))}</button>
+        </div>` : ''}
       ${a.tool === 'place_call' ? callResult(a, events) : ''}
       ${a.tool === 'open_url_prefilled' && a.status === 'done' ? `<p class="small"><a href="${esc(a.result.url)}" target="_blank" rel="noopener">Open</a></p>` : ''}
       ${proposed ? `
@@ -322,13 +379,13 @@ async function renderCase(id, auto = false) {
     ${c.summary ? `<div class="card summary" style="margin-top:10px">${esc(c.summary)}</div>` : ''}
     ${c.questions?.length && !c.busy ? `
       <div class="card questions" style="margin-top:10px">
-        <strong>A few things Handled needs</strong>
+        <strong>${esc(t('needs'))}</strong>
         ${c.questions.map((q, i) => `<div class="field-label">${esc(q.question)}</div><input data-q="${i}" data-field="${esc(q.field)}">`).join('')}
-        <div class="row" style="margin-top:10px"><button class="primary" id="answer">Send answers</button></div>
+        <div class="row" style="margin-top:10px"><button class="primary" id="answer">${esc(t('send_answers'))}</button></div>
       </div>` : ''}
-    ${proposed.length ? `<h2>Ready for your approval <span class="muted small">${proposed.length}</span></h2><div class="stack">${proposed.map(a => actionCard(a, c.events)).join('')}</div>` : ''}
+    ${proposed.length ? `<h2>${esc(t('approve'))} <span class="muted small">${proposed.length}</span></h2><div class="stack">${proposed.map(a => actionCard(a, c.events)).join('')}</div>` : ''}
     ${upcoming.length ? `
-      <h2>Deadlines and check-ins</h2>
+      <h2>${esc(t('deadlines'))}</h2>
       <div class="card">${upcoming.map(d => `
         <div class="deadline">${dateBox(d.due_at)}
           <div>
@@ -339,25 +396,25 @@ async function renderCase(id, auto = false) {
         </div>`).join('')}
         <p class="small"><a href="/api/cases/${esc(c.id)}/calendar.ics">Add to calendar</a></p>
       </div>` : ''}
-    ${other.length ? `<h2>Done and in progress</h2><div class="stack">${other.slice().reverse().map(a => actionCard(a, c.events)).join('')}</div>` : ''}
+    ${other.length ? `<h2>${esc(t('done'))}</h2><div class="stack">${other.slice().reverse().map(a => actionCard(a, c.events)).join('')}</div>` : ''}
     ${c.rules.length ? `
-      <h2>Rules and sources</h2>
+      <h2>${esc(t('rules'))}</h2>
       <div class="stack">${c.rules.map(r => `
         <details class="card"><summary class="small"><strong>${esc(r.title)}</strong> <span class="chip ${esc(r.status)}">${esc(r.status)}${r.last_verified ? ` ${esc(r.last_verified)}` : ''}</span></summary>
           <p class="small">${esc(r.rule)}</p>
           <p class="small muted">Source: <a href="${esc(r.source_url)}" target="_blank" rel="noopener">${esc(r.source_url)}</a><br>Confirm with: ${esc(r.confirm_with)}${r.notes ? `<br>${esc(r.notes)}` : ''}</p>
           <p class="tiny muted">Information with sources, not legal, tax, immigration or medical advice.</p>
         </details>`).join('')}</div>` : ''}
-    <h2>Timeline</h2>
+    <h2>${esc(t('timeline'))}</h2>
     <div class="card"><ul class="timeline">${c.events.map(eventLine).join('')}</ul>
       ${c.jobs.length ? `<p class="small muted">Scheduled: ${c.jobs.map(j => `${esc(j.kind)} ${esc(relDay(j.run_at))}`).join(', ')}</p>` : ''}
     </div>
-    <h2>Add to this case</h2>
+    <h2>${esc(t('add'))}</h2>
     <div class="card">
       <textarea id="caseReply" rows="2" placeholder="Reply, correct a detail, or say what happened (e.g. they paid)" style="width:100%;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:10px"></textarea>
       <div class="row" style="margin-top:8px;justify-content:space-between">
         <button class="ghost" id="resolve">${c.status === 'resolved' ? 'Resolved' : 'Mark resolved'}</button>
-        <button class="primary" id="sendReply">Send</button>
+        <button class="primary" id="sendReply">${esc(t('send'))}</button>
       </div>
     </div>`
 
@@ -371,6 +428,13 @@ async function renderCase(id, auto = false) {
     const r = await api(`/api/actions/${aid}/approve`, { payload })
     editing.delete(aid)
     toast(r.ok ? 'Done.' : `Failed: ${r.error}`)
+    renderCase(id)
+  }))
+  view.querySelectorAll('[data-complete]').forEach(b => b.addEventListener('click', async () => {
+    const aid = b.dataset.complete
+    const notes = view.querySelector(`[data-notes="${aid}"]`)?.value.trim()
+    b.disabled = true
+    await api(`/api/actions/${aid}/complete`, { notes: notes || undefined })
     renderCase(id)
   }))
   view.querySelectorAll('[data-reject]').forEach(b => b.addEventListener('click', async () => {
@@ -388,8 +452,9 @@ async function renderCase(id, auto = false) {
     toast('Copied')
   }))
   view.querySelector('#answer')?.addEventListener('click', async () => {
-    const answers = [...view.querySelectorAll('[data-q]')].map(i => `${c.questions[Number(i.dataset.q)].question} ${i.value}`).join('\n')
-    await api(`/api/cases/${id}/reply`, { text: answers })
+    const answers = Object.fromEntries([...view.querySelectorAll('[data-q]')].filter(i => i.value.trim()).map(i => [i.dataset.field, i.value.trim()]))
+    if (!Object.keys(answers).length) return
+    await api(`/api/cases/${id}/reply`, { answers })
     renderCase(id)
   })
   view.querySelector('#sendReply').addEventListener('click', async () => {
@@ -448,7 +513,7 @@ async function renderGallery() {
 }
 
 async function renderSettings() {
-  const profile = await api('/api/profile')
+  const [profile, personas, civic] = await Promise.all([api('/api/profile'), api('/api/personas'), api('/api/civic')])
   const i = state.integrations
   const cal = `${location.origin}/calendar.ics`
   view.innerHTML = `
@@ -475,6 +540,29 @@ async function renderSettings() {
       Calls (Vapi): ${i.calls ? 'connected' : 'not set'}<br>
       Forward email or webhook notes to <code>POST ${esc(location.origin)}/api/inbound</code>
     </div>
+    <h2>Who is using Handled</h2>
+    <div class="card stack">
+      <div class="row">${personas.map(p => `<button class="ghost" data-persona="${esc(p.id)}">${esc(p.name)} <span class="muted small">${esc(p.language)}</span></button>`).join('')}</div>
+      <p class="small muted">${personas.map(p => `${esc(p.name)}: ${esc(p.persona)}`).join('<br>')}</p>
+      <label class="row small"><input type="checkbox" id="fresh" checked> Start with no cases (for a clean demo)</label>
+      <div class="row small">Language
+        <select id="lang">${Object.entries({ en: 'English', es: 'Español', pt: 'Português', zh: '中文', tl: 'Filipino', vi: 'Tiếng Việt', ru: 'Русский' }).map(([k, v]) => `<option value="${k}" ${profile.language === k ? 'selected' : ''}>${v}</option>`).join('')}</select>
+      </div>
+    </div>
+    <h2>What Handled knows about you</h2>
+    <div class="card small">
+      ${Object.keys(profile.memory ?? {}).length ? `<dl class="kv">${Object.entries(profile.memory).map(([k, m]) => `<dt>${esc(k.replace(/_/g, ' '))}</dt><dd>${esc(typeof m.value === 'object' ? JSON.stringify(m.value) : m.value)} <span class="tiny muted">from ${esc(m.from)}, ${esc(m.at)}</span></dd>`).join('')}</dl>` : '<span class="muted">Nothing learned yet. Every answer you give is kept here, so no playbook asks twice.</span>'}
+    </div>
+    <h2>Give back to the City</h2>
+    <div class="card small stack">
+      <p>Handled can share what it sees with the City: which obligations people hit, and which steps still need a person because there is no online path. Counts only, never names or addresses.</p>
+      <dl class="kv">
+        <dt>Obligations handled</dt><dd>${civic.obligations.map(o => `${esc(o.playbook)} (${o.n})`).join(', ') || 'none yet'}</dd>
+        <dt>No online path</dt><dd>${civic.steps_with_no_online_path.map(s => `${esc(s.host)} (${s.count})`).join(', ') || 'none yet'}</dd>
+        <dt>311 reports</dt><dd>${civic.reports_311.prepared} prepared, ${civic.reports_311.closed_by_city} closed by the City</dd>
+      </dl>
+      <a href="/api/civic" download="handled-civic-report.json">Download the anonymous report</a>
+    </div>
     <h2>Your profile</h2>
     <div class="card settings">
       <p class="small muted">Handled fills forms from this. Never put SSNs, card numbers or full ID numbers here.</p>
@@ -487,6 +575,20 @@ async function renderSettings() {
     toast(r.fired ? `${r.fired} scheduled ${r.fired === 1 ? 'item' : 'items'} fired` : 'Nothing due yet')
     renderSettings()
   }))
+  view.querySelectorAll('[data-persona]').forEach(b => b.addEventListener('click', async () => {
+    await api(`/api/personas/${b.dataset.persona}`, { fresh: view.querySelector('#fresh').checked })
+    state = null
+    await refreshState()
+    translateChrome()
+    toast(`Now using Handled as ${state.profile.name}`)
+    renderSettings()
+  }))
+  view.querySelector('#lang').addEventListener('change', async e => {
+    await api('/api/profile', { ...profile, language: e.target.value })
+    await refreshState()
+    translateChrome()
+    renderSettings()
+  })
   view.querySelector('#resetClock').addEventListener('click', async () => {
     await api('/api/clock/reset', {})
     await refreshState()
@@ -566,6 +668,11 @@ document.getElementById('closeComposer').addEventListener('click', () => {
 document.getElementById('sendText').addEventListener('click', () => {
   const text = textEl.value.trim()
   if (!text && !files.length) return
+  if (composer.dataset.mode === 'onboard') {
+    composer.dataset.mode = ''
+    textEl.value = ''
+    return onboard(text)
+  }
   submit({ text, files, source: files.length ? 'photo' : 'typed or pasted text' })
 })
 
@@ -573,19 +680,23 @@ const Speech = window.SpeechRecognition ?? window.webkitSpeechRecognition
 let recognizer = null
 let heard = ''
 
-document.getElementById('voice').addEventListener('click', () => {
+let voiceMode = 'capture'
+
+function startVoice(mode = 'capture') {
+  voiceMode = mode
   if (!Speech) {
     toast('Voice needs Chrome or Safari. Type instead.')
     composer.hidden = false
+    composer.dataset.mode = mode
     textEl.focus()
     return
   }
   composer.hidden = true
   listening.hidden = false
   heard = ''
-  document.getElementById('transcript').textContent = 'Listening...'
+  document.getElementById('transcript').textContent = t('listening')
   recognizer = new Speech()
-  recognizer.lang = 'en-US'
+  recognizer.lang = SPEECH_LANG[state?.profile?.language] ?? 'en-US'
   recognizer.continuous = true
   recognizer.interimResults = true
   recognizer.onresult = e => {
@@ -596,10 +707,12 @@ document.getElementById('voice').addEventListener('click', () => {
       else interim += r[0].transcript
     }
     heard = final + interim
-    document.getElementById('transcript').textContent = heard || 'Listening...'
+    document.getElementById('transcript').textContent = heard || t('listening')
   }
   recognizer.start()
-})
+}
+
+document.getElementById('voice').addEventListener('click', () => startVoice('capture'))
 
 document.getElementById('cancelVoice').addEventListener('click', () => {
   recognizer?.abort()
@@ -613,8 +726,17 @@ document.getElementById('sendVoice').addEventListener('click', () => {
     listening.hidden = true
     return
   }
-  submit({ text: `Voice note: "${text}"`, source: 'voice note' })
+  if (voiceMode === 'onboard') onboard(text)
+  else submit({ text: `Voice note: "${text}"`, source: 'voice note' })
 })
+
+async function onboard(text) {
+  listening.hidden = true
+  composer.hidden = true
+  const { case_id } = await api('/api/onboard', { text })
+  await refreshState()
+  go(`/case/${case_id}`)
+}
 
 setInterval(async () => {
   await refreshState()

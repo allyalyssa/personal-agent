@@ -1,0 +1,12 @@
+{
+  "id": "cbp_i94",
+  "title": "Check your I-94 arrival record",
+  "jurisdiction": "Federal",
+  "rule": "Your I-94 is your official record of entry and shows the date your authorized stay ends. Download it from CBP after each entry and check that the class of admission and the end date are right. Mistakes are much easier to fix early. Employers, SSA and the DMV ask for it.",
+  "params": {},
+  "source_url": "https://i94.cbp.dhs.gov/",
+  "verify_phrase": "I-94",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "US Customs and Border Protection or an immigration attorney"
+}

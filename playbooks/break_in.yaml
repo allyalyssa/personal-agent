@@ -5,7 +5,7 @@ pitch: Police report pre-filled, insurance packet built, and a live call to a gl
 depth: deep
 triggers:
   documents: [photo of broken car window, police report, insurance claim]
-  phrases: [broke into my car, car break-in, smashed window, broken window, bipping, stole from my car]
+  phrases: [broke into my car, car break-in, smashed window, broken window, bipping, stole from my car, me rompieron el vidrio, me robaron del auto, rompieron la ventana del auto, quebraram o vidro do carro]
 required_fields:
   incident_date: { type: date, label: When it happened, get: extract or ask }
   incident_location: { type: string, label: Where the car was parked, get: extract or ask }

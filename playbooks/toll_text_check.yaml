@@ -5,7 +5,7 @@ pitch: Compares the text with how Bay Area bridge tolls are billed and the offic
 depth: standard
 triggers:
   documents: [screenshot of a text message about tolls, FasTrak notice]
-  phrases: [toll, FasTrak, unpaid toll, toll violation, bridge toll text]
+  phrases: [toll, FasTrak, unpaid toll, toll violation, bridge toll text, peaje, pedágio]
 required_fields:
   message_text: { type: string, label: The text message, get: extract or ask }
   links: { type: list, label: Links in the message, get: extract, optional: true }

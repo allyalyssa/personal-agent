@@ -1,0 +1,13 @@
+{
+  "id": "uscis_ar11",
+  "title": "Report your new address to USCIS (AR-11)",
+  "jurisdiction": "Federal",
+  "rule": "Noncitizens in the US must report a change of address to USCIS within 10 days of moving, using Form AR-11 (online, free). Changing your address with the Post Office does not update USCIS. Exceptions include A and G visa holders and visa waiver (ESTA) visitors. If you have pending USCIS applications, update each one.",
+  "params": { "days_after_move": 10 },
+  "source_url": "https://www.uscis.gov/ar-11",
+  "verify_phrase": "10 days",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "USCIS or an immigration attorney",
+  "notes": "Checked 2026-10-24 against several legal clinic and law firm summaries citing INA 265, not yet against uscis.gov itself."
+}

@@ -4,7 +4,8 @@ export const DATASETS = {
   addresses: { id: '3mea-di5p', name: 'San Francisco Addresses - Enterprise Addressing System' },
   assessor: { id: 'wv5m-vpq2', name: 'Assessor Historical Secured Property Tax Rolls' },
   street_sweeping: { id: 'yhqp-riqs', name: 'Street Sweeping Schedule' },
-  temporary_no_parking: { id: 'sftu-nd43', name: 'Parking Signs / Street Space Permits' }
+  temporary_no_parking: { id: 'sftu-nd43', name: 'Parking Signs / Street Space Permits' },
+  cases_311: { id: 'vw6y-z8j6', name: '311 Cases' }
 }
 
 async function soda(dataset: keyof typeof DATASETS, params: Record<string, string>) {
@@ -113,8 +114,45 @@ export async function noParkingByAddress(address: string, date: string) {
   }
 }
 
-export async function queryDatasf(args: { dataset: 'assessor' | 'street_sweeping' | 'temporary_no_parking', address: string, date?: string }) {
+// What neighbors already reported to 311 near this address, and how fast the City closed it.
+export async function nearby311(address: string, keyword?: string, days = 60, meters = 150) {
+  const addr = await lookupAddress(address)
+  if (!addr.match) return { found: false, address, sources: [addr.query_url] }
+  const since = new Date(Date.now() - days * 86400000).toISOString().slice(0, 19)
+  const kw = keyword ? ` and (upper(service_name) like '%${keyword.toUpperCase().replace(/'/g, "''")}%' or upper(service_subtype) like '%${keyword.toUpperCase().replace(/'/g, "''")}%' or upper(service_details) like '%${keyword.toUpperCase().replace(/'/g, "''")}%')` : ''
+  const { rows, url } = await soda('cases_311', {
+    $where: `requested_datetime > '${since}' and within_circle(point, ${Number(addr.match.latitude)}, ${Number(addr.match.longitude)}, ${meters})${kw}`,
+    $select: 'service_request_id,service_name,service_subtype,status_description,requested_datetime,closed_date,address,agency_responsible',
+    $order: 'requested_datetime DESC',
+    $limit: '50'
+  })
+  const closed = rows.filter(r => r.closed_date)
+  const hours = closed.map(r => (Date.parse(r.closed_date) - Date.parse(r.requested_datetime)) / 3600000).filter(h => h >= 0).sort((x, y) => x - y)
+  const open = rows.filter(r => !r.closed_date && r.status_description !== 'Closed')
+  return {
+    found: rows.length > 0,
+    address: addr.match.address,
+    neighborhood: addr.match.nhood,
+    within_meters: meters,
+    days,
+    reports: rows.length,
+    open_reports: open.length,
+    median_hours_to_close: hours.length ? Math.round(hours[Math.floor(hours.length / 2)]) : null,
+    agencies: [...new Set(rows.map(r => r.agency_responsible).filter(Boolean))],
+    recent: rows.slice(0, 5).map(r => ({ id: r.service_request_id, what: `${r.service_name}${r.service_subtype ? ` / ${r.service_subtype}` : ''}`, status: r.status_description, requested: r.requested_datetime?.slice(0, 10), closed: r.closed_date?.slice(0, 10) ?? null, address: r.address })),
+    dataset: DATASETS.cases_311,
+    sources: [addr.query_url, url]
+  }
+}
+
+export async function status311(requestId: string) {
+  const { rows, url } = await soda('cases_311', { $where: `service_request_id='${requestId.replace(/'/g, "''")}'`, $select: 'service_request_id,status_description,status_notes,closed_date,updated_datetime' })
+  return { found: rows.length > 0, ...(rows[0] ?? {}), source: url }
+}
+
+export async function queryDatasf(args: { dataset: 'assessor' | 'street_sweeping' | 'temporary_no_parking' | 'nearby_311', address: string, date?: string, keyword?: string }) {
   if (args.dataset === 'assessor') return assessorByAddress(args.address)
   if (args.dataset === 'street_sweeping') return sweepingByAddress(args.address)
+  if (args.dataset === 'nearby_311') return nearby311(args.address, args.keyword)
   return noParkingByAddress(args.address, args.date ?? new Date().toISOString().slice(0, 10))
 }

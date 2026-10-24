@@ -1,12 +1,13 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
-import { readFileSync, existsSync } from 'node:fs'
+import { readFileSync, existsSync, readdirSync } from 'node:fs'
 import { extname } from 'node:path'
 import { db } from './db.ts'
 import { loadRules, allRules } from './rules.ts'
 import { loadPlaybooks, allPlaybooks, playbook, PACKS } from './playbooks.ts'
 import { createCase, caseView, listCases, resolveCase, getProfile, setProfile, getCase } from './engine.ts'
 import { intake, reply } from './agent.ts'
-import { executeAction, rejectAction } from './actions.ts'
+import { executeAction, rejectAction, completeAction } from './actions.ts'
+import { civicReport } from './civic.ts'
 import { runDueJobs, startScheduler } from './scheduler.ts'
 import { advance, resetClock, now, offsetMs, today } from './clock.ts'
 import { watchCall } from './calls.ts'
@@ -14,7 +15,7 @@ import { calendarFeed } from './ics.ts'
 
 loadRules()
 loadPlaybooks()
-if (!Object.keys(getProfile()).length) setProfile(JSON.parse(readFileSync(existsSync('profile.json') ? 'profile.json' : 'profile.example.json', 'utf8')))
+if (!Object.keys(getProfile()).length) setProfile(JSON.parse(readFileSync(existsSync('profile.json') ? 'profile.json' : 'profiles/jordan.json', 'utf8')))
 
 const TYPES: Record<string, string> = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.webmanifest': 'application/manifest+json' }
 
@@ -47,6 +48,7 @@ function state() {
       claude: Boolean(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN),
       email: Boolean(process.env.RESEND_API_KEY),
       sms: Boolean(process.env.TWILIO_ACCOUNT_SID),
+      free_mode: !process.env.RESEND_API_KEY || !process.env.TWILIO_ACCOUNT_SID || !process.env.VAPI_API_KEY,
       calls: Boolean(process.env.VAPI_API_KEY && process.env.VAPI_PHONE_NUMBER_ID)
     }
   }
@@ -101,6 +103,29 @@ const routes: [string, RegExp, (m: RegExpMatchArray, req: IncomingMessage, res: 
     const p = playbook(m[1])
     send(res, 200, { case_id: startIntake(p.sample, undefined, `sample for ${p.id}`) })
   }],
+  // "Tell Handled about you": one voice note becomes a profile and a set of cases.
+  ['POST', /^\/api\/onboard$/, async (_, req, res) => {
+    const b = await body(req)
+    const id = createCase('Getting to know you')
+    intake(id, { text: b.text, source: 'onboarding. The user is introducing themself. Save every durable fact with remember (language too, as an ISO code under the key language). Then open_case for each obligation that applies to them now, up to 6, passing what you know. Route this case with playbook_id "none" and finish with a short list of what you opened and why' }).catch(e => console.error('onboard', e))
+    send(res, 200, { case_id: id })
+  }],
+  ['POST', /^\/api\/actions\/(\d+)\/complete$/, async (m, req, res) => {
+    const b = await body(req)
+    await completeAction(Number(m[1]), b.notes)
+    send(res, 200, { ok: true })
+  }],
+  ['GET', /^\/api\/personas$/, async (_, __, res) => send(res, 200, readdirSync('profiles').filter(f => f.endsWith('.json')).map(f => ({ id: f.replace('.json', ''), ...JSON.parse(readFileSync(`profiles/${f}`, 'utf8')) })).map(p => ({ id: p.id, name: p.name, persona: p.persona, language: p.language })))],
+  ['POST', /^\/api\/personas\/(\w+)$/, async (m, req, res) => {
+    const b = await body(req)
+    if (b.fresh) {
+      db.exec('delete from cases; delete from events; delete from actions; delete from deadlines; delete from jobs;')
+      resetClock()
+    }
+    setProfile(JSON.parse(readFileSync(`profiles/${m[1]}.json`, 'utf8')))
+    send(res, 200, getProfile())
+  }],
+  ['GET', /^\/api\/civic$/, async (_, __, res) => send(res, 200, civicReport())],
   ['GET', /^\/api\/rules$/, async (_, __, res) => send(res, 200, allRules())],
   ['GET', /^\/api\/profile$/, async (_, __, res) => send(res, 200, getProfile())],
   ['POST', /^\/api\/profile$/, async (_, req, res) => {

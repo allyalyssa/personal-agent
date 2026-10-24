@@ -1,7 +1,7 @@
 import { db, json } from './db.ts'
 import { now } from './clock.ts'
 import { getCase, getProfile, logEvent, updateCase, setFields, plan } from './engine.ts'
-import { structured } from './llm.ts'
+import { structured, hasClaude, languageName } from './llm.ts'
 import { notifyUser } from './actions.ts'
 import { redact, redactDeep } from './redact.ts'
 
@@ -103,11 +103,12 @@ export async function finishCall(caseId: string, actionId: number, call: any) {
   const outcomeSchema = {
     type: 'object',
     additionalProperties: false,
-    required: ['reached', 'resolved', 'summary', 'appointment_date', 'appointment_time', 'price', 'next_step', 'fields'],
+    required: ['reached', 'resolved', 'summary', 'summary_for_user', 'appointment_date', 'appointment_time', 'price', 'next_step', 'fields'],
     properties: {
       reached: { type: 'boolean', description: 'Spoke with a person who could help' },
       resolved: { type: 'boolean', description: 'The call goal was achieved' },
       summary: { type: 'string', description: 'Two sentences, plain English' },
+      summary_for_user: { type: 'string', description: `The same two sentences in ${languageName(getProfile().language)}` },
       appointment_date: { type: ['string', 'null'], description: 'YYYY-MM-DD if a date was agreed' },
       appointment_time: { type: ['string', 'null'], description: 'Time or window as said, e.g. 9-11am' },
       price: { type: ['number', 'null'], description: 'Quoted or agreed price in dollars' },
@@ -124,13 +125,16 @@ export async function finishCall(caseId: string, actionId: number, call: any) {
       }
     }
   }
-  const outcome = transcript.trim()
+  const price = transcript.match(/\$\s?(\d[\d,]*(?:\.\d{2})?)/)
+  const outcome = transcript.trim() && !hasClaude()
+    ? { reached: true, resolved: true, summary: transcript.slice(0, 300), appointment_date: null, appointment_time: null, price: price ? Number(price[1].replace(/,/g, '')) : null, next_step: 'Check the details above.', summary_for_user: null, fields: [] }
+    : transcript.trim()
     ? await structured<any>(
       `You read phone call transcripts for a personal assistant app and record exactly what was agreed. Today is ${now().toISOString().slice(0, 10)}. Only record what the other party actually said; use null when something was not stated.`,
       [{ type: 'text', text: `Call goal: ${payload.goal}\nWanted: ${JSON.stringify(payload.outcome ?? {})}\nEnded because: ${call.endedReason}\n\nTranscript:\n${transcript}` }],
       outcomeSchema
     )
-    : { reached: false, resolved: false, summary: `No conversation (${call.endedReason}).`, appointment_date: null, appointment_time: null, price: null, next_step: 'Try again or call manually.', fields: [] }
+    : { reached: false, resolved: false, summary: `No conversation (${call.endedReason}).`, appointment_date: null, appointment_time: null, price: null, next_step: 'Try again or call manually.', summary_for_user: null, fields: [] }
 
   const result = redactDeep({ call_id: call.id, ended_reason: call.endedReason, duration_s: call.startedAt && call.endedAt ? Math.round((Date.parse(call.endedAt) - Date.parse(call.startedAt)) / 1000) : null, recording_url: call.artifact?.recordingUrl ?? call.recordingUrl ?? null, transcript, outcome })
   db.prepare(`update actions set status = ?, result = ?, done_at = ? where id = ?`).run(outcome.resolved ? 'done' : 'failed', JSON.stringify(result), now().toISOString(), actionId)
@@ -151,5 +155,5 @@ export async function finishCall(caseId: string, actionId: number, call: any) {
   const c = getCase(caseId)
   // Re-plan so drafts that depend on the call (quote, appointment) pick up the new facts.
   if (c.playbook) plan(caseId)
-  await notifyUser(caseId, `${c.title}. ${outcome.summary}`)
+  await notifyUser(caseId, `${c.title}. ${outcome.summary_for_user || outcome.summary}`)
 }

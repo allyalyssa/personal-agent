@@ -1,0 +1,13 @@
+{
+  "id": "ssa_ssn_noncitizen",
+  "title": "Getting a Social Security number as a noncitizen",
+  "jurisdiction": "Federal",
+  "rule": "If your status allows you to work, apply for an SSN in person at a Social Security office. SSA recommends waiting about 10 days after arriving so it can verify your DHS records online. Bring original documents (passport, I-94, and work authorization such as an I-797 or EAD); photocopies are not accepted. It is free. If you are applying for work authorization from USCIS, you can request the SSN on Form I-765 instead.",
+  "params": { "wait_days_after_arrival": 10 },
+  "source_url": "https://www.ssa.gov/ssnvisa/",
+  "verify_phrase": "Social Security",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "Social Security Administration",
+  "notes": "The 10-day recommendation comes from SSA publication EN-05-10096, found on 2026-10-24 in archived and university copies; the current version was not read."
+}

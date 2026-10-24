@@ -5,7 +5,7 @@ pitch: SF landlords owe you interest on your security deposit every year. Most n
 depth: deep
 triggers:
   documents: [lease, deposit receipt, move-in statement, rent ledger]
-  phrases: [security deposit, deposit interest, my deposit, move-in]
+  phrases: [security deposit, deposit interest, my deposit, move-in, depósito de garantía, mi depósito, interés del depósito, depósito caução]
 required_fields:
   deposit_amount: { type: number, label: Security deposit amount, get: extract or ask, profile: renter.deposit_amount }
   move_in_date: { type: date, label: Move-in date, get: extract or ask, profile: renter.move_in_date }

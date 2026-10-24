@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: handled
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: node server/index.ts
+    envVars:
+      - key: NODE_VERSION
+        value: 24.19.0
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_FROM
+        sync: false
+      - key: VAPI_API_KEY
+        sync: false
+      - key: VAPI_PHONE_NUMBER_ID
+        sync: false

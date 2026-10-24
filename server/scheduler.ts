@@ -1,6 +1,7 @@
 import { db, json } from './db.ts'
 import { now } from './clock.ts'
-import { getCase, updateCase, logEvent, insertAction, context } from './engine.ts'
+import { getCase, updateCase, logEvent, insertAction, context, resolveCase } from './engine.ts'
+import { status311 } from './datasf.ts'
 import { playbook } from './playbooks.ts'
 import { notifyUser } from './actions.ts'
 
@@ -29,6 +30,19 @@ export async function runDueJobs() {
         continue
       }
       const spec = playbook(c.playbook).followups?.find(f => f.after_action === payload.step)
+      const requestId = spec?.check_311 ? c.fields[spec.check_311] : null
+      if (requestId) {
+        const s = await status311(String(requestId))
+        logEvent(c.id, 'data', `Checked 311 request ${requestId} in City data: ${s.found ? s.status_description : 'not found yet'}`, s)
+        if (s.found && s.status_description === 'Closed') {
+          resolveCase(c.id, 0)
+          await notifyUser(c.id, `The City closed your 311 report ${requestId}${s.status_notes ? `: ${s.status_notes}` : ''}. Thanks for fixing your block.`)
+          continue
+        }
+        db.prepare(`insert into jobs (case_id, kind, run_at, payload) values (?, 'followup', ?, ?)`).run(c.id, new Date(now().getTime() + 3 * 86400000).toISOString(), job.payload)
+        await notifyUser(c.id, `311 request ${requestId} is still ${s.found ? s.status_description : 'not in City data yet'}. Handled checks again in 3 days.`)
+        continue
+      }
       updateCase(c.id, { status: 'escalated' })
       if (spec?.escalate) {
         const id = insertAction(c.id, { ...spec.escalate, id: spec.escalate.id ?? `${payload.step}_escalation` }, context(c))

@@ -1,0 +1,107 @@
+id: arrival_kit
+pack: newcomer
+title: Just landed in SF
+pitch: Tell Handled where you're from, your visa and your address, in any language. It builds every first-weeks deadline (USCIS address report, SSN, I-94, CA license) and prepares each one.
+depth: deep
+triggers:
+  documents: [visa, I-94, I-797 approval notice, offer letter, passport stamp, lease]
+  phrases: [just landed, just arrived, just moved to San Francisco, new to SF, moved here, my visa, relocating, acabo de llegar, llegué a San Francisco, me mudé a San Francisco, me mudé a SF, acabei de chegar, me mudei para San Francisco]
+required_fields:
+  arrival_date: { type: date, label: Date you arrived in the US, get: extract or ask, profile: memory.arrival_date.value }
+  sf_address: { type: string, label: Your San Francisco address, get: extract or profile, profile: address }
+  moved_in_date: { type: date, label: Date you moved into that address, get: extract or ask, profile: moved_to_sf }
+  staying_for: { type: string, label: Visiting for a short time or moving here?, get: extract or ask }
+  visa_type: { type: string, label: Visa or status (e.g. H-1B, O-1, F-1, L-1, TN, B-1, ESTA), get: extract or ask, profile: work.visa }
+  visa_waiver: { type: boolean, label: Entered on ESTA / visa waiver?, get: extract or ask, default: false }
+  work_authorized: { type: boolean, label: Allowed to work in the US now?, get: extract or ask }
+  employer_name: { type: string, label: Employer, get: extract or ask, profile: work.employer, optional: true }
+  origin_country: { type: string, label: Country you came from, get: extract or ask, profile: memory.origin_country.value }
+  will_drive: { type: boolean, label: Will you drive here?, get: ask, default: false }
+rules: [uscis_ar11, ssa_ssn_noncitizen, cbp_i94, ca_dmv_new_resident, sf_newcomer_services]
+guidance: >
+  This is the Puentes case: people arriving from Latin America, Spain and elsewhere, often speaking Spanish or Portuguese.
+  Answer in their language. Save origin_country, visa_type, arrival_date, employer_name and language with remember.
+  If they are moving (not visiting), also open_case first_30_days with what you know, and open_case deposit_interest
+  or rent_increase_check only if they mention a lease. Immigration points are information with sources; recommend an
+  immigration attorney for anything about status. Short visits: skip AR-11 and DMV unless they stay 30 days or more.
+actions:
+  - id: i94
+    tool: open_url_prefilled
+    title: Download your I-94 and check the end date
+    needs_approval: true
+    due: today
+    payload:
+      url: https://i94.cbp.dhs.gov/
+      search_for: "Use your passport details. Check: class of admission {{visa_type}}, and the admit-until date."
+  - id: ar11
+    tool: prepare_form
+    title: Prepare your USCIS address report (AR-11) for {{sf_address}}
+    needs_approval: true
+    unless: visa_waiver
+    due: moved_in_date + 10 days
+    payload:
+      form_name: USCIS Form AR-11, change of address (online, free)
+      official_url: https://www.uscis.gov/ar-11
+      fields:
+        Name: "{{profile.name}}"
+        New address: "{{sf_address}}"
+        Date you moved in: "{{moved_in_date}}"
+        Status: "{{visa_type}}"
+        Pending USCIS cases: "List each receipt number on the form (Handled does not store them)"
+      instructions: Changing your address with the Post Office does not update USCIS. Information, not legal advice; confirm with USCIS or an immigration attorney.
+  - id: ssn
+    tool: prepare_form
+    title: Get ready for your Social Security number appointment
+    needs_approval: true
+    when: work_authorized
+    due: arrival_date + 10 days
+    payload:
+      form_name: Social Security number application (in person, free)
+      official_url: https://www.ssa.gov/ssnvisa/
+      fields:
+        Bring (originals only): "Passport, I-94 printout, work authorization ({{visa_type}} approval notice or EAD), offer letter from {{employer_name}}"
+        Earliest suggested date: "{{arrival_date}} + about 10 days, so SSA can verify your records"
+        Your US address: "{{sf_address}}"
+      instructions: Book or walk in at an SF Social Security office. Your employer can onboard you before the card arrives; give them the number when it comes.
+  - id: library_card
+    tool: open_url_prefilled
+    title: Get a free SF Public Library card (also unlocks free museum passes)
+    needs_approval: true
+    due: today + 7 days
+    payload:
+      url: https://sfpl.org/
+  - id: dmv
+    tool: open_url_prefilled
+    title: Book a California DMV appointment early (they book up weeks out)
+    needs_approval: true
+    when: will_drive
+    due: moved_in_date + 10 days
+    payload:
+      url: https://www.dmv.ca.gov/portal/
+      search_for: "Driver license application, first-time CA applicant. Bring passport, I-94, proof of SF address."
+deadlines:
+  - title: Report your SF address to USCIS (AR-11)
+    due: moved_in_date + 10 days
+    rule: uscis_ar11
+    unless: visa_waiver
+    remind_days_before: [5, 1]
+  - title: Apply for your Social Security number (about 10 days after arrival)
+    due: arrival_date + 10 days
+    rule: ssa_ssn_noncitizen
+    when: work_authorized
+    remind_days_before: [1]
+  - title: Apply for a California driver license (10 days after becoming a resident)
+    due: moved_in_date + 10 days
+    rule: ca_dmv_new_resident
+    when: will_drive
+    remind_days_before: [3]
+  - title: Check your I-94 end date
+    due: today
+    rule: cbp_i94
+followups:
+  - after_action: ssn
+    wait: 14 days
+    check: Did your Social Security card arrive? Give the number to {{employer_name}} payroll.
+    resolved_when: SSN received and given to payroll
+sample: |
+  Nota de voz: "Hola, acabo de llegar a San Francisco desde Montevideo. Llegué el 20 de octubre con visa O-1 para trabajar en Flux Labs. Me mudé ayer a 1000 Guerrero St. No voy a manejar por ahora."

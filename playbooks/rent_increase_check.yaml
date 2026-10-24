@@ -5,7 +5,7 @@ pitch: Checks your building's year built in City data, the Rent Board's allowabl
 depth: standard
 triggers:
   documents: [rent increase notice, notice of change in terms of tenancy]
-  phrases: [rent increase, raising my rent, new rent, rent going up]
+  phrases: [rent increase, raising my rent, new rent, rent going up, aumento de renta, subieron la renta, aumento do aluguel]
 required_fields:
   rental_address: { type: string, label: Rental address, get: extract or profile, profile: address }
   current_rent: { type: number, label: Current monthly rent, get: extract or ask, profile: renter.monthly_rent }

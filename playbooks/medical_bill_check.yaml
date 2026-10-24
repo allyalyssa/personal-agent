@@ -5,7 +5,7 @@ pitch: Compares the bill with your insurer's statement, flags duplicates, calls 
 depth: deep
 triggers:
   documents: [medical bill, hospital statement, explanation of benefits, EOB]
-  phrases: [medical bill, hospital bill, EOB, billed twice, surprise bill]
+  phrases: [medical bill, hospital bill, EOB, billed twice, surprise bill, factura médica, cuenta del hospital, conta do hospital]
 required_fields:
   provider_name: { type: string, label: Provider or hospital, get: extract or ask }
   billing_email: { type: email, label: Billing office email, get: extract or ask, optional: true }

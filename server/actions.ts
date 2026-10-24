@@ -1,7 +1,7 @@
 import { db, json } from './db.ts'
 import { now, evalFormula } from './clock.ts'
 import { updateCase, logEvent, scheduleFollowups, getProfile } from './engine.ts'
-import { placeCall } from './calls.ts'
+import { placeCall, finishCall } from './calls.ts'
 
 export async function sendEmail(p: { to: string, subject: string, body: string, cc?: string }) {
   if (!process.env.RESEND_API_KEY) throw new Error('Email is not configured: set RESEND_API_KEY and EMAIL_FROM in .env')
@@ -58,10 +58,29 @@ function prefillUrl(p: { url: string, params?: Record<string, string> }) {
   return u.toString()
 }
 
+// With no paid provider configured, Handled still does all the drafting and hands the last tap
+// to the phone: the mail app, the messages app, or the dialer with the script on screen.
+function handoff(tool: string, p: Record<string, any>) {
+  if (tool === 'send_email' && !process.env.RESEND_API_KEY) {
+    const q = new URLSearchParams({ subject: p.subject ?? '', body: p.body ?? '' })
+    if (p.cc) q.set('cc', p.cc)
+    return { handoff: 'email', url: `mailto:${encodeURIComponent(p.to)}?${q.toString().replace(/\+/g, '%20')}` }
+  }
+  if (tool === 'send_sms' && !process.env.TWILIO_ACCOUNT_SID) return { handoff: 'sms', url: `sms:${p.to}?&body=${encodeURIComponent(p.body ?? '')}` }
+  if (tool === 'place_call' && !process.env.VAPI_API_KEY) return { handoff: 'call', url: `tel:${p.to}` }
+  return null
+}
+
 export async function executeAction(id: number, edited?: Record<string, any>) {
   const a = db.prepare('select * from actions where id = ?').get(id) as any
   if (a.status !== 'proposed') throw new Error(`Action ${id} is ${a.status}`)
   const payload = { ...json(a.payload, {} as Record<string, any>), ...(edited ?? {}) }
+  const manual = handoff(a.tool, payload)
+  if (manual) {
+    db.prepare(`update actions set status = 'handoff', payload = ?, result = ? where id = ?`).run(JSON.stringify(payload), JSON.stringify(manual), id)
+    logEvent(a.case_id, 'handoff', `Ready on your phone: ${a.title}`, manual)
+    return { ok: true, result: manual }
+  }
   db.prepare(`update actions set status = 'running', payload = ? where id = ?`).run(JSON.stringify(payload), id)
 
   let result: any
@@ -93,6 +112,19 @@ export async function executeAction(id: number, edited?: Record<string, any>) {
   if (payload.waits_on_other_party) updateCase(a.case_id, { status: 'waiting_on_other_party' })
   if (a.step) scheduleFollowups(a.case_id, a.step)
   return { ok: true, result }
+}
+
+// The user did the last step themself (sent the email, made the call). For a call, what they
+// heard becomes the outcome, exactly as an automated call's transcript would.
+export async function completeAction(id: number, notes?: string) {
+  const a = db.prepare('select * from actions where id = ?').get(id) as any
+  const payload = json(a.payload, {} as Record<string, any>)
+  const result = { ...json(a.result, {}), completed_by: 'you', notes: notes ?? null }
+  db.prepare(`update actions set status = 'done', result = ?, done_at = ? where id = ?`).run(JSON.stringify(result), now().toISOString(), id)
+  logEvent(a.case_id, 'action', `Done: ${a.title}`, { tool: a.tool, by: 'you', notes })
+  if (payload.waits_on_other_party) updateCase(a.case_id, { status: 'waiting_on_other_party' })
+  if (a.step) scheduleFollowups(a.case_id, a.step)
+  if (a.tool === 'place_call' && notes) await finishCall(a.case_id, id, { id: null, endedReason: 'you made the call', transcript: `Notes from ${getProfile().name}: ${notes}` })
 }
 
 export function rejectAction(id: number) {

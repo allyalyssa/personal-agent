@@ -1,12 +1,12 @@
 import type Anthropic from '@anthropic-ai/sdk'
-import { client, MODEL, EFFORT, FALLBACK, structured, imageBlock } from './llm.ts'
-import { allPlaybooks, playbook } from './playbooks.ts'
+import { client, MODEL, EFFORT, FALLBACK, structured, imageBlock, hasClaude, languageName } from './llm.ts'
+import { allPlaybooks, playbook, type Playbook } from './playbooks.ts'
 import { rule } from './rules.ts'
 import { computeFns } from './compute.ts'
 import { queryDatasf } from './datasf.ts'
 import { today } from './clock.ts'
 import { redact, redactDeep } from './redact.ts'
-import { getCase, updateCase, logEvent, setFields, prefillFromProfile, missingFields, plan, getProfile, insertAction, context, caseView } from './engine.ts'
+import { getCase, updateCase, logEvent, setFields, prefillFromProfile, missingFields, plan, getProfile, insertAction, context, caseView, remember, createCase, coerceAnswers } from './engine.ts'
 import { db } from './db.ts'
 
 type Tool = Anthropic.Beta.BetaTool
@@ -41,11 +41,12 @@ const tools: Tool[] = [
   },
   {
     name: 'query_datasf',
-    description: 'Query live San Francisco open data for an address. assessor: year built, units, use (for rent control). street_sweeping: sweeping schedule for that block. temporary_no_parking: posted no-parking permits active on a date.',
+    description: 'Query live San Francisco open data for an address. assessor: year built, units, use (for rent control). street_sweeping: sweeping schedule for that block. temporary_no_parking: posted no-parking permits active on a date. nearby_311: 311 reports within 150 m in the last 60 days (optionally filtered by keyword such as streetlight, pothole, graffiti, dumping), with how fast the City closed them.',
     input_schema: {
       type: 'object',
       properties: {
-        dataset: { type: 'string', enum: ['assessor', 'street_sweeping', 'temporary_no_parking'] },
+        dataset: { type: 'string', enum: ['assessor', 'street_sweeping', 'temporary_no_parking', 'nearby_311'] },
+        keyword: { type: 'string', description: 'For nearby_311' },
         address: { type: 'string', description: 'Street address in San Francisco, e.g. "1000 Guerrero St"' },
         date: { type: 'string', description: 'YYYY-MM-DD, for temporary_no_parking' }
       },
@@ -90,6 +91,29 @@ const tools: Tool[] = [
     }
   },
   {
+    name: 'remember',
+    description: 'Save a durable fact about the user to their profile memory, so future playbooks prefill it instead of asking. Use snake_case keys that match playbook field names when one fits (e.g. visa_type, employer_name, hr_email, arrival_date, landlord_email). Never save SSNs, card or full ID numbers.',
+    input_schema: {
+      type: 'object',
+      properties: { key: { type: 'string' }, value: {}, why: { type: 'string' } },
+      required: ['key', 'value']
+    }
+  },
+  {
+    name: 'open_case',
+    description: 'Open another case for an obligation this capture revealed, handled by its own playbook in the background. Pass the facts you already know so it does not ask again.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        playbook_id: { type: 'string' },
+        title: { type: 'string' },
+        facts: { type: 'string', description: 'What you know that this playbook needs, in plain text' },
+        reason: { type: 'string' }
+      },
+      required: ['playbook_id', 'title', 'facts', 'reason']
+    }
+  },
+  {
     name: 'propose_action',
     description: 'Propose an extra action the playbook does not cover. It goes to the user for approval like every other action. Tools: send_email {to, subject, body}, send_sms {to, body}, place_call {to, contact_name, goal, opener, facts[], must_not[], ask[]}, create_calendar_event {title, date, note}, prepare_form {form_name, official_url, fields{}, instructions}, open_url_prefilled {url, params{}}, schedule_followup {wait, check}.',
     input_schema: {
@@ -125,6 +149,8 @@ Hard rules:
 - Never store or repeat full SSNs, card numbers, government ID numbers, or full account numbers. Last 4 digits at most.
 - Government and legal forms are prepared, never submitted. The user presses the final button.
 - Keep messages short and plain. The user is on a phone.
+- Write everything the user reads (your messages, ask_user questions, case titles) in the user's language, given in each turn. Anything that goes to other people (emails, texts, call scripts, forms) stays in English unless the recipient's language is known. For each such draft, call revise_action with {"for_you": "<one or two lines in the user's language saying what it says>"}.
+- Offload as much as you can. When you learn a durable fact about the user (visa type, employer, landlord, family member, car, language, arrival date), save it with remember so no one asks again. When the capture reveals other obligations the user likely has (for example a newcomer who also rents and has a car), open each with open_case instead of only mentioning it.
 
 Playbooks:
 ${catalog()}`
@@ -205,6 +231,21 @@ async function runTool(caseId: string, name: string, input: any): Promise<{ resu
     const payload = { ...JSON.parse(a.payload), ...redactDeep(input.changes) }
     db.prepare('update actions set payload = ? where id = ?').run(JSON.stringify(payload), input.action_id)
     return { result: { ok: true, payload } }
+  }
+  if (name === 'remember') {
+    remember(input.key, input.value, getCase(caseId).title)
+    logEvent(caseId, 'memory', `Remembered ${input.key}`, { why: input.why })
+    return { result: { ok: true } }
+  }
+  if (name === 'open_case') {
+    const opened = db.prepare(`select count(*) n from events where case_id = ? and kind = 'opened_case'`).get(caseId) as any
+    if (opened.n >= 6) return { result: { error: 'Already opened 6 cases from this capture' } }
+    playbook(input.playbook_id)
+    const id = createCase(input.title)
+    logEvent(caseId, 'opened_case', `Opened: ${input.title}`, { case_id: id, reason: input.reason })
+    logEvent(id, 'route', `Opened from "${getCase(caseId).title}"`, { reason: input.reason })
+    intake(id, { text: `Opened by Handled from another case. Use playbook ${input.playbook_id}. Known facts: ${input.facts}`, source: 'another case' }).catch(e => console.error('open_case', e))
+    return { result: { ok: true, case_id: id } }
   }
   if (name === 'propose_action') {
     const id = insertAction(caseId, { tool: input.tool, title: input.title, payload: input.payload, due: input.due, needs_approval: true }, context(getCase(caseId)))
@@ -316,8 +357,9 @@ export async function extractDocument(caseId: string, files: string[]) {
 }
 
 export async function intake(caseId: string, input: { text?: string, files?: string[], source: string }) {
-  const parts: string[] = [`Today is ${today()}. Source: ${input.source}.`]
+  if (!hasClaude()) return intakeOffline(caseId, input.text ?? '')
   const profile = getProfile()
+  const parts: string[] = [`Today is ${today()}. Source: ${input.source}. User's language: ${languageName(profile.language)}.`]
   parts.push(`User profile: ${JSON.stringify(redactDeep(profile))}`)
   if (input.files?.length) {
     updateCase(caseId, { busy: 1 })
@@ -334,8 +376,14 @@ export async function intake(caseId: string, input: { text?: string, files?: str
   return runAgent(caseId, [{ type: 'text', text: parts.join('\n\n') }])
 }
 
-export async function reply(caseId: string, input: { text?: string, files?: string[] }) {
-  const parts: string[] = [`Today is ${today()}.`]
+export async function reply(caseId: string, input: { text?: string, files?: string[], answers?: Record<string, any> }) {
+  if (input.answers) {
+    setFields(caseId, coerceAnswers(getCase(caseId).playbook, input.answers))
+    logEvent(caseId, 'user', `Answered ${Object.keys(input.answers).join(', ')}`)
+  }
+  if (!hasClaude()) return replyOffline(caseId)
+  const parts: string[] = [`Today is ${today()}. User's language: ${languageName(getProfile().language)}.`]
+  if (input.answers) parts.push(`User answered: ${JSON.stringify(redactDeep(input.answers))}. These are saved with set_fields already.`)
   if (input.files?.length) {
     const doc = await extractDocument(caseId, input.files)
     parts.push(`New document (extracted and redacted):\n${JSON.stringify(doc, null, 2)}`)
@@ -343,4 +391,54 @@ export async function reply(caseId: string, input: { text?: string, files?: stri
   if (input.text) parts.push(`User replied:\n${redact(input.text)}`)
   logEvent(caseId, 'user', input.text ? redact(input.text) : 'Added a document')
   return runAgent(caseId, [{ type: 'text', text: parts.join('\n\n') }])
+}
+
+// No-key mode: pick the playbook whose trigger phrases match best, prefill from the profile,
+// and ask for the rest with a form. The engine does everything else the same way.
+export function routeByTriggers(text: string): Playbook | null {
+  const t = text.toLowerCase()
+  let best: Playbook | null = null
+  let bestScore = 0
+  for (const p of allPlaybooks()) {
+    const score = [...p.triggers.phrases, ...p.triggers.documents].map(String).filter(ph => t.includes(ph.toLowerCase())).reduce((s, ph) => s + ph.split(' ').length, 0)
+    if (score > bestScore) {
+      best = p
+      bestScore = score
+    }
+  }
+  return best
+}
+
+function askMissing(caseId: string) {
+  const c = getCase(caseId)
+  const missing = missingFields(c)
+  if (missing.length) {
+    updateCase(caseId, { questions: missing.map(m => ({ field: m.field, question: m.label })) })
+    logEvent(caseId, 'question', `Needs: ${missing.map(m => m.label).join(', ')}`)
+    return
+  }
+  updateCase(caseId, { questions: null })
+  const v = plan(caseId)
+  const lines = v.deadlines.slice(0, 6).map((d: any) => `${d.due_at}: ${d.title}`)
+  updateCase(caseId, { summary: `Planned ${v.actions.filter((x: any) => x.status === 'proposed').length} actions.${lines.length ? '\n' + lines.join('\n') : ''}` })
+}
+
+export function intakeOffline(caseId: string, text: string) {
+  logEvent(caseId, 'user', redact(text))
+  const p = routeByTriggers(text)
+  if (!p) {
+    updateCase(caseId, { title: redact(text).slice(0, 60) || 'New capture', summary: 'No playbook matched these words. Pick one from Playbooks, or add an Anthropic key so Handled can read free-form text and photos.' })
+    return caseView(caseId)
+  }
+  updateCase(caseId, { playbook: p.id, pack: p.pack, title: p.title })
+  prefillFromProfile(caseId)
+  logEvent(caseId, 'route', `Matched playbook by keywords: ${p.title}`)
+  askMissing(caseId)
+  return caseView(caseId)
+}
+
+export function replyOffline(caseId: string) {
+  const c = getCase(caseId)
+  if (c.playbook) askMissing(caseId)
+  return caseView(caseId)
 }

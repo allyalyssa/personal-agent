@@ -1,0 +1,63 @@
+{
+  "persona": "Puentes fellow who just arrived from Montevideo for a new job",
+  "name": "Valentina Rodríguez",
+  "email": "valentina@example.com",
+  "phone": "+15555550110",
+  "language": "es",
+  "address": "1000 Guerrero St, Apt 5, San Francisco, CA 94110",
+  "neighborhood": "Mission",
+  "moved_to_sf": "2026-10-21",
+  "renter": {
+    "landlord_name": "Valencia Street Properties",
+    "landlord_email": "landlord@example.com",
+    "move_in_date": "2026-10-21",
+    "deposit_amount": 3200,
+    "monthly_rent": 3200
+  },
+  "work": {
+    "employer": "Flux Labs",
+    "hr_email": "people@example.com",
+    "visa": "O-1"
+  },
+  "car": null,
+  "family": [
+    {
+      "name": "Ana Rodríguez",
+      "relation": "mother",
+      "phone": "+59895550111",
+      "address": "Montevideo, Uruguay",
+      "paratransit_eligible": false
+    }
+  ],
+  "business": null,
+  "library_card": false,
+  "memory": {
+    "origin_country": {
+      "value": "Uruguay",
+      "from": "demo profile",
+      "at": "2026-10-21"
+    },
+    "arrival_date": {
+      "value": "2026-10-20",
+      "from": "demo profile",
+      "at": "2026-10-21"
+    }
+  },
+  "contacts": [
+    {
+      "name": "Mission Auto Glass (demo line)",
+      "kind": "auto_glass",
+      "phone": "+15555550102"
+    },
+    {
+      "name": "SF Paratransit reservations (demo line)",
+      "kind": "paratransit",
+      "phone": "+15555550103"
+    },
+    {
+      "name": "Hospital billing office (demo line)",
+      "kind": "medical_billing",
+      "phone": "+15555550104"
+    }
+  ]
+}

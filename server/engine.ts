@@ -119,11 +119,57 @@ export function missingFields(c: Case) {
     .map(([k, f]) => ({ field: k, label: f.label, get: f.get }))
 }
 
+function setPath(obj: any, path: string, value: any) {
+  const keys = path.split('.')
+  let o = obj
+  for (const [i, k] of keys.slice(0, -1).entries()) {
+    if (o[k] == null) o[k] = /^\d+$/.test(keys[i + 1]) ? [] : {}
+    o = o[k]
+  }
+  o[keys.at(-1)!] = value
+}
+
+// Anything the user tells Handled about themself is kept, so no playbook asks twice.
+// Facts with a profile path go to that path; everything else grows profile.memory, one key per fact.
+export function remember(key: string, value: any, from: string) {
+  const profile = getProfile()
+  profile.memory ??= {}
+  profile.memory[key] = { value: redactDeep(value), from, at: now().toISOString().slice(0, 10) }
+  setProfile(profile)
+}
+
 export function setFields(caseId: string, fields: Record<string, any>) {
   const c = getCase(caseId)
-  const merged = { ...c.fields, ...redactDeep(fields) }
+  const clean = redactDeep(fields)
+  const merged = { ...c.fields, ...clean }
   updateCase(caseId, { fields: merged })
+  if (c.playbook) {
+    const p = playbook(c.playbook)
+    const profile = getProfile()
+    let changed = false
+    for (const [k, v] of Object.entries(clean)) {
+      const f = p.required_fields[k]
+      if (!f?.profile || v == null || v === '' || get(profile, f.profile) != null) continue
+      setPath(profile, f.profile, v)
+      changed = true
+    }
+    if (changed) setProfile(profile)
+  }
   return merged
+}
+
+// Form answers arrive as text; turn them into the field's type.
+export function coerceAnswers(playbookId: string | null, answers: Record<string, any>) {
+  if (!playbookId) return answers
+  const fields = playbook(playbookId).required_fields
+  return Object.fromEntries(Object.entries(answers).map(([k, v]) => {
+    const t = fields[k]?.type
+    if (typeof v !== 'string') return [k, v]
+    if (t === 'number') return [k, Number(v.replace(/[$,\s]/g, ''))]
+    if (t === 'boolean') return [k, /^(y|yes|s[ií]|sim|true|1)/i.test(v.trim())]
+    if (t === 'list') return [k, v.split(/,|\n/).map(s => s.trim()).filter(Boolean)]
+    return [k, v.trim()]
+  }))
 }
 
 export function prefillFromProfile(caseId: string) {
@@ -134,6 +180,7 @@ export function prefillFromProfile(caseId: string) {
   for (const [k, f] of Object.entries(p.required_fields)) {
     if (fields[k] !== undefined) continue
     if (f.profile && get(profile, f.profile) != null) fields[k] = get(profile, f.profile)
+    else if (profile.memory?.[k]?.value != null) fields[k] = profile.memory[k].value
     else if (f.default !== undefined) fields[k] = f.default
   }
   updateCase(caseId, { fields })

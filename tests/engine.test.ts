@@ -12,7 +12,7 @@ const { readFileSync } = await import('node:fs')
 
 loadRules()
 loadPlaybooks()
-setProfile(JSON.parse(readFileSync('profile.example.json', 'utf8')))
+setProfile(JSON.parse(readFileSync('profiles/jordan.json', 'utf8')))
 
 test('every rule has a source and a status', () => {
   for (const r of allRules()) {

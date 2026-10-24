@@ -5,7 +5,7 @@ pitch: A dated written request, a follow-up, then a DBI complaint ready to file.
 depth: standard
 triggers:
   documents: [photo of mold, leak, broken heater, pest evidence]
-  phrases: [landlord won't fix, repair, no heat, leak, mold, broken, pests, cockroaches, mice]
+  phrases: [landlord won't fix, repair, no heat, leak, mold, broken, pests, cockroaches, mice, no arregla, humedad, goteras, vazamento]
 required_fields:
   problem: { type: string, label: What needs repair, get: extract or ask }
   first_noticed: { type: date, label: When you first noticed it, get: ask }

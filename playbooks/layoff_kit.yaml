@@ -5,7 +5,7 @@ pitch: One voice note becomes every deadline that starts the day you are laid of
 depth: deep
 triggers:
   documents: [termination letter, separation agreement, severance agreement, layoff notice]
-  phrases: [laid off, let go, terminated, last day, severance, RIF, my job was eliminated]
+  phrases: [laid off, let go, terminated, last day, severance, RIF, my job was eliminated, me despidieron, me echaron, perdí mi trabajo, fui despedido, fui demitido, perdi meu emprego]
 required_fields:
   employer_name: { type: string, label: Employer, get: extract or ask, profile: work.employer }
   hr_email: { type: email, label: HR email, get: extract or ask, profile: work.hr_email }

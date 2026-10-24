@@ -5,7 +5,7 @@ pitch: Explains why from City sweeping and no-parking data for that block, links
 depth: standard
 triggers:
   documents: [tow notice, AutoReturn notice, citation]
-  phrases: [towed, my car is gone, car got towed, AutoReturn]
+  phrases: [towed, my car is gone, car got towed, AutoReturn, se llevaron mi auto, grúa, guincharam meu carro]
 required_fields:
   parked_address: { type: string, label: Where the car was parked (street address), get: extract or ask }
   tow_date: { type: date, label: Date of tow, get: extract or ask }

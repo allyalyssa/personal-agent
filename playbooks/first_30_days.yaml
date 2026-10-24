@@ -5,7 +5,7 @@ pitch: A checklist with real deadlines (DMV license and registration, voter regi
 depth: standard
 triggers:
   documents: [new lease, moving confirmation]
-  phrases: [just moved to SF, new to San Francisco, moved here, newcomer, relocating]
+  phrases: [just moved to SF, new to San Francisco, moved here, newcomer, relocating, recién llegado, recém-chegado]
 required_fields:
   move_in_date: { type: date, label: Date you became an SF resident, get: extract or ask, profile: moved_to_sf }
   has_car: { type: boolean, label: Did you bring a car?, get: ask }
