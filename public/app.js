@@ -391,6 +391,20 @@ function eventLine(e) {
 
 const MEAL = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', snack: 'Snack' }
 
+function recipeBlock(r) {
+  const lines = r.ingredients.map(i => [i.amount, i.item].filter(Boolean).join(' '))
+  const copy = [r.name, r.url, '', ...lines.map(l => `- ${l}`)].join('\n')
+  return `<div class="recipe">
+    <div class="small"><a href="${esc(safeUrl(r.url))}" target="_blank" rel="noopener"><strong>${esc(r.name)}</strong></a>
+      <span class="muted">${esc(r.servings)} serving${r.servings === 1 ? '' : 's'} · ${esc(r.minutes)} min · ★${esc(r.rating)} (${esc(r.reviews)})</span></div>
+    <div class="row small" style="margin:4px 0">${[...r.cuisines, r.main].map(t => `<span class="chip">${esc(t.replace('_', ' '))}</span>`).join('')}
+      ${r.kcal != null ? `<span class="chip">${esc(r.kcal)} kcal</span>` : ''}<span class="chip">Protein ${esc(r.protein_g)} g</span></div>
+    <details><summary class="small">Ingredients for you</summary><ul class="small">${lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul></details>
+    <div class="row"><button class="link small" data-copy="${esc(copy)}">Copy ingredients and link</button>
+      <span class="stars" aria-label="Rate this recipe">${[1, 2, 3, 4, 5].map(n => `<button class="link small" data-rate="${esc(r.id)}" data-stars="${n}" aria-label="${n} star${n === 1 ? '' : 's'}">☆</button>`).join('')}</span></div>
+  </div>`
+}
+
 function foodCard(c) {
   const tg = c.computed.targets
   const p = c.computed.plan
@@ -414,7 +428,8 @@ function foodCard(c) {
     <h2>Today's meals</h2>
     <div class="stack">${p.meals.map(m => `
       <div class="card meal">
-        <div class="spread"><strong>${esc(MEAL[m.meal])}</strong><span class="muted small">${esc(m.time)}</span></div>
+        <div class="spread"><strong>${esc(MEAL[m.meal])}</strong><span class="muted small">${esc(m.time)}${m.kcal_target ? ` · about ${esc(m.kcal_target)} kcal` : ''}</span></div>
+        ${m.recipe ? recipeBlock(m.recipe) : ''}
         ${m.items.map(i => {
           const deal = p.shopping.find(s => s.id === i.id)?.deal
           return `<div class="meal-item">
@@ -586,6 +601,12 @@ async function renderCase(id, auto = false) {
   view.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => {
     navigator.clipboard.writeText(b.dataset.copy)
     toast('Copied')
+  }))
+  view.querySelectorAll('[data-rate]').forEach(b => b.addEventListener('click', async () => {
+    b.disabled = true
+    await api(`/api/cases/${id}/rate`, { recipe: Number(b.dataset.rate), stars: Number(b.dataset.stars) })
+    toast(Number(b.dataset.stars) >= 4 ? 'Got it. More like this, and still something new now and then.' : 'Got it. Handled will try other kinds of dishes.')
+    renderCase(id)
   }))
   view.querySelectorAll('[data-food]').forEach(b => b.addEventListener('click', async () => {
     b.disabled = true

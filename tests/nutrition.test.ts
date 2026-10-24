@@ -5,7 +5,7 @@ process.env.HANDLED_DB = ':memory:'
 delete process.env.ANTHROPIC_API_KEY
 const { loadRules } = await import('../server/rules.ts')
 const { loadPlaybooks } = await import('../server/playbooks.ts')
-const { nutritionTargets, mealPlan, parseHeight, parseWeight, parseTimes, allowedFoods } = await import('../server/nutrition.ts')
+const { nutritionTargets, mealPlan, parseHeight, parseWeight, parseTimes, allowedFoods, allowedRecipes, amount } = await import('../server/nutrition.ts')
 const { routeByTriggers } = await import('../server/agent.ts')
 const { createCase, updateCase, setFields, plan, setProfile, prefillFromProfile } = await import('../server/engine.ts')
 const { readFileSync } = await import('node:fs')
@@ -90,10 +90,10 @@ test('allergies, diet and celiac remove foods', () => {
   assert.ok(ids.includes('lentils'))
 })
 
-test('meal plan pairs iron with vitamin C and prefers nearby deals', () => {
+test('without a fitting recipe, the plate plan pairs iron with vitamin C and prefers nearby deals', () => {
   const t: any = nutritionTargets({ age: 29, sex: 'female', height: '165 cm', weight: '62 kg', exercise: 'lift 3x a week', goal: 'lose', conditions: 'anemia' })
   const nearby = { deals: { black_beans: [{ item: 'Black Beans 15 oz', price: 0.99, store: 'Safeway', walk_minutes: 6, valid_to: '2026-10-28T06:59:59+00:00' }] }, stores: [], markets: [] }
-  const p: any = mealPlan({ targets: t, nearby, likes: 'eggs', meal_times: '8am, 1pm, 8pm' })
+  const p: any = mealPlan({ targets: t, nearby, likes: 'eggs', meal_times: '8am, 1pm, 8pm', recipes: [] })
   const all = p.meals.flatMap((m: any) => m.items.map((i: any) => i.id))
   assert.ok(all.includes('black_beans'))
   assert.ok(all.includes('eggs'))
@@ -102,6 +102,36 @@ test('meal plan pairs iron with vitamin C and prefers nearby deals', () => {
   assert.ok(Math.abs(kcal.have - t.calories) / t.calories < 0.15, `${kcal.have} vs ${t.calories}`)
   assert.equal(p.first_expiry.date, '2026-10-28')
   assert.match(p.shopping_text, /Safeway \$0\.99 \(6 min walk\)/)
+})
+
+test('each meal gets a recipe sized to its share of the day', () => {
+  const t: any = nutritionTargets({ age: 29, sex: 'female', height: '165 cm', weight: '62 kg', exercise: 'lift 3x a week', goal: 'lose', conditions: 'anemia' })
+  const p: any = mealPlan({ targets: t, nearby: {}, meal_times: '8am, 1pm, 7pm', max_cook_minutes: 45 })
+  const ids = p.meals.map((m: any) => m.recipe?.id)
+  assert.ok(ids.every(Boolean), JSON.stringify(p.meals.map((m: any) => [m.meal, m.recipe?.name])))
+  assert.equal(new Set(ids).size, ids.length)
+  for (const m of p.meals) assert.ok(Math.abs(m.recipe.kcal - m.kcal_target) <= m.kcal_target * 0.25, `${m.meal} ${m.recipe.kcal} vs ${m.kcal_target}`)
+  assert.deepEqual(p.meals.map((m: any) => m.kcal_target), [400, 560, 480, 160])
+  assert.ok(p.meals.every((m: any) => m.recipe.minutes <= 45 && m.recipe.url.startsWith('https://www.food.com/recipe/')))
+  assert.deepEqual(p.coverage.map((c: any) => c.key), ['kcal', 'protein', 'fiber'])
+})
+
+test('recipes respect diet, allergies and celiac line by line', () => {
+  const lines = (args: any) => allowedRecipes(args).flatMap((r: any) => r.ingredients.map((i: any) => i.line.toLowerCase()))
+  assert.ok(!lines({ diet: 'vegetarian', max_cook_minutes: 600 }).some((l: string) => /chicken|beef|pork|bacon|shrimp|salmon/.test(l)))
+  assert.ok(!lines({ allergies: 'peanuts', max_cook_minutes: 600 }).some((l: string) => l.includes('peanut')))
+  const celiac = lines({ conditions: 'celiac', max_cook_minutes: 600 })
+  assert.ok(!celiac.some((l: string) => /\bflour\b/.test(l) && !/rice flour|almond flour|coconut flour|corn flour|gluten.free/.test(l)))
+  assert.ok(allowedRecipes({ allergies: 'shellfish', max_cook_minutes: 600 }).some((r: any) => r.main === 'seafood' && /salmon/i.test(r.name)))
+  assert.ok(allowedRecipes({ max_cook_minutes: 20 }).every((r: any) => r.minutes <= 20))
+})
+
+test('amounts for one serving read like a cook would say them', () => {
+  assert.equal(amount({ line: '', qty: 0.167, unit: 'lb', item: 'sausage' }, 1), '2 2/3 oz')
+  assert.equal(amount({ line: '', qty: 0.05, unit: 'cup', item: 'water' }, 1), '2 1/3 tsp')
+  assert.equal(amount({ line: '', qty: 0.75, unit: null, item: 'eggs' }, 2), '1 1/2')
+  assert.equal(amount({ line: '', qty: 0.333, unit: 'tbsp', item: 'oil' }, 1), '1 tsp')
+  assert.equal(amount({ line: '', qty: null, unit: null, item: 'salt' }, 1), '')
 })
 
 test('keyword mode reads body facts from a voice note', async () => {

@@ -437,6 +437,10 @@ main { max-width: 680px; margin: 0 auto; padding: 16px; outline: none; }
 .meal-item { display: flex; justify-content: space-between; gap: 8px; align-items: center; padding: 6px 0; border-top: 1px solid var(--line); }
 .meal-item:first-of-type { border-top: 0; }
 .meal-item .row { gap: 10px; flex-shrink: 0; }
+.recipe { padding: 6px 0; }
+.recipe > .row:last-child { justify-content: space-between; }
+.recipe details ul { margin: 4px 0; padding-left: 18px; }
+.stars button { font-size: 1.1rem; padding: 0 2px; }
 .bar-row { display: grid; grid-template-columns: 7.5em 1fr auto; gap: 8px; align-items: center; margin-top: 5px; }
 .bar { height: 7px; border-radius: 4px; background: var(--line); overflow: hidden; }
 .bar > div { height: 100%; border-radius: 4px; }

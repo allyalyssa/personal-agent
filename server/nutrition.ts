@@ -1,10 +1,16 @@
 import { readFileSync } from 'node:fs'
 import { rule } from './rules.ts'
 import { today } from './clock.ts'
+import { tasteSampler, rng, ratingCount } from './taste.ts'
 
 export type Food = { id: string, name: string, serving: string, search: string, match: string[], exclude: string[], roles: string[], diet: string[], allergens: string[], cook_minutes: number, n: Record<string, number> }
 
 export const FOODS = JSON.parse(readFileSync('nutrition/foods.json', 'utf8')) as { source: string, source_url: string, units: Record<string, string>, foods: Food[] }
+
+export type Ingredient = { line: string, qty: number | null, unit: string | null, item: string, size?: string }
+export type Recipe = { id: number, name: string, dish: string, url: string, meal: string, category: string, cuisines: string[], main: string, tags: string[], minutes: number | null, servings: number, rating: number, reviews: number, score: number, per_serving: Record<string, number>, ingredients: Ingredient[] }
+
+export const RECIPES = JSON.parse(readFileSync('nutrition/recipes.json', 'utf8')) as { source: string, source_url: string, license: string, recipes: Recipe[] }
 
 const round = (n: number, step = 1) => Number((Math.round(n / step) * step).toFixed(2))
 
@@ -412,23 +418,79 @@ const SLOTS: Record<string, string[]> = {
   snack: ['snack']
 }
 
-export function allowedFoods(args: { diet?: any, allergies?: any, conditions?: any, dislikes?: any, max_cook_minutes?: any }) {
+type Limits = { diet?: any, allergies?: any, conditions?: any, dislikes?: any, max_cook_minutes?: any }
+
+function limits(args: Limits) {
   const diet = list(args.diet).join(' ')
   const allergies = list(args.allergies).join(' ')
   const conditions = parseConditions(args.conditions)
   const dislikes = list(args.dislikes)
-  const maxCook = Number(args.max_cook_minutes) || 30
   const blocked = new Set<string>()
   if (/peanut|maní|mani|amendoim/.test(allergies)) blocked.add('peanut')
   if (/(?<!pea)nut|almond|cashew|walnut|pecan|pistachio|hazelnut|nueces|nuez|almendra|castanha|nozes/.test(allergies)) blocked.add('tree_nut')
   if (/egg|huevo|ovo/.test(allergies)) blocked.add('egg')
   if (/dairy|milk|lact|lácteo|lacteo|leche|leite/.test(allergies + diet)) blocked.add('dairy')
   if (/soy|soja/.test(allergies)) blocked.add('soy')
-  if (/fish|pescado|peixe/.test(allergies)) blocked.add('fish')
+  if (/(?<!shell)fish|pescado|peixe/.test(allergies)) blocked.add('fish')
+  if (/shellfish|shrimp|prawn|crab|lobster|marisco|camar[oã]o/.test(allergies)) blocked.add('shellfish')
   if (/gluten|wheat|trigo|celiac/.test(allergies + diet)) blocked.add('gluten')
   for (const c of conditions) for (const e of rule('nutrition_conditions').params[c]?.exclude ?? []) blocked.add(e)
   // FDA fish advice for pregnancy: keep to 2 or 3 servings a week, so daily plans use salmon and sardines, not tuna.
   if (conditions.includes('pregnancy')) dislikes.push('tuna')
+  return { diet, blocked, dislikes, maxCook: Number(args.max_cook_minutes) || 30 }
+}
+
+const SEAFOOD = /fish|salmon|tuna|\bcod\b|tilapia|halibut|anchov|sardine|trout|shrimp|prawn|crab|lobster|\bscallops?\b|clam|mussel|oyster/
+const MEAT = /beef|steak|pork|bacon|\bham\b|sausage|chicken|turkey|lamb|veal|duck|prosciutto|pancetta|pepperoni|salami|chorizo|kielbasa|hot dog|meatball|gelatin|\blard\b/
+const PORK = /pork|bacon|\bham\b|\blard\b|prosciutto|pancetta|pepperoni|salami|chorizo|kielbasa/
+const ALCOHOL = /wine|\bbeer\b|\brum\b|bourbon|brandy|sherry|liqueur|vodka|whiske?y|tequila/
+const LINE_BLOCKS: Record<string, RegExp> = {
+  peanut: /peanut/,
+  tree_nut: /almond|cashew|walnut|pecan|pistachio|hazelnut|macadamia|pine nut|brazil nut|\bnuts\b/,
+  egg: /\beggs?\b|egg (?:white|yolk)|mayonnaise|\bmayo\b/,
+  dairy: /(?<!peanut |almond |coconut |soy |oat |apple |nut )(?:butter|milk)\b|buttermilk|cheese|(?<!coconut )cream(?! of tartar)|yogh?urt|ghee|whey|parmesan|mozzarella|cheddar|ricotta/,
+  soy: /\bsoy|tofu|edamame|tempeh|miso|tamari/,
+  fish: /(?<!shell)fish|salmon|tuna|\bcod\b|tilapia|halibut|anchov|sardine|trout|worcestershire/,
+  shellfish: /shrimp|prawn|crab|lobster|\bscallops?\b|clam|mussel|oyster/,
+  gluten: /flour|bread|pasta|noodle|wheat|barley|\brye\b|couscous|cracker|tortilla|soy sauce|\bbeer\b|biscuit|bisquick|crumb|spaghetti|macaroni|penne|fettuccine|linguine|lasagna|rotini|ziti|orzo|pie crust|crouton|seitan/
+}
+const GLUTEN_FREE = /gluten.free|rice noodle|rice flour|almond flour|coconut flour|corn tortilla|cornmeal|corn flour|cornstarch|tamari/g
+
+export function allowedRecipes(args: Limits, recipes = RECIPES.recipes) {
+  const { diet, blocked, dislikes, maxCook } = limits(args)
+  const rules = [...blocked].filter(t => LINE_BLOCKS[t]).map(t => LINE_BLOCKS[t])
+  if (/vegan|plant/.test(diet)) rules.push(MEAT, SEAFOOD, LINE_BLOCKS.dairy, LINE_BLOCKS.egg, /honey/)
+  else if (/vegetar/.test(diet)) rules.push(MEAT, SEAFOOD)
+  else if (/pescatar/.test(diet)) rules.push(MEAT)
+  if (/halal/.test(diet)) rules.push(PORK, ALCOHOL, /gelatin/)
+  if (/kosher/.test(diet)) rules.push(PORK, LINE_BLOCKS.shellfish)
+  return recipes.filter(r => {
+    if (r.minutes == null || r.minutes > maxCook) return false
+    const name = r.name.toLowerCase()
+    const lines = r.ingredients.map(i => i.line.toLowerCase())
+    if (lines.some(l => rules.some(rx => rx.test(rx === LINE_BLOCKS.gluten ? l.replace(GLUTEN_FREE, '') : l)))) return false
+    return !dislikes.some(d => name.includes(d) || lines.some(l => l.includes(d)))
+  })
+}
+
+const FRACTIONS: [number, string][] = [[0, ''], [1 / 8, '1/8'], [1 / 4, '1/4'], [1 / 3, '1/3'], [1 / 2, '1/2'], [2 / 3, '2/3'], [3 / 4, '3/4'], [1, '']]
+const SMALLER: Record<string, [string, number, number]> = { cup: ['tbsp', 16, 0.25], tbsp: ['tsp', 3, 1], lb: ['oz', 16, 0.5] }
+
+// "0.167 lb" for one serving reads as "2 2/3 oz".
+export function amount(i: Ingredient, servings: number) {
+  if (i.qty == null) return ''
+  let qty = i.qty * servings
+  let unit = i.unit
+  while (unit && SMALLER[unit] && qty < SMALLER[unit][2]) [unit, qty] = [SMALLER[unit][0], qty * SMALLER[unit][1]]
+  let whole = Math.floor(qty)
+  const [frac, text] = FRACTIONS.reduce((a, b) => Math.abs(qty - whole - b[0]) < Math.abs(qty - whole - a[0]) ? b : a)
+  if (frac === 1) whole += 1
+  const n = [whole || '', text].filter(Boolean).join(' ') || '1/8'
+  return [n, unit].filter(Boolean).join(' ')
+}
+
+export function allowedFoods(args: Limits) {
+  const { diet, blocked, dislikes, maxCook } = limits(args)
   return FOODS.foods.filter(f => {
     if (f.allergens.some(a => blocked.has(a))) return false
     if (/vegan|plant/.test(diet) && !f.diet.includes('vegan')) return false
@@ -440,7 +502,24 @@ export function allowedFoods(args: { diet?: any, allergies?: any, conditions?: a
   })
 }
 
-export function mealPlan(args: { targets: any, nearby?: any, diet?: any, allergies?: any, conditions?: any, likes?: any, dislikes?: any, max_cook_minutes?: any, meal_times?: any, delivery?: any }) {
+const MEAL_SHARE: Record<string, number> = { breakfast: 0.25, lunch: 0.35, dinner: 0.30, snack: 0.10 }
+const RECIPE_MEAL: Record<string, string> = { breakfast: 'breakfast', lunch: 'main', dinner: 'main', snack: 'snack' }
+
+function pickRecipe(pool: Recipe[], meal: string, kcal: number, protein: number | null, taken: Set<number>, mains: Set<string>, taste: (r: Recipe) => number) {
+  let best: { recipe: Recipe, servings: number } | null = null
+  let bestScore = -1
+  for (const r of pool) {
+    if (r.meal !== RECIPE_MEAL[meal] || taken.has(r.id) || !(r.per_serving.kcal > 0)) continue
+    const servings = Math.min(2, Math.max(0.5, round(kcal / r.per_serving.kcal, 0.5)))
+    if (Math.abs(servings * r.per_serving.kcal - kcal) > kcal * 0.25) continue
+    const proteinFit = protein ? 0.5 + 0.5 * Math.min(1, servings * r.per_serving.protein_g / protein) : 1
+    const s = taste(r) * (r.score / 5) * proteinFit * (mains.has(r.main) ? 0.1 : 1)
+    if (s > bestScore) [best, bestScore] = [{ recipe: r, servings }, s]
+  }
+  return best
+}
+
+export function mealPlan(args: { targets: any, nearby?: any, diet?: any, allergies?: any, conditions?: any, likes?: any, dislikes?: any, max_cook_minutes?: any, meal_times?: any, delivery?: any, recipes?: Recipe[] }) {
   const tg = args.targets
   if (!tg?.ready) return { ready: false }
   const foods = allowedFoods(args)
@@ -503,10 +582,42 @@ export function mealPlan(args: { targets: any, nearby?: any, diet?: any, allergi
     }
   }
 
-  const keys = ['kcal', 'protein', 'fiber', 'iron', 'calcium', 'vitamin_c', 'potassium', 'magnesium', 'folate', 'b12', 'vitamin_d']
+  const shareTotal = meals.reduce((s, m) => s + MEAL_SHARE[m.meal], 0)
+  const pool = allowedRecipes(args, args.recipes)
+  const seed = `${today()}:${ratingCount()}`
+  const taken = new Set<number>()
+  const mains = new Set<string>()
+  const planned = day.map(m => {
+    const share = MEAL_SHARE[m.meal] / shareTotal
+    const pick = pickRecipe(pool, m.meal, target * share, tg.protein ? tg.protein.target * share : null, taken, mains, tasteSampler(rng(`${seed}:${m.meal}:${m.time}`)))
+    if (!pick) return { ...m, kcal_target: tg.no_calorie_target ? null : round(target * share, 10), recipe: null }
+    const r = pick.recipe
+    taken.add(r.id)
+    mains.add(r.main)
+    return {
+      ...m,
+      kcal_target: tg.no_calorie_target ? null : round(target * share, 10),
+      items: [],
+      recipe: {
+        id: r.id, name: r.name, url: r.url, cuisines: r.cuisines, main: r.main, minutes: r.minutes, rating: r.rating, reviews: r.reviews,
+        servings: pick.servings,
+        kcal: tg.no_calorie_target ? null : round(pick.servings * r.per_serving.kcal),
+        protein_g: round(pick.servings * r.per_serving.protein_g),
+        fiber_g: round(pick.servings * r.per_serving.fiber_g),
+        sodium_mg: round(pick.servings * r.per_serving.sodium_mg, 10),
+        ingredients: r.ingredients.map(i => ({ amount: amount(i, pick.servings), item: i.item }))
+      }
+    }
+  })
+  const plates = planned.filter(m => !m.recipe)
+  const recipes = planned.flatMap(m => m.recipe ? [m.recipe] : [])
+  const plateTotal = (key: string) => plates.reduce((s, m) => s + m.items.reduce((t, i) => t + (byId[i.id].n[key] ?? 0) * i.servings, 0), 0)
+  const recipeTotal: Record<string, (r: any) => number> = { kcal: r => r.kcal ?? 0, protein: r => r.protein_g, fiber: r => r.fiber_g }
+
+  const keys = recipes.length ? ['kcal', 'protein', 'fiber'] : ['kcal', 'protein', 'fiber', 'iron', 'calcium', 'vitamin_c', 'potassium', 'magnesium', 'folate', 'b12', 'vitamin_d']
   const coverage = keys.filter(k => k !== 'kcal' || !tg.no_calorie_target).map(k => {
     const need = k === 'kcal' ? (tg.calories ?? null) : tg.needs[k]
-    const have = round(total(k), k === 'b12' || k === 'vitamin_d' || k === 'iron' ? 0.1 : 1)
+    const have = round(plateTotal(k) + recipes.reduce((s, r) => s + recipeTotal[k](r), 0), k === 'b12' || k === 'vitamin_d' || k === 'iron' ? 0.1 : 1)
     return { key: k, name: k === 'kcal' ? 'Calories' : NUTRIENTS[k].name, have, need, unit: k === 'kcal' ? 'kcal' : NUTRIENTS[k].unit, percent: need ? Math.round(have / need * 100) : null }
   })
   const gaps = coverage.filter(c => c.key !== 'kcal' && c.percent != null && c.percent < 80).map(c => ({
@@ -515,13 +626,13 @@ export function mealPlan(args: { targets: any, nearby?: any, diet?: any, allergi
   }))
 
   const pairs: string[] = []
-  for (const m of day) {
+  for (const m of plates) {
     const iron = m.items.find(i => byId[i.id].n.iron >= 3)
     const c = m.items.find(i => byId[i.id].n.vitamin_c >= 50)
     if (iron && c) pairs.push(`${m.meal}: ${byId[iron.id].name.toLowerCase()} with ${byId[c.id].name.toLowerCase()}, so the vitamin C helps you absorb the iron`)
   }
 
-  const chosen = [...new Set(day.flatMap(m => m.items.map(i => i.id)))]
+  const chosen = [...new Set(plates.flatMap(m => m.items.map(i => i.id)))]
   const delivery = args.delivery === true || /^(y|yes|sí|si|sim|true)/i.test(String(args.delivery ?? ''))
   const shopping = chosen.map(id => {
     const best = (deals[id] ?? [])[0] ?? null
@@ -534,14 +645,17 @@ export function mealPlan(args: { targets: any, nearby?: any, diet?: any, allergi
   })
   const onSale = shopping.filter(s => s.deal)
   const expiring = onSale.filter(s => s.deal!.valid_to).sort((a, b) => a.deal!.valid_to.localeCompare(b.deal!.valid_to))[0] ?? null
-  const shoppingText = shopping.map(s => s.deal ? `${s.name}: ${s.deal.store} ${s.deal.price_text ?? `$${s.deal.price}`}${s.deal.walk_minutes != null ? ` (${s.deal.walk_minutes} min walk)` : ''}` : s.name).join('; ')
+  const shoppingText = [
+    ...recipes.map(r => `${r.name}: ${r.ingredients.map(i => [i.amount, i.item].filter(Boolean).join(' ')).join(', ')}`),
+    ...shopping.map(s => s.deal ? `${s.name}: ${s.deal.store} ${s.deal.price_text ?? `$${s.deal.price}`}${s.deal.walk_minutes != null ? ` (${s.deal.walk_minutes} min walk)` : ''}` : s.name)
+  ].join('; ')
 
   return {
     ready: true,
     date: today(),
     meal_times: times,
     meal_times_text: times.join('; '),
-    meals: day,
+    meals: planned,
     coverage,
     gaps,
     pairs,
@@ -551,6 +665,8 @@ export function mealPlan(args: { targets: any, nearby?: any, diet?: any, allergi
     first_expiry: expiring ? { item: expiring.name, store: expiring.deal!.store, date: expiring.deal!.valid_to.slice(0, 10) } : null,
     stores: (args.nearby?.stores ?? []).slice(0, 5),
     markets: (args.nearby?.markets ?? []).slice(0, 3),
-    note: 'Nutrients are USDA FoodData Central averages per serving; deals come from store flyers and can sell out.'
+    note: recipes.length
+      ? 'Recipes are the best-rated Food.com version of each dish, sized to your meal. Iron, calcium and other nutrients are not tracked for recipes yet; deals come from store flyers and can sell out.'
+      : 'Nutrients are USDA FoodData Central averages per serving; deals come from store flyers and can sell out.'
   }
 }

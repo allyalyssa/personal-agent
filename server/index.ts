@@ -5,7 +5,8 @@ import { db } from './db.ts'
 import { loadRules, allRules } from './rules.ts'
 import { loadPlaybooks, allPlaybooks, playbook, PACKS } from './playbooks.ts'
 import { createCase, caseView, listCases, resolveCase, getProfile, setProfile, getCase, setFields, plan, remember } from './engine.ts'
-import { FOODS } from './nutrition.ts'
+import { FOODS, RECIPES } from './nutrition.ts'
+import { rate } from './taste.ts'
 import { intake, reply } from './agent.ts'
 import { executeAction, rejectAction, completeAction } from './actions.ts'
 import { civicReport } from './civic.ts'
@@ -92,6 +93,15 @@ const routes: [string, RegExp, (m: RegExpMatchArray, req: IncomingMessage, res: 
     profile.food = { ...profile.food, likes: likes.join(', '), dislikes: dislikes.join(', ') }
     setProfile(profile)
     remember(b.like ? 'foods_you_like' : 'foods_you_skip', (b.like ? likes : dislikes).join(', '), 'meal plan feedback')
+    send(res, 200, plan(m[1]))
+  }],
+  // Star a recipe. Handled learns which cuisines and main ingredients you like and still tries new ones.
+  ['POST', /^\/api\/cases\/(\w+)\/rate$/, async (m, req, res) => {
+    const b = await body(req)
+    const recipe = RECIPES.recipes.find(r => r.id === Number(b.recipe))
+    if (!recipe) return send(res, 400, { error: 'Unknown recipe' })
+    if (!db.prepare('select 1 from cases where id = ?').get(m[1])) return send(res, 404, { error: 'Case not found' })
+    rate(m[1], recipe, Number(b.stars))
     send(res, 200, plan(m[1]))
   }],
   ['POST', /^\/api\/cases\/(\w+)\/resolve$/, async (m, req, res) => {
