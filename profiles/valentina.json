@@ -4,6 +4,7 @@
   "email": "valentina@example.com",
   "phone": "+15555550110",
   "language": "es",
+  "ui_language": "en",
   "address": "1000 Guerrero St, Apt 5, San Francisco, CA 94110",
   "neighborhood": "Mission",
   "moved_to_sf": "2023-10-15",

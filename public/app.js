@@ -12,36 +12,40 @@ const usd2 = n => `$${Number(n || 0).toLocaleString('en-US', { minimumFractionDi
 const STRINGS = {
   en: {
     open: 'Open', waiting_on_other_party: 'Waiting on them', escalated: 'Escalated', resolved: 'Resolved',
-    send_email: 'Email', send_sms: 'Text message', place_call: 'Phone call', create_calendar_event: 'Calendar', prepare_form: 'Form, ready for you to submit', open_url_prefilled: 'Link', schedule_followup: 'Follow-up',
-    next_deadline: 'Next deadline', nothing_due: 'Nothing due. Capture anything below.', at_stake: 'Money at stake', recovered: 'Recovered', cases: 'Cases',
-    approve: 'Ready for your approval', deadlines: 'Deadlines and check-ins', done: 'Done and in progress', rules: 'Rules and sources', timeline: 'Timeline', add: 'Add to this case',
-    needs: 'A few things Handled needs', send_answers: 'Send answers', photo: 'Photo', voice: 'Voice', type: 'Type', handle: 'Handle it', cancel: 'Cancel', send: 'Send',
+    send_email: 'Email', send_sms: 'Text message', place_call: 'Phone call', create_calendar_event: 'Calendar', prepare_form: 'Form, ready for you to submit', open_url_prefilled: 'Website', schedule_followup: 'Follow-up',
+    next_deadline: 'Next up', nothing_due: 'Nothing due. Snap a photo, talk or type below.', at_stake: 'Money involved', recovered: 'Recovered', cases: 'Home', your_list: 'Your list',
+    approve: 'Waiting for your OK', deadlines: 'Dates and check-ins', done: 'Done and in progress', rules: 'Sources', timeline: 'Activity', add: 'Add an update',
+    needs: 'Handled needs a few details', send_answers: 'Continue', photo: 'Photo', voice: 'Voice', type: 'Type', handle: 'Handle it', cancel: 'Cancel', send: 'Send',
     intro_title: 'Life in SF comes with rules nobody explains.', intro: 'Tell Handled who you are, in any language. It finds the deadlines, the paperwork and the money, and does the follow-up.', intro_btn: 'Tell Handled about you',
-    for_you: 'What it says', i_did_it: 'I did it', what_they_said: 'What did they say? (price, date, reference number)', open_phone: 'Open on your phone', listening: 'Listening...'
+    for_you: 'What this means', i_did_it: 'I did it', what_they_said: 'What did they say? (price, date, reference number)', open_phone: 'Open on your phone', listening: 'Listening...'
   },
   es: {
     open: 'Abierto', waiting_on_other_party: 'Esperando respuesta', escalated: 'Escalado', resolved: 'Resuelto',
     send_email: 'Email', send_sms: 'Mensaje de texto', place_call: 'Llamada', create_calendar_event: 'Calendario', prepare_form: 'Formulario listo para que lo envíes', open_url_prefilled: 'Enlace', schedule_followup: 'Seguimiento',
-    next_deadline: 'Próximo plazo', nothing_due: 'Nada pendiente. Captura lo que sea abajo.', at_stake: 'Dinero en juego', recovered: 'Recuperado', cases: 'Casos',
-    approve: 'Listo para tu aprobación', deadlines: 'Plazos y seguimientos', done: 'Hecho y en curso', rules: 'Reglas y fuentes', timeline: 'Historial', add: 'Agregar a este caso',
-    needs: 'Handled necesita algunos datos', send_answers: 'Enviar respuestas', photo: 'Foto', voice: 'Voz', type: 'Escribir', handle: 'Resuélvelo', cancel: 'Cancelar', send: 'Enviar',
+    next_deadline: 'Lo próximo', nothing_due: 'Nada pendiente. Toma una foto, habla o escribe abajo.', at_stake: 'Dinero en juego', recovered: 'Recuperado', cases: 'Inicio', your_list: 'Tu lista',
+    approve: 'Esperando tu visto bueno', deadlines: 'Fechas y seguimientos', done: 'Hecho y en curso', rules: 'Fuentes', timeline: 'Actividad', add: 'Agregar una novedad',
+    needs: 'Handled necesita unos datos', send_answers: 'Continuar', photo: 'Foto', voice: 'Voz', type: 'Escribir', handle: 'Resuélvelo', cancel: 'Cancelar', send: 'Enviar',
     intro_title: 'Vivir en SF viene con reglas que nadie te explica.', intro: 'Cuéntale a Handled quién eres, en tu idioma. Encuentra los plazos, los trámites y el dinero, y hace el seguimiento.', intro_btn: 'Cuéntale a Handled sobre ti',
     for_you: 'Lo que dice', i_did_it: 'Listo, lo hice', what_they_said: '¿Qué te dijeron? (precio, fecha, número de referencia)', open_phone: 'Abrir en tu teléfono', listening: 'Escuchando...'
   },
   pt: {
     open: 'Aberto', waiting_on_other_party: 'Aguardando resposta', escalated: 'Escalado', resolved: 'Resolvido',
     send_email: 'Email', send_sms: 'Mensagem de texto', place_call: 'Ligação', create_calendar_event: 'Calendário', prepare_form: 'Formulário pronto para você enviar', open_url_prefilled: 'Link', schedule_followup: 'Acompanhamento',
-    next_deadline: 'Próximo prazo', nothing_due: 'Nada pendente. Registre qualquer coisa abaixo.', at_stake: 'Dinheiro em jogo', recovered: 'Recuperado', cases: 'Casos',
-    approve: 'Pronto para sua aprovação', deadlines: 'Prazos e acompanhamentos', done: 'Feito e em andamento', rules: 'Regras e fontes', timeline: 'Histórico', add: 'Adicionar a este caso',
-    needs: 'O Handled precisa de alguns dados', send_answers: 'Enviar respostas', photo: 'Foto', voice: 'Voz', type: 'Escrever', handle: 'Resolver', cancel: 'Cancelar', send: 'Enviar',
+    next_deadline: 'A seguir', nothing_due: 'Nada pendente. Tire uma foto, fale ou escreva abaixo.', at_stake: 'Dinheiro envolvido', recovered: 'Recuperado', cases: 'Início', your_list: 'Sua lista',
+    approve: 'Aguardando seu OK', deadlines: 'Datas e acompanhamentos', done: 'Feito e em andamento', rules: 'Fontes', timeline: 'Atividade', add: 'Adicionar uma novidade',
+    needs: 'O Handled precisa de alguns dados', send_answers: 'Continuar', photo: 'Foto', voice: 'Voz', type: 'Escrever', handle: 'Resolver', cancel: 'Cancelar', send: 'Enviar',
     intro_title: 'Morar em SF vem com regras que ninguém explica.', intro: 'Conte ao Handled quem você é, no seu idioma. Ele encontra os prazos, a papelada e o dinheiro, e faz o acompanhamento.', intro_btn: 'Conte ao Handled sobre você',
     for_you: 'O que diz', i_did_it: 'Feito', what_they_said: 'O que disseram? (preço, data, número de referência)', open_phone: 'Abrir no seu telefone', listening: 'Ouvindo...'
   }
 }
 const SPEECH_LANG = { en: 'en-US', es: 'es-US', pt: 'pt-BR', zh: 'zh-CN', tl: 'fil-PH', vi: 'vi-VN', ru: 'ru-RU' }
-const t = key => (STRINGS[state?.profile?.language] ?? STRINGS.en)[key] ?? STRINGS.en[key] ?? key
+// The app's own words follow ui_language; what Handled explains to the person stays in their language.
+const t = key => (STRINGS[state?.profile?.ui_language ?? state?.profile?.language] ?? STRINGS.en)[key] ?? STRINGS.en[key] ?? key
 const STATUS = new Proxy({}, { get: (_, k) => t(k) })
 const TOOL = new Proxy({}, { get: (_, k) => t(k) })
+const DEV = new URLSearchParams(location.search).has('dev')
+const LANG_NAME = { es: 'Español', pt: 'Português', zh: '中文', tl: 'Filipino', vi: 'Tiếng Việt', ru: 'Русский' }
+const STAR = '<svg viewBox="0 0 20 20" aria-hidden="true"><path fill="currentColor" d="M10 1.8l2.5 5.2 5.7.8-4.1 4 1 5.6L10 14.8l-5.1 2.6 1-5.6-4.1-4 5.7-.8z"/></svg>'
 const PACK_LABEL = { renter: 'Renter', car: 'Car', work: 'Work', everyday: 'Everyday', care: 'Care', business: 'Business', newcomer: 'Newcomer', city: 'City', food: 'Food', good: 'Good stuff' }
 
 async function api(path, body) {
@@ -155,9 +159,9 @@ function helperTips() {
   if (c?.computed?.targets?.ready) return c.computed.targets.explanation
   if (c) {
     const next = c.actions?.find(a => a.status === 'proposed')
-    return [c.summary, next ? `Next: ${next.title}. Nothing goes out until you tap Approve.` : null].filter(Boolean)
+    return [next ? `Next: ${next.title}. Nothing goes out until you tap Approve.` : 'Nothing is waiting on you here.']
   }
-  if (route === '/gallery') return ['Pick a playbook and tap "Try with a sample" to see it run on live City data.', 'Eat well near you plans meals from what is on sale within walking distance.']
+  if (route === '/gallery') return ['Pick a topic and tap "See an example". It uses live City data.', "Eat well near you plans meals around what's on sale within walking distance."]
   if (route === '/settings') return [`You can rename me, change my color and hat, or upload your own picture below.`]
   const d = state?.next_deadline
   return [`Hi, I'm ${s.name}. Snap a notice, or tell me what you want to eat this week.`, d ? `Next up: ${d.title}, ${relDay(d.due_at)}.` : 'Nothing due right now.']
@@ -182,7 +186,12 @@ function drawHelper(say = false) {
   el.innerHTML = `
     ${say && tip ? `<div class="helper-bubble" role="status"><strong>${esc(s.name)}</strong> ${esc(tip)}</div>` : ''}
     <button class="helper-body" aria-label="${esc(s.name)}, tap for a tip">${s.image ? `<img src="${esc(s.image)}" alt="">` : helperSvg(s)}</button>`
+  // The bubble steps out of the way after a few seconds so it never sits on top of the page.
+  clearTimeout(helperHide)
+  if (say && tip) helperHide = setTimeout(() => el.querySelector('.helper-bubble')?.remove(), 7000)
 }
+
+let helperHide = null
 
 async function render() {
   clearTimeout(caseTimer)
@@ -203,8 +212,8 @@ function integrationWarning() {
   const notes = []
   if (!i.claude) notes.push('Keyword mode: no Anthropic key, so Handled matches playbooks by keywords and asks with a form.')
   if (i.free_mode) notes.push('Free mode: Handled drafts every email, text and call script; your phone sends the last tap.')
-  if (!notes.length) return ''
-  return `<div class="card small" style="background:var(--info-bg);margin-bottom:10px">${notes.map(esc).join('<br>')}</div>`
+  if (!notes.length || !DEV) return ''
+  return `<div class="card small dev" style="margin-bottom:16px">${notes.map(esc).join('<br>')}</div>`
 }
 
 function translateChrome() {
@@ -218,33 +227,38 @@ function translateChrome() {
   document.getElementById('cancelVoice').textContent = t('cancel')
   document.getElementById('sendVoice').textContent = t('send')
   document.querySelector('[data-go="home"].tab').textContent = t('cases')
+  document.querySelector('[data-go="gallery"].tab').textContent = 'Topics'
 }
 
 function renderHome() {
   const s = state
   const next = s.next_deadline
-  const soon = next && daysFromToday(next.due_at) <= 3
+  const first = s.profile.name?.split(' ')[0]
   view.innerHTML = `
     ${integrationWarning()}
+    <h1>${first ? `Hi, ${esc(first)}` : 'Handled'}</h1>
+    <p class="muted" style="margin:4px 0 16px">${s.cases.length ? `${s.totals.open} open, ${s.cases.reduce((n, c) => n + c.pending_approvals, 0)} waiting for your OK.` : esc(t('nothing_due'))}</p>
     ${next ? `
-      <button class="banner ${soon ? 'soon' : ''}" data-case="${esc(next.case_id)}">
-        <div class="label">${esc(t('next_deadline'))}, ${esc(relDay(next.due_at))}</div>
-        <div class="what">${esc(next.title)}</div>
-        <div class="small" style="opacity:.85">${esc(prettyDate(next.due_at))} &middot; ${esc(next.case_title)}</div>
-      </button>` : `
-      <div class="banner"><div class="label">${esc(t('next_deadline'))}</div><div class="what">${esc(t('nothing_due'))}</div></div>`}
+      <button class="card next" data-case="${esc(next.case_id)}">
+        ${dateBox(next.due_at)}
+        <div>
+          <div class="label">${esc(t('next_deadline'))} · ${esc(relDay(next.due_at))}</div>
+          <div class="what">${esc(next.title)}</div>
+          <div class="meta">${esc(next.case_title)}</div>
+        </div>
+      </button>` : ''}
     <div class="totals">
-      <div class="card total"><div class="muted small">${esc(t('at_stake'))}</div><div class="n">${usd(s.totals.at_stake)}</div></div>
-      <div class="card total money"><div class="muted small">${esc(t('recovered'))}</div><div class="n">${usd(s.totals.recovered)}</div></div>
+      <div class="card stat"><div class="label">${esc(t('at_stake'))}</div><div class="n">${usd(s.totals.at_stake)}</div></div>
+      <div class="card stat money"><div class="label">${esc(t('recovered'))}</div><div class="n">${usd(s.totals.recovered)}</div></div>
     </div>
-    <h2>${esc(t('cases'))} <span class="muted small">${s.totals.open}</span></h2>
+    <h2>${esc(t('your_list'))}${s.cases.length ? `<span class="count">${s.cases.length}</span>` : ''}</h2>
     <div class="stack">
       ${s.cases.length ? s.cases.map(caseCard).join('') : `
         <div class="card empty">
           <div class="big">${esc(t('intro_title'))}</div>
           <p class="muted">${esc(t('intro'))}</p>
           <button class="primary" data-onboard>${esc(t('intro_btn'))}</button>
-          <p><button class="link" data-go-gallery>${playbookCount ?? ''} playbooks</button></p>
+          <p><button class="link" data-go-gallery>See what Handled can do</button></p>
         </div>`}
     </div>`
   view.querySelectorAll('[data-case]').forEach(el => el.addEventListener('click', () => go(`/case/${el.dataset.case}`)))
@@ -262,16 +276,10 @@ function caseCard(c) {
     <button class="card case-card" data-case="${esc(c.id)}">
       <div class="spread">
         <div class="case-title">${esc(c.title)}</div>
-        <span class="status ${esc(c.status)}">${esc(STATUS[c.status])}</span>
+        ${c.money_at_stake > 0 ? `<span class="chip money num">${usd(c.money_at_stake)}</span>` : c.money_recovered > 0 ? `<span class="chip money num">${usd(c.money_recovered)} back</span>` : c.status !== 'open' ? `<span class="status ${esc(c.status)}">${esc(STATUS[c.status])}</span>` : ''}
       </div>
-      <div class="row small muted" style="margin-top:6px">
-        ${c.pack ? `<span class="chip">${esc(PACK_LABEL[c.pack] ?? c.pack)}</span>` : ''}
-        ${c.money_at_stake > 0 ? `<span class="chip money">${usd(c.money_at_stake)} at stake</span>` : ''}
-        ${c.money_recovered > 0 ? `<span class="chip money">${usd(c.money_recovered)} recovered</span>` : ''}
-        ${c.pending_approvals ? `<span class="chip alert">${c.pending_approvals} to approve</span>` : ''}
-        ${c.busy ? `<span class="working"><span class="spinner"></span>working</span>` : ''}
-      </div>
-      ${c.next_deadline ? `<div class="small" style="margin-top:6px">Next: ${esc(c.next_deadline.title)} &middot; <strong>${esc(relDay(c.next_deadline.due_at))}</strong></div>` : ''}
+      ${c.busy ? `<div class="meta working"><span class="spinner"></span>Working on it</div>` : c.next_deadline ? `<div class="meta"><span>${esc(c.next_deadline.title)}</span><span>${esc(relDay(c.next_deadline.due_at))}</span></div>` : ''}
+      ${c.pending_approvals ? `<div class="needs"><span class="dot"></span>${c.pending_approvals} waiting for your OK</div>` : ''}
     </button>`
 }
 
@@ -280,7 +288,7 @@ function hasPlaceholder(v) {
 }
 
 function markPlaceholders(text) {
-  return esc(text).replace(/\[([a-z_.0-9]+)\]/g, '<span class="placeholder">needs $1</span>')
+  return esc(text).replace(/\[([a-z_.0-9]+)\]/g, '<span class="placeholder">fill in</span>')
 }
 
 function actionBody(a, isEditing) {
@@ -294,11 +302,11 @@ function actionBody(a, isEditing) {
       </div>`
     return `
       <dl class="kv"><dt>To</dt><dd>${markPlaceholders(p.to)}</dd>${p.cc ? `<dt>Cc</dt><dd>${markPlaceholders(p.cc)}</dd>` : ''}<dt>Subject</dt><dd>${markPlaceholders(p.subject)}</dd></dl>
-      <div class="transcript-box" style="margin-top:8px">${markPlaceholders(p.body)}</div>`
+      <div class="preview" style="margin-top:8px">${markPlaceholders(p.body)}</div>`
   }
   if (a.tool === 'send_sms') {
     if (isEditing) return `<div class="edit" data-edit="${a.id}"><div class="field-label">To</div><input name="to" value="${esc(p.to)}"><div class="field-label">Message</div><textarea name="body" style="min-height:90px">${esc(p.body)}</textarea></div>`
-    return `<dl class="kv"><dt>To</dt><dd>${markPlaceholders(p.to)}</dd></dl><div class="transcript-box" style="margin-top:8px">${markPlaceholders(p.body)}</div>`
+    return `<dl class="kv"><dt>To</dt><dd>${markPlaceholders(p.to)}</dd></dl><div class="preview" style="margin-top:8px">${markPlaceholders(p.body)}</div>`
   }
   if (a.tool === 'place_call') {
     const list = (title, items) => items?.length ? `<div class="field-label">${title}</div><ul class="small" style="margin:0;padding-left:18px">${items.map(i => `<li>${markPlaceholders(i)}</li>`).join('')}</ul>` : ''
@@ -349,6 +357,8 @@ function callResult(a, events) {
     </div>`
 }
 
+const ACTION_STATUS = { done: 'Done', handoff: 'Ready on your phone', failed: "Didn't go through", in_progress: 'In progress', running: 'Working', rejected: 'Skipped' }
+
 function actionCard(a, events) {
   const isEditing = editing.has(a.id)
   const blocked = hasPlaceholder(a.payload)
@@ -360,21 +370,21 @@ function actionCard(a, events) {
           <div class="tool">${esc(TOOL[a.tool] ?? a.tool)}${a.due_at ? ` &middot; ${esc(relDay(a.due_at))}` : ''}</div>
           <div class="case-title">${esc(a.title)}</div>
         </div>
-        ${!proposed ? `<span class="chip ${a.status === 'done' ? 'verified' : a.status === 'failed' ? 'alert' : ''}">${esc(a.status.replace('_', ' '))}</span>` : ''}
+        ${!proposed ? `<span class="chip ${a.status === 'done' ? 'verified' : a.status === 'failed' ? 'alert' : ''}">${esc(ACTION_STATUS[a.status] ?? a.status)}</span>` : ''}
       </div>
-      ${a.payload.for_you ? `<div class="small" style="margin-top:8px;padding:8px 10px;border-radius:10px;background:var(--info-bg)"><strong>${esc(t('for_you'))}:</strong> ${esc(a.payload.for_you)}</div>` : ''}
-      <div style="margin-top:8px">${actionBody(a, isEditing)}</div>
+      ${a.payload.for_you ? `<div class="for-you"><span class="label">${esc(t('for_you'))}${LANG_NAME[state.profile.language] ? ` · ${LANG_NAME[state.profile.language]}` : ''}</span>${esc(a.payload.for_you)}</div>` : ''}
+      <div style="margin-top:12px">${actionBody(a, isEditing)}</div>
       ${a.status === 'failed' && a.result?.error ? `<p class="small" style="color:var(--danger)">${esc(a.result.error)}</p>` : ''}
       ${a.status === 'handoff' ? `
         <div class="stack" style="margin-top:10px">
           <a class="primary" style="display:block;text-align:center;text-decoration:none" href="${esc(safeUrl(a.result.url))}">${esc(t('open_phone'))}</a>
-          ${a.tool === 'place_call' ? `<textarea data-notes="${a.id}" rows="3" placeholder="${esc(t('what_they_said'))}" style="width:100%;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:10px"></textarea>` : ''}
+          ${a.tool === 'place_call' ? `<textarea data-notes="${a.id}" rows="3" class="field" placeholder="${esc(t('what_they_said'))}"></textarea>` : ''}
           <button class="ghost" data-complete="${a.id}">${esc(t('i_did_it'))}</button>
         </div>` : ''}
       ${a.tool === 'place_call' ? callResult(a, events) : ''}
       ${a.tool === 'open_url_prefilled' && a.status === 'done' ? `<p class="small"><a href="${esc(safeUrl(a.result.url))}" target="_blank" rel="noopener">Open</a></p>` : ''}
       ${proposed ? `
-        ${blocked && !isEditing ? `<p class="small" style="color:var(--warn)">Fill in the highlighted parts before approving.</p>` : ''}
+        ${blocked && !isEditing ? `<p class="small" style="color:var(--accent)">Fill in the highlighted spots first.</p>` : ''}
         <div class="row" style="margin-top:10px">
           <button class="primary" data-approve="${a.id}" ${blocked && !isEditing ? 'disabled' : ''}>${a.tool === 'place_call' ? 'Approve and call' : a.tool === 'send_email' || a.tool === 'send_sms' ? 'Approve and send' : 'Approve'}</button>
           ${['send_email', 'send_sms', 'place_call'].includes(a.tool) ? `<button class="ghost" data-edit-btn="${a.id}">${isEditing ? 'Cancel edit' : 'Edit'}</button>` : ''}
@@ -386,7 +396,7 @@ function actionCard(a, events) {
 function eventLine(e) {
   const d = new Date(e.at)
   const extra = e.kind === 'data' && e.detail?.sources ? ` <a class="small" href="${esc(safeUrl(e.detail.sources.at(-1)))}" target="_blank" rel="noopener">data</a>` : ''
-  return `<li class="${esc(e.kind)}"><div class="small">${esc(e.title)}${extra}</div><div class="tiny muted">${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} ${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</div></li>`
+  return `<li class="${esc(e.kind)}"><div class="small">${esc(e.title.replace(/^Looked up DataSF (\w+)/, 'Checked City data ($1)').replace(/^Matched playbook by keywords: /, 'Recognized: '))}${extra}</div><div class="tiny muted">${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} ${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</div></li>`
 }
 
 const MEAL = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', snack: 'Snack' }
@@ -395,13 +405,13 @@ function recipeBlock(r) {
   const lines = r.ingredients.map(i => [i.amount, i.item].filter(Boolean).join(' '))
   const copy = [r.name, r.url, '', ...lines.map(l => `- ${l}`)].join('\n')
   return `<div class="recipe">
-    <div class="small"><a href="${esc(safeUrl(r.url))}" target="_blank" rel="noopener"><strong>${esc(r.name)}</strong></a>
-      <span class="muted">${esc(r.servings)} serving${r.servings === 1 ? '' : 's'} · ${esc(r.minutes)} min · ★${esc(r.rating)} (${esc(r.reviews)})</span></div>
-    <div class="row small" style="margin:4px 0">${[...r.cuisines, r.main].map(t => `<span class="chip">${esc(t.replace('_', ' '))}</span>`).join('')}
-      ${r.kcal != null ? `<span class="chip">${esc(r.kcal)} kcal</span>` : ''}<span class="chip">Protein ${esc(r.protein_g)} g</span></div>
-    <details><summary class="small">Ingredients for you</summary><ul class="small">${lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul></details>
-    <div class="row"><button class="link small" data-copy="${esc(copy)}">Copy ingredients and link</button>
-      <span class="stars" aria-label="Rate this recipe">${[1, 2, 3, 4, 5].map(n => `<button class="link small" data-rate="${esc(r.id)}" data-stars="${n}" aria-label="${n} star${n === 1 ? '' : 's'}">☆</button>`).join('')}</span></div>
+    <a class="recipe-title" href="${esc(safeUrl(r.url))}" target="_blank" rel="noopener">${esc(r.name)}</a>
+    <div class="meta num"><span>${esc(r.minutes)} min</span>${r.kcal != null ? `<span>${esc(r.kcal)} kcal</span>` : ''}<span>${esc(r.protein_g)} g protein</span><span>${esc(r.rating)} stars, ${esc(r.reviews)} reviews</span></div>
+    <details><summary class="small">Ingredients, sized for you (${esc(r.servings)} serving${r.servings === 1 ? '' : 's'})</summary><ul class="small">${lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul></details>
+    <div class="recipe-foot">
+      <button class="link small" data-copy="${esc(copy)}">Copy list</button>
+      <span class="stars" role="group" aria-label="Rate this recipe">${[1, 2, 3, 4, 5].map(n => `<button data-rate="${esc(r.id)}" data-stars="${n}" aria-label="Rate ${n} of 5">${STAR}</button>`).join('')}</span>
+    </div>
   </div>`
 }
 
@@ -409,83 +419,93 @@ function foodCard(c) {
   const tg = c.computed.targets
   const p = c.computed.plan
   const near = c.fields.nearby
-  if (!tg.ready) return `<div class="card" style="margin-top:10px"><div class="small">${esc(tg.reason ?? `Handled needs your ${tg.missing.join(', ')} to work out your targets.`)}</div></div>`
-  const macro = [tg.protein ? `Protein ${tg.protein.target} g` : null, tg.carbs_g ? `Carbs ${tg.carbs_g} g` : null, tg.fat_g ? `Fat ${tg.fat_g} g` : null, `Fiber ${tg.needs.fiber} g`, `Water about ${tg.water_l} L`].filter(Boolean)
+  if (!tg.ready) return `<div class="card" style="margin-top:16px"><div class="small">${esc(tg.reason ?? `Add your ${tg.missing.join(' and ')} so Handled can work out your targets.`)}</div></div>`
+  const macro = [tg.protein && ['Protein', `${tg.protein.target} g`], tg.carbs_g && ['Carbs', `${tg.carbs_g} g`], tg.fat_g && ['Fat', `${tg.fat_g} g`], ['Fiber', `${tg.needs.fiber} g`]].filter(Boolean)
+  const lang = LANG_NAME[state.profile.language]
+  const where = d => d.walk_minutes != null ? `${d.store}, ${d.walk_minutes} min walk` : d.store
   return `
-    <div class="card food" style="margin-top:10px">
-      <div class="muted small">What your body needs</div>
-      <div class="headline-money">${esc(tg.headline)}</div>
-      <div class="row small" style="margin:6px 0">${macro.map(m => `<span class="chip">${esc(m)}</span>`).join('')}</div>
-      <ul class="small explain">${tg.explanation.map(l => `<li>${esc(l)}</li>`).join('')}</ul>
-      ${tg.conditions.map(n => `<div class="small note"><strong>${esc(n.label)}.</strong> ${esc(n.note)} <span class="muted">Confirm with ${esc(n.confirm_with)}. <a href="${esc(safeUrl(n.source_url))}" target="_blank" rel="noopener">Source</a></span></div>`).join('')}
-      ${tg.assumptions.length ? `<div class="tiny muted">${tg.assumptions.map(esc).join(' ')}</div>` : ''}
-      <details style="margin-top:8px"><summary class="small"><strong>Every nutrient, and how to get it</strong></summary>
-        <table class="nutrients small">${tg.nutrients.map(n => `<tr class="${n.priority ? 'priority' : ''}"><th>${esc(n.name)}</th><td>${esc(n.amount)} ${esc(n.unit)}</td><td>${esc(n.how)} <span class="muted">From: ${esc(n.foods)}.</span></td></tr>`).join('')}</table>
-        <p class="tiny muted">${esc(tg.formula)} x ${esc(tg.activity_factor)} activity. Sodium under ${esc(tg.sodium_limit_mg)} mg. Information with sources, not medical advice.</p>
+    <div class="card food" style="margin-top:16px">
+      <div class="label">What your body needs each day</div>
+      <div class="hero-number num" style="margin-top:4px">${tg.calories ? `${esc(tg.calories.toLocaleString('en-US'))} <span style="font-size:1rem;font-weight:500;color:var(--muted);letter-spacing:0">calories</span>` : esc(tg.headline)}</div>
+      <div class="macros">${macro.map(([k, v]) => `<div><div class="label">${k}</div><div class="v">${esc(v)}</div></div>`).join('')}</div>
+      ${lang ? `<div class="label" style="margin-top:16px">${state.profile.language === 'pt' ? 'Para você' : 'Para ti'} · ${esc(lang)}</div>` : ''}
+      <ul class="explain">${tg.explanation.map(l => `<li>${esc(l)}</li>`).join('')}</ul>
+      ${tg.conditions.map(n => `<div class="callout"><strong>${esc(n.label)}.</strong> ${esc(n.note)} <span class="muted">Confirm with ${esc(n.confirm_with)}. <a href="${esc(safeUrl(n.source_url))}" target="_blank" rel="noopener">Source</a></span></div>`).join('')}
+      ${tg.assumptions.length ? `<p class="tiny muted">${tg.assumptions.map(esc).join(' ')}</p>` : ''}
+      <details style="margin-top:16px"><summary class="small">Every nutrient, and how to get it</summary>
+        <table class="nutrients small">${tg.nutrients.map(n => `<tr class="${n.priority ? 'priority' : ''}"><th>${esc(n.name)}</th><td>${esc(n.amount)} ${esc(n.unit)}</td><td>${esc(n.how)} <span class="muted">From ${esc(n.foods)}.</span></td></tr>`).join('')}</table>
+        <p class="tiny muted">${esc(tg.formula)}, activity factor ${esc(tg.activity_factor)}. Sodium under ${esc(tg.sodium_limit_mg)} mg. Information with sources, not medical advice.</p>
       </details>
     </div>
     ${p?.ready ? `
     <h2>Today's meals</h2>
     <div class="stack">${p.meals.map(m => `
       <div class="card meal">
-        <div class="spread"><strong>${esc(MEAL[m.meal])}</strong><span class="muted small">${esc(m.time)}${m.kcal_target ? ` · about ${esc(m.kcal_target)} kcal` : ''}</span></div>
+        <div class="meal-head"><strong>${esc(MEAL[m.meal])}</strong><span class="meta num">${m.time ? `<span>${esc(m.time)}</span>` : ''}${m.kcal_target ? `<span>about ${esc(m.kcal_target)} kcal</span>` : ''}</span></div>
         ${m.recipe ? recipeBlock(m.recipe) : ''}
-        ${m.items.map(i => {
-          const deal = p.shopping.find(s => s.id === i.id)?.deal
-          return `<div class="meal-item">
-            <div class="small"><strong>${esc(i.servings)} x</strong> ${esc(i.name)} <span class="muted">(${esc(i.serving)})</span>${deal ? ` <span class="chip money">${esc(deal.price_text)} at ${esc(deal.store)}${deal.walk_minutes != null ? `, ${esc(deal.walk_minutes)} min walk` : ''}</span>` : ''}</div>
+        ${m.items.map(i => `<div class="meal-item">
+            <div class="small"><span class="num">${esc(i.servings)} x</span> ${esc(i.name)} <span class="muted">${esc(i.serving)}</span></div>
             <div class="row"><button class="link small" data-food="${esc(i.id)}" data-like="1">Like</button><button class="link small" data-food="${esc(i.id)}" data-like="0">Swap</button></div>
-          </div>`
-        }).join('')}
+          </div>`).join('')}
+        ${m.deals?.length ? `<div class="on-sale">On sale near you: ${m.deals.slice(0, 3).map(d => `${esc(d.food)} ${esc(d.price_text)} at ${esc(where(d))}`).join('; ')}</div>` : ''}
       </div>`).join('')}
     </div>
-    ${p.pairs.length ? `<div class="card small" style="margin-top:10px"><strong>Paired for absorption:</strong> ${p.pairs.map(esc).join('; ')}.</div>` : ''}
-    <div class="card" style="margin-top:10px">
-      <div class="small"><strong>How this day covers you</strong></div>
-      ${p.coverage.filter(x => x.need).map(x => `<div class="bar-row small"><span>${esc(x.name)}</span><div class="bar"><div style="width:${Math.min(100, x.percent)}%;background:${x.percent >= 80 ? 'var(--money)' : 'var(--warn)'}"></div></div><span class="muted">${esc(x.have)}/${esc(x.need)} ${esc(x.unit)}</span></div>`).join('')}
-      ${p.gaps.map(g => `<div class="tiny" style="color:var(--warn)">${esc(g.name)} is short. ${esc(g.tip)}</div>`).join('')}
+    ${p.pairs.length ? `<div class="callout" style="background:var(--brand-soft)"><strong>Eat together for better absorption.</strong> ${p.pairs.map(esc).join('; ')}.</div>` : ''}
+    <div class="card" style="margin-top:8px">
+      <div class="small" style="font-weight:600">How today's meals add up</div>
+      ${p.coverage.filter(x => x.need).map(x => `<div class="bar-row"><span>${esc(x.name)}</span><div class="bar"><div style="width:${Math.min(100, x.percent)}%;background:${x.percent >= 80 ? 'var(--money)' : 'var(--accent)'}"></div></div><span class="muted num">${esc(Math.round(x.have))} / ${esc(x.need)} ${esc(x.unit)}</span></div>`).join('')}
+      ${p.gaps.map(g => `<p class="tiny" style="color:var(--accent);margin-bottom:0">${esc(g.name)} is low. ${esc(g.tip)}</p>`).join('')}
     </div>
-    <h2>Shopping near ${esc(near?.address ?? c.fields.food_area ?? 'you')}</h2>
-    <div class="card small">
-      ${p.shopping.map(s => `<div class="spread shop"><span>${esc(s.name)}</span><span>${s.deal ? `<span class="money">${esc(s.deal.price_text)}</span> ${esc(s.deal.store)}${s.deal.walk_minutes != null ? ` (${esc(s.deal.walk_minutes)} min)` : ''}${s.deal.valid_to ? ` <span class="muted tiny">until ${esc(prettyDate(s.deal.valid_to.slice(0, 10)))}</span>` : ''}` : '<span class="muted">regular price</span>'}${s.order_url ? ` <a href="${esc(safeUrl(s.order_url))}" target="_blank" rel="noopener">order</a>` : ''}</span></div>`).join('')}
-      ${near?.stores?.length ? `<p class="tiny muted">Within ${esc(near.walk_minutes)} min: ${near.stores.slice(0, 6).map(s => `${esc(s.name)} (${esc(s.walk_minutes)} min)`).join(', ')}.</p>` : ''}
-      ${near?.markets?.length ? `<p class="tiny">Farmers markets nearby: ${near.markets.map(m => `${esc(m.name)} (${esc(m.walk_minutes)} min)`).join(', ')}. Many take CalFresh and add Market Match money for produce.</p>` : ''}
-      ${near?.map_error ? `<p class="tiny" style="color:var(--warn)">Map data was unavailable, so walk times are missing; deals are for your ZIP code.</p>` : ''}
-      <p class="tiny muted">${esc(p.note)} ${esc(near?.note ?? '')}</p>
-    </div>` : ''}`
+    <h2>Shopping list${p.on_sale_count ? `<span class="count">${esc(p.on_sale_count)} on sale near you</span>` : ''}</h2>
+    <div class="card">
+      ${p.shopping.slice(0, 14).map(s => `<div class="shop"><span>${esc(s.name)}</span><span>${s.deal ? `<span class="num" style="color:var(--money);font-weight:600">${esc(s.deal.price_text)}</span><br><span class="tiny muted">${esc(where(s.deal))}${s.deal.valid_to ? `, until ${esc(prettyDate(s.deal.valid_to.slice(0, 10)).replace(/, \d{4}$/, ''))}` : ''}</span>` : ''}${s.order_url ? ` <a class="small" href="${esc(safeUrl(s.order_url))}" target="_blank" rel="noopener">Order</a>` : ''}</span></div>`).join('')}
+      ${near?.markets?.length ? `<p class="small" style="margin-top:12px">Farmers markets nearby: ${near.markets.map(m => `${esc(m.name)} (${esc(m.walk_minutes)} min)`).join(', ')}. Many take CalFresh and add Market Match money for produce.</p>` : ''}
+      ${near?.map_error ? `<p class="tiny" style="color:var(--accent)">We couldn't load walk times. These deals are for your ZIP code.</p>` : ''}
+    </div>
+    <p class="tiny muted">Deals from this week's store flyers near ${esc(near?.address ?? c.fields.food_area ?? 'you')}. Recipes from Food.com, scaled to your portions. Nutrient values from USDA FoodData Central.</p>` : ''}`
 }
 
 function computedHeadline(c) {
   if (c.computed?.targets) return foodCard(c)
   const i = c.computed?.interest
   if (i) return `
-    <div class="card" style="margin-top:10px">
-      <div class="muted small">Your landlord owes you</div>
-      <div class="headline-money">${usd2(i.total_owed)}</div>
-      <ul class="small" style="padding-left:18px;margin:6px 0">${i.years.map(y => `<li>${esc(y.math)}</li>`).join('')}</ul>
-      <div class="small muted">Next payment: ${usd2(i.next_payment.interest)} due ${esc(prettyDate(i.next_payment.due_date))}. Rates: <a href="${esc(safeUrl(i.source_url))}" target="_blank" rel="noopener">SF Rent Board</a>, checked ${esc(i.last_verified)}.</div>
-      ${i.years_needing_confirmation.length ? `<div class="small" style="color:var(--warn)">Not counted (rate not verified): ${esc(i.years_needing_confirmation.join('; '))}. Ask the Rent Board.</div>` : ''}
+    <div class="card" style="margin-top:16px">
+      <div class="label">Your landlord owes you</div>
+      <div class="hero-number money" style="margin-top:4px">${usd2(i.total_owed)}</div>
+      ${i.net_minimum != null && i.net_minimum < i.total_owed ? `<div class="meta">At least ${usd2(i.net_minimum)} after the Rent Board fee share they may keep</div>` : ''}
+      <ul class="explain num">${i.years.map(y => `<li>${esc(y.math.replace(/^(\d{4}-\d{2}-\d{2})/, d => prettyDate(d).replace(/^\w+, /, '')))}</li>`).join('')}</ul>
+      <p class="small muted" style="margin-bottom:0">Next payment ${usd2(i.next_payment.interest)}, due ${esc(prettyDate(i.next_payment.due_date))}. Rates from the <a href="${esc(safeUrl(i.source_url))}" target="_blank" rel="noopener">SF Rent Board</a>, checked ${esc(prettyDate(i.last_verified).replace(/^\w+, /, ''))}.</p>
+      ${i.years_needing_confirmation.length ? `<div class="callout">Not counted yet, because the rate isn't confirmed: ${esc(i.years_needing_confirmation.join('; '))}. Ask the Rent Board.</div>` : ''}
     </div>`
   const chk = c.computed?.check
+  const ticket = c.fields.citation
+  if (chk && 'contest_grounds' in chk) return `
+    <div class="card" style="margin-top:16px">
+      <div class="label">Street-cleaning check${ticket?.found ? ` · citation ${esc(ticket.citation_number ?? c.fields.citation_number)}` : ''}</div>
+      <div class="hero-number" style="margin-top:4px;font-size:1.75rem;color:${chk.contest_grounds ? 'var(--money)' : 'var(--ink)'}">${chk.contest_grounds ? 'You have grounds to protest' : chk.scheduled ? 'The ticket matches the schedule' : 'No schedule found'}</div>
+      ${ticket?.found ? `<div class="meta num" style="margin-top:8px"><span>${usd2(ticket.fine)}</span><span>${esc(ticket.location)}</span><span>${esc(chk.issued)}</span></div>` : ''}
+      <p class="small" style="margin-bottom:0">${esc(chk.explanation)}</p>
+      ${chk.scheduled ? '<p class="small muted" style="margin-bottom:0">A protest the City will reject costs you time. Handled points you to payment plans instead.</p>' : ''}
+    </div>`
   if (chk) return `
-    <div class="card" style="margin-top:10px">
-      <div class="muted small">Increase asked vs allowed</div>
+    <div class="card" style="margin-top:16px">
+      <div class="label">Increase asked vs allowed</div>
       <div class="headline-money" style="color:${chk.overcharge_per_month ? 'var(--danger)' : 'var(--money)'}">${chk.increase_percent}% vs ${chk.max_percent_with_banking ?? '?'}%</div>
       <div class="small">${esc(chk.math ?? '')}</div>
       <div class="small muted">${esc(chk.coverage_basis)}</div>
     </div>`
   const v = c.computed?.verdict
   if (v) return `
-    <div class="card" style="margin-top:10px">
-      <div class="muted small">Verdict</div>
-      <div class="headline-money" style="color:${v.verdict === 'likely scam' ? 'var(--danger)' : v.verdict === 'likely real' ? 'var(--money)' : 'var(--warn)'}">${esc(v.verdict)}</div>
-      <div class="small">${v.links.map(l => `${esc(l.host)}: ${l.official ? 'official domain' : 'not an official domain'}`).join('<br>')}</div>
+    <div class="card" style="margin-top:16px">
+      <div class="label">Our read</div>
+      <div class="headline-money" style="color:${v.verdict === 'likely scam' ? 'var(--danger)' : v.verdict === 'likely real' ? 'var(--money)' : 'var(--accent)'}">${esc(v.verdict)}</div>
+      <div class="small">${v.links.map(l => `${esc(l.host)}: ${l.official ? 'official website' : 'not an official website'}`).join('<br>')}</div>
       <div class="small muted">${esc(v.advice)}</div>
     </div>`
   const b = c.computed?.compare
   if (b) return `
-    <div class="card" style="margin-top:10px">
-      <div class="muted small">Possible overbilling</div>
+    <div class="card" style="margin-top:16px">
+      <div class="label">Possible overbilling</div>
       <div class="headline-money">${usd2(b.disputed_amount)}</div>
       <div class="small">${esc(b.math ?? '')}${b.duplicate_lines.length ? `<br>Duplicate: ${b.duplicate_lines.map(l => `${esc(l.description)} ${usd2(l.amount)}`).join(', ')}` : ''}</div>
     </div>`
@@ -497,7 +517,7 @@ async function renderCase(id, auto = false) {
   try {
     c = await api(`/api/cases/${id}`)
   } catch {
-    view.innerHTML = `<p>Case not found. <button class="link" onclick="location.hash='/'">Back</button></p>`
+    view.innerHTML = `<p>We can't find that. <button class="link" onclick="location.hash='/'">Back to your list</button></p>`
     return
   }
   if (route !== `/case/${id}`) return
@@ -514,57 +534,56 @@ async function renderCase(id, auto = false) {
   const upcoming = c.deadlines.filter(d => !d.done && d.kind !== 'meal')
   const meals = c.deadlines.filter(d => d.kind === 'meal').length
   view.innerHTML = `
-    <button class="back" onclick="location.hash='/'">&larr; Cases</button>
-    <div class="spread">
+    <button class="back" onclick="location.hash='/'">&larr; ${esc(t('your_list'))}</button>
+    <div class="case-head">
       <h1>${esc(c.title)}</h1>
-      <span class="status ${esc(c.status)}">${esc(STATUS[c.status])}</span>
+      <div class="meta">${c.status !== 'open' ? `<span>${esc(STATUS[c.status])}</span>` : ''}${proposed.length ? `<span>${proposed.length} waiting for your OK</span>` : ''}${upcoming[0] ? `<span>Next date ${esc(relDay(upcoming[0].due_at))}</span>` : ''}${c.money_recovered > 0 ? `<span>${usd2(c.money_recovered)} recovered</span>` : ''}</div>
     </div>
-    <div class="row small muted" style="margin-top:6px">
-      ${c.playbook_title ? `<span class="chip">${esc(c.playbook_title)}</span>` : ''}
-      ${c.money_at_stake > 0 ? `<span class="chip money">${usd2(c.money_at_stake)} at stake</span>` : ''}
-      ${c.money_recovered > 0 ? `<span class="chip money">${usd2(c.money_recovered)} recovered</span>` : ''}
-    </div>
-    ${c.busy ? `<div class="card working" style="margin-top:12px"><span class="spinner"></span><span>${esc(c.events.at(-1)?.title ?? 'Reading')}...</span></div>` : ''}
+    ${c.busy ? `<div class="card working" style="margin-top:16px"><span class="spinner"></span><span>Looking this over...</span></div>` : ''}
     ${computedHeadline(c)}
-    ${c.summary ? `<div class="card summary" style="margin-top:10px">${esc(c.summary)}</div>` : ''}
+    ${c.summary ? `<div class="card summary" style="margin-top:16px">${esc(c.summary)}</div>` : ''}
     ${c.questions?.length && !c.busy ? `
-      <div class="card questions" style="margin-top:10px">
-        <strong>${esc(t('needs'))}</strong>
-        ${c.questions.map((q, i) => `<div class="field-label">${esc(q.question)}</div><input data-q="${i}" data-field="${esc(q.field)}">`).join('')}
-        <div class="row" style="margin-top:10px"><button class="primary" id="answer">${esc(t('send_answers'))}</button></div>
+      <div class="card questions" style="margin-top:16px">
+        <div style="font-weight:600">${esc(t('needs'))}</div>
+        ${c.questions.map((q, i) => `<label class="field-label" for="q${i}">${esc(q.question)}</label><input id="q${i}" data-q="${i}" data-field="${esc(q.field)}">`).join('')}
+        <div class="row" style="margin-top:16px"><button class="primary" id="answer">${esc(t('send_answers'))}</button></div>
       </div>` : ''}
-    ${proposed.length ? `<h2>${esc(t('approve'))} <span class="muted small">${proposed.length}</span></h2><div class="stack">${proposed.map(a => actionCard(a, c.events)).join('')}</div>` : ''}
-    ${upcoming.length ? `
+    ${proposed.length ? `<h2>${esc(t('approve'))}<span class="count">${proposed.length}</span></h2><p class="small muted" style="margin-top:-4px">Nothing goes out until you tap Approve.</p><div class="stack">${proposed.map(a => actionCard(a, c.events)).join('')}</div>` : ''}
+    ${upcoming.length || meals ? `
       <h2>${esc(t('deadlines'))}</h2>
-      <div class="card">${upcoming.map(d => `
+      <div class="card">${upcoming.map(d => {
+        const r = c.rules.find(x => x.id === d.rule_id)
+        return `
         <div class="deadline">${dateBox(d.due_at)}
           <div>
-            <div class="small"><strong>${esc(d.title)}</strong> <span class="muted">${esc(relDay(d.due_at))}</span></div>
-            ${d.rule_id ? `<span class="chip ${c.rules.find(r => r.id === d.rule_id)?.status ?? ''}">${esc(c.rules.find(r => r.id === d.rule_id)?.status ?? '')}</span>` : d.kind === 'checkin' ? '<span class="chip">automatic check-in</span>' : d.kind === 'event' ? '<span class="chip">calendar</span>' : ''}
-            ${d.note ? `<div class="tiny muted" style="margin-top:3px">${esc(d.note)}</div>` : ''}
+            <div class="small" style="font-weight:600">${esc(d.title)}</div>
+            <div class="meta"><span>${esc(relDay(d.due_at))}</span>${r ? `<span>${r.status === 'verified' ? `Rule checked ${esc(prettyDate(r.last_verified).replace(/^\w+, /, '').replace(/, \d{4}$/, ''))}` : 'Rule not checked yet'}</span>` : d.kind === 'checkin' ? '<span>Automatic check-in</span>' : d.kind === 'event' ? '<span>On your calendar</span>' : ''}</div>
+            ${d.note ? `<div class="tiny muted" style="margin-top:4px">${esc(d.note)}</div>` : ''}
           </div>
-        </div>`).join('')}
-        ${meals ? `<p class="small">${meals} meal times are on your calendar.</p>` : ''}
-        <p class="small"><a href="/api/cases/${esc(c.id)}/calendar.ics">Add to calendar</a></p>
+        </div>`
+      }).join('')}
+        ${meals ? `<p class="small" style="margin-bottom:0">${meals} meal times are on your calendar this week.</p>` : ''}
+        <p class="small" style="margin-bottom:0"><a href="/api/cases/${esc(c.id)}/calendar.ics">Add to my calendar</a></p>
       </div>` : ''}
     ${other.length ? `<h2>${esc(t('done'))}</h2><div class="stack">${other.slice().reverse().map(a => actionCard(a, c.events)).join('')}</div>` : ''}
     ${c.rules.length ? `
       <h2>${esc(t('rules'))}</h2>
-      <div class="stack">${c.rules.map(r => `
-        <details class="card"><summary class="small"><strong>${esc(r.title)}</strong> <span class="chip ${esc(r.status)}">${esc(r.status)}${r.last_verified ? ` ${esc(r.last_verified)}` : ''}</span></summary>
+      <div class="card sources">${c.rules.map(r => `
+        <details><summary class="small"><span style="font-weight:600">${esc(r.title)}</span> <span class="chip ${esc(r.status)}">${r.status === 'verified' ? `Checked ${esc(prettyDate(r.last_verified).replace(/^\w+, /, '').replace(/, \d{4}$/, ''))}` : 'Not checked yet'}</span></summary>
           <p class="small">${esc(r.rule)}</p>
-          <p class="small muted">Source: <a href="${esc(safeUrl(r.source_url))}" target="_blank" rel="noopener">${esc(r.source_url)}</a><br>Confirm with: ${esc(r.confirm_with)}${r.notes ? `<br>${esc(r.notes)}` : ''}</p>
-          <p class="tiny muted">Information with sources, not legal, tax, immigration or medical advice.</p>
-        </details>`).join('')}</div>` : ''}
-    <h2>${esc(t('timeline'))}</h2>
-    <div class="card"><ul class="timeline">${c.events.map(eventLine).join('')}</ul>
-      ${c.jobs.length ? `<p class="small muted">Scheduled: ${c.jobs.map(j => `${esc(j.kind)} ${esc(relDay(j.run_at))}`).join(', ')}</p>` : ''}
-    </div>
+          <p class="small muted"><a href="${esc(safeUrl(r.source_url))}" target="_blank" rel="noopener">Source</a> · Confirm with ${esc(r.confirm_with)}</p>
+        </details>`).join('')}
+        <p class="tiny muted" style="margin:12px 0 0">Information with sources, not legal, tax, immigration or medical advice.</p>
+      </div>` : ''}
+    <details class="card" style="margin-top:32px" ${DEV ? 'open' : ''}><summary class="small" style="font-weight:600">${esc(t('timeline'))}</summary>
+      <ul class="timeline">${c.events.filter(e => DEV || !['route', 'plan', 'question', 'fields'].includes(e.kind)).map(eventLine).join('')}</ul>
+      ${DEV && c.jobs.length ? `<p class="small muted">Scheduled: ${c.jobs.map(j => `${esc(j.kind)} ${esc(relDay(j.run_at))}`).join(', ')}</p>` : ''}
+    </details>
     <h2>${esc(t('add'))}</h2>
     <div class="card">
-      <textarea id="caseReply" rows="2" placeholder="Reply, correct a detail, or say what happened (e.g. they paid)" style="width:100%;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:10px"></textarea>
+      <textarea id="caseReply" class="field" rows="2" aria-label="${esc(t('add'))}" placeholder="Add an update or fix a detail. For example: they paid."></textarea>
       <div class="row" style="margin-top:8px;justify-content:space-between">
-        <button class="ghost" id="resolve">${c.status === 'resolved' ? 'Resolved' : 'Mark resolved'}</button>
+        <button class="ghost" id="resolve">${c.status === 'resolved' ? 'Resolved' : 'Mark as done'}</button>
         <button class="primary" id="sendReply">${esc(t('send'))}</button>
       </div>
     </div>`
@@ -573,12 +592,12 @@ async function renderCase(id, auto = false) {
     const aid = Number(b.dataset.approve)
     const editEl = view.querySelector(`[data-edit="${aid}"]`)
     const payload = editEl ? Object.fromEntries([...editEl.querySelectorAll('[name]')].map(i => [i.name, i.value])) : undefined
-    if (payload && hasPlaceholder(payload)) return toast('Fill in the highlighted parts first.')
+    if (payload && hasPlaceholder(payload)) return toast('Fill in the highlighted spots first.')
     b.disabled = true
-    b.textContent = 'Working...'
+    b.textContent = 'One moment...'
     const r = await api(`/api/actions/${aid}/approve`, { payload })
     editing.delete(aid)
-    toast(r.ok ? 'Done.' : `Failed: ${r.error}`)
+    toast(r.ok ? 'Done.' : `That didn't go through. ${r.error}`)
     renderCase(id)
   }))
   view.querySelectorAll('[data-complete]').forEach(b => b.addEventListener('click', async () => {
@@ -605,13 +624,13 @@ async function renderCase(id, auto = false) {
   view.querySelectorAll('[data-rate]').forEach(b => b.addEventListener('click', async () => {
     b.disabled = true
     await api(`/api/cases/${id}/rate`, { recipe: Number(b.dataset.rate), stars: Number(b.dataset.stars) })
-    toast(Number(b.dataset.stars) >= 4 ? 'Got it. More like this, and still something new now and then.' : 'Got it. Handled will try other kinds of dishes.')
+    toast(Number(b.dataset.stars) >= 4 ? 'Noted. More like this, plus something new now and then.' : "Noted. We'll try other kinds of dishes.")
     renderCase(id)
   }))
   view.querySelectorAll('[data-food]').forEach(b => b.addEventListener('click', async () => {
     b.disabled = true
     await api(`/api/cases/${id}/food`, { food: b.dataset.food, like: b.dataset.like === '1' })
-    toast(b.dataset.like === '1' ? 'Got it. Handled will pick it more often.' : 'Swapped. Handled will skip it from now on.')
+    toast(b.dataset.like === '1' ? "Noted. You'll see this more often." : "Swapped. You won't see it again.")
     renderCase(id)
   }))
   view.querySelector('#answer')?.addEventListener('click', async () => {
@@ -627,7 +646,7 @@ async function renderCase(id, auto = false) {
     renderCase(id)
   })
   view.querySelector('#resolve').addEventListener('click', async () => {
-    const amount = c.money_at_stake > 0 ? prompt(`How much did you recover? (at stake: ${usd2(c.money_at_stake)})`, String(c.money_at_stake)) : '0'
+    const amount = c.money_at_stake > 0 ? prompt(`How much did you get back? (Amount owed: ${usd2(c.money_at_stake)})`, String(c.money_at_stake)) : '0'
     if (amount === null) return
     await api(`/api/cases/${id}/resolve`, { recovered: Number(amount) })
     await refreshState()
@@ -646,21 +665,20 @@ async function renderGallery() {
   const order = Object.keys(packs)
   shown.sort((a, b) => order.indexOf(a.pack) - order.indexOf(b.pack) || (a.depth === 'deep' ? -1 : 1))
   view.innerHTML = `
-    <h1>Playbooks</h1>
-    <p class="muted small">Each one is a declarative file: triggers, required fields, rules with sources, actions with deadlines, and follow-ups. One engine runs them all.</p>
-    <div class="gallery-scroll" role="tablist">
-      <button class="chip ${galleryPack === 'all' ? 'on' : ''}" data-pack="all">Featured ${playbooks.filter(p => p.featured).length}</button>
-      <button class="chip ${galleryPack === 'more' ? 'on' : ''}" data-pack="more">More ${playbooks.filter(p => !p.featured).length}</button>
-      ${order.map(k => `<button class="chip ${galleryPack === k ? 'on' : ''}" data-pack="${esc(k)}">${esc(packs[k])} ${playbooks.filter(p => p.pack === k).length}</button>`).join('')}
+    <h1>Topics</h1>
+    <p class="muted" style="margin-top:4px">Pick something you're dealing with and see how Handled works through it, with live City data.</p>
+    <div class="filters" role="tablist">
+      <button role="tab" class="${galleryPack === 'all' ? 'on' : ''}" data-pack="all">Common</button>
+      ${order.filter(k => playbooks.some(p => p.pack === k)).map(k => `<button role="tab" class="${galleryPack === k ? 'on' : ''}" data-pack="${esc(k)}">${esc(packs[k])}</button>`).join('')}
+      <button role="tab" class="${galleryPack === 'more' ? 'on' : ''}" data-pack="more">Everything else</button>
     </div>
-    <div class="pack-grid" style="margin-top:12px">
+    <div class="pack-grid" style="margin-top:16px">
       ${shown.map(p => `
         <div class="card pb-card">
-          <div class="row"><span class="chip">${esc(packs[p.pack])}</span>${p.depth === 'deep' ? '<span class="chip verified">deep</span>' : ''}</div>
-          <strong>${esc(p.title)}</strong>
+          <div class="label">${esc(packs[p.pack])}</div>
+          <div style="font-weight:600;line-height:1.3">${esc(p.title)}</div>
           <p>${esc(p.pitch)}</p>
-          <div class="tiny muted">${[...new Set(p.actions)].map(t => TOOL[t] ?? t).join(' &middot; ')}</div>
-          <button class="ghost" data-try="${esc(p.id)}">Try with a sample</button>
+          <div><button class="ghost" data-try="${esc(p.id)}">See an example</button></div>
         </div>`).join('')}
     </div>`
   view.querySelectorAll('[data-pack]').forEach(b => b.addEventListener('click', () => {
@@ -682,82 +700,79 @@ async function renderSettings() {
   const cal = `${location.origin}/calendar.ics`
   view.innerHTML = `
     <h1>Settings</h1>
-    <h2>Time</h2>
-    <div class="card stack">
-      <div class="spread"><span>Handled's clock</span><strong class="clock-pill">${esc(prettyDate(state.clock.today))}${state.clock.offset_days ? ` (+${state.clock.offset_days} days)` : ''}</strong></div>
-      <div class="ff">
-        <button class="ghost" data-ff="1">+1 day</button>
-        <button class="ghost" data-ff="3">+3 days</button>
-        <button class="ghost" data-ff="7">+7 days</button>
-        <button class="ghost" data-ff="15">+15 days</button>
-      </div>
-      <p class="small muted">Fast-forward moves the clock and runs any reminders and check-ins that come due, so escalations fire right now.</p>
-      <button class="ghost" id="resetClock">Back to real time</button>
-    </div>
-    <h2>Calendar</h2>
-    <div class="card small">Subscribe your phone calendar to <a href="${esc(cal)}">${esc(cal)}</a>. Every deadline, check-in and booking shows up there.</div>
-    <h2>Connections</h2>
-    <div class="card small">
-      Claude: ${i.claude ? 'connected' : 'not set'}<br>
-      Email (Resend): ${i.email ? 'connected' : 'not set'}<br>
-      Texts (Twilio): ${i.sms ? 'connected' : 'not set'}<br>
-      Calls (Vapi): ${i.calls ? 'connected' : 'not set'}<br>
-      Forward email or webhook notes to <code>POST ${esc(location.origin)}/api/inbound</code>
-    </div>
-    <h2>Who is using Handled</h2>
-    <div class="card stack">
-      <div class="row">${personas.map(p => `<button class="ghost" data-persona="${esc(p.id)}">${esc(p.name)} <span class="muted small">${esc(p.language)}</span></button>`).join('')}</div>
-      <p class="small muted">${personas.map(p => `${esc(p.name)}: ${esc(p.persona)}`).join('<br>')}</p>
-      <label class="row small"><input type="checkbox" id="fresh" checked> Start with no cases (for a clean demo)</label>
-      <div class="row small">Language
-        <select id="lang">${Object.entries({ en: 'English', es: 'Español', pt: 'Português', zh: '中文', tl: 'Filipino', vi: 'Tiếng Việt', ru: 'Русский' }).map(([k, v]) => `<option value="${k}" ${profile.language === k ? 'selected' : ''}>${v}</option>`).join('')}</select>
-      </div>
+    <h2>Your language</h2>
+    <div class="card">
+      <label class="field-label" for="lang" style="margin-top:0">Handled explains things to you in</label>
+      <select id="lang" class="field">${Object.entries({ en: 'English', es: 'Español', pt: 'Português', zh: '中文', tl: 'Filipino', vi: 'Tiếng Việt', ru: 'Русский' }).map(([k, v]) => `<option value="${k}" ${profile.language === k ? 'selected' : ''}>${v}</option>`).join('')}</select>
+      <p class="small muted" style="margin-bottom:0">It writes to landlords, employers and the City in English, and shows you what each message says.</p>
     </div>
     <h2>Your helper</h2>
     <div class="card stack small">
-      <div class="row"><span id="helperPreview">${helperSettings().image ? `<img src="${esc(helperSettings().image)}" alt="" width="56" height="56" style="object-fit:contain">` : helperSvg(helperSettings())}</span>
-        <label>Name <input id="helperName" value="${esc(helperSettings().name)}" maxlength="20" style="width:8em"></label>
+      <div class="row" style="gap:16px"><span id="helperPreview">${helperSettings().image ? `<img src="${esc(helperSettings().image)}" alt="" width="48" height="48" style="object-fit:contain">` : helperSvg(helperSettings())}</span>
+        <label>Name <input id="helperName" class="field" value="${esc(helperSettings().name)}" maxlength="20" style="width:8em;min-height:36px;padding:4px 8px"></label>
         <label>Color <input id="helperColor" type="color" value="${esc(helperSettings().color)}"></label>
-        <label>Hat <select id="helperHat">${Object.keys(HATS).map(h => `<option ${helperSettings().hat === h ? 'selected' : ''}>${h}</option>`).join('')}</select></label>
+        <label>Hat <select id="helperHat" class="field" style="width:auto;min-height:36px;padding:4px 8px">${Object.keys(HATS).map(h => `<option ${helperSettings().hat === h ? 'selected' : ''}>${h}</option>`).join('')}</select></label>
       </div>
       <div class="row">
-        <label class="ghost button-like">Use my own picture (PNG) <input id="helperImage" type="file" accept="image/png,image/*" hidden></label>
+        <label class="button-like">Use my own picture <input id="helperImage" type="file" accept="image/png,image/*" hidden></label>
         ${helperSettings().image ? '<button class="ghost" id="helperClear">Back to the drawing</button>' : ''}
         <label class="row"><input type="checkbox" id="helperHidden" ${helperSettings().hidden ? 'checked' : ''}> Hide</label>
       </div>
     </div>
     <h2>What Handled knows about you</h2>
     <div class="card small">
-      ${Object.keys(profile.memory ?? {}).length ? `<dl class="kv">${Object.entries(profile.memory).map(([k, m]) => `<dt>${esc(k.replace(/_/g, ' '))}</dt><dd>${esc(typeof m.value === 'object' ? JSON.stringify(m.value) : m.value)} <span class="tiny muted">from ${esc(m.from)}, ${esc(m.at)}</span></dd>`).join('')}</dl>` : '<span class="muted">Nothing learned yet. Every answer you give is kept here, so no playbook asks twice.</span>'}
+      ${Object.keys(profile.memory ?? {}).length ? `<dl class="kv">${Object.entries(profile.memory).map(([k, m]) => `<dt>${esc(k.replace(/_/g, ' ').replace(/^\w/, x => x.toUpperCase()))}</dt><dd>${esc(typeof m.value === 'object' ? JSON.stringify(m.value) : m.value)}</dd>`).join('')}</dl>` : '<span class="muted">Nothing yet. Handled saves your answers here so it never asks twice.</span>'}
     </div>
-    <h2>Give back to the City</h2>
-    <div class="card small stack">
-      <p>Handled can share what it sees with the City: which obligations people hit, and which steps still need a person because there is no online path. Counts only, never names or addresses.</p>
+    <h2>Calendar</h2>
+    <div class="card small">Add every date and check-in to your phone's calendar. <a href="${esc(cal)}">Subscribe</a></div>
+    <h2>Help the City improve</h2>
+    <div class="card small">
+      <p style="margin-top:0">Handled can share what people needed help with, and which City steps still have no online option. Counts only, never names or addresses.</p>
       <dl class="kv">
-        <dt>Obligations handled</dt><dd>${civic.obligations.map(o => `${esc(o.playbook)} (${o.n})`).join(', ') || 'none yet'}</dd>
-        <dt>No online path</dt><dd>${civic.steps_with_no_online_path.map(s => `${esc(s.host)} (${s.count})`).join(', ') || 'none yet'}</dd>
+        <dt>Needed help with</dt><dd>${civic.obligations.map(o => `${esc(o.playbook.replace(/_/g, ' '))} (${o.n})`).join(', ') || 'Nothing yet'}</dd>
+        <dt>No online option</dt><dd>${civic.steps_with_no_online_path.map(s => `${esc(s.host)} (${s.count})`).join(', ') || 'None yet'}</dd>
         <dt>311 reports</dt><dd>${civic.reports_311.prepared} prepared, ${civic.reports_311.closed_by_city} closed by the City</dd>
       </dl>
-      <a href="/api/civic" download="handled-civic-report.json">Download the anonymous report</a>
+      <p style="margin-bottom:0"><a href="/api/civic" download="handled-civic-report.json">Download the anonymous report</a></p>
     </div>
-    <h2>How well it works</h2>
+    <h2>How we check our work</h2>
     <div class="card small">
       ${evals.routing_keyword_mode ? `<dl class="kv">
-        <dt>Routing, keyword mode</dt><dd>${esc(evals.routing_keyword_mode.total)} (${Object.entries(evals.routing_keyword_mode.by_language).map(([k, v]) => `${esc(k)} ${esc(v)}`).join(', ')})</dd>
-        <dt>Routing, Claude</dt><dd>${typeof evals.routing_claude === 'string' ? esc(evals.routing_claude) : `${esc(evals.routing_claude.total)} (${Object.entries(evals.routing_claude.by_language).map(([k, v]) => `${esc(k)} ${esc(v)}`).join(', ')})`}</dd>
-        <dt>Sweeping check vs real City tickets</dt><dd>${evals.sweeping_rule_vs_city_tickets.schedule_matches}/${evals.sweeping_rule_vs_city_tickets.tickets_checked} agree</dd>
-      </dl><p class="tiny muted">Run ${esc(evals.run_at.slice(0, 16).replace('T', ' '))} UTC with npm run eval.</p>` : esc(evals.note)}
+        <dt>Understands what you sent</dt><dd>${esc(evals.routing_keyword_mode.total)} test messages in English, Spanish and Portuguese</dd>
+        <dt>Parking ticket check</dt><dd>Agrees with the City on ${evals.sweeping_rule_vs_city_tickets.schedule_matches} of ${evals.sweeping_rule_vs_city_tickets.tickets_checked} real street-cleaning tickets</dd>
+        <dt>Deposit interest</dt><dd>Rates checked against the SF Rent Board</dd>
+      </dl>` : '<span class="muted">Not run yet.</span>'}
     </div>
-    <h2>Your profile</h2>
-    <div class="card settings">
-      <p class="small muted">Handled fills forms from this. Never put SSNs, card numbers or full ID numbers here.</p>
-      <textarea id="profile" rows="16" spellcheck="false" style="font-family:ui-monospace,monospace;font-size:.8rem">${esc(JSON.stringify(profile, null, 2))}</textarea>
-      <div class="row" style="margin-top:8px;justify-content:flex-end"><button class="primary" id="saveProfile">Save</button></div>
-    </div>`
+    <details class="card dev" style="margin-top:32px" ${DEV ? 'open' : ''}>
+      <summary class="small" style="font-weight:600">Demo tools</summary>
+      <div class="stack" style="margin-top:12px">
+        <div class="spread small"><span>Handled's clock</span><strong class="clock-pill">${esc(prettyDate(state.clock.today))}${state.clock.offset_days ? ` (+${state.clock.offset_days} days)` : ''}</strong></div>
+        <div class="ff">
+          <button class="ghost" data-ff="1">+1 day</button>
+          <button class="ghost" data-ff="3">+3 days</button>
+          <button class="ghost" data-ff="7">+7 days</button>
+          <button class="ghost" data-ff="15">+15 days</button>
+        </div>
+        <p class="tiny muted">Moves the clock forward and runs any reminders and check-ins that come due.</p>
+        <button class="ghost" id="resetClock">Back to real time</button>
+        <div class="field-label">Persona</div>
+        <div class="row">${personas.map(p => `<button class="ghost" data-persona="${esc(p.id)}">${esc(p.name)}</button>`).join('')}</div>
+        <label class="row small"><input type="checkbox" id="fresh" checked> Start with an empty list</label>
+        <div class="field-label">Connected services</div>
+        <dl class="kv"><dt>Smart reading</dt><dd>${i.claude ? 'On' : 'Off'}</dd><dt>Email</dt><dd>${i.email ? 'On' : 'Off, opens your mail app'}</dd><dt>Texts</dt><dd>${i.sms ? 'On' : 'Off, opens your messages app'}</dd><dt>Calls</dt><dd>${i.calls ? 'On' : 'Off, opens your dialer'}</dd></dl>
+        <p class="tiny muted">Forward emails or meeting notes to POST ${esc(location.origin)}/api/inbound</p>
+        <div class="field-label">Profile</div>
+        <div class="settings">
+          <p class="tiny muted">Handled uses this to fill out forms. Don't enter your SSN, card numbers or full ID numbers.</p>
+          <textarea id="profile" rows="12" spellcheck="false" style="font-family:ui-monospace,monospace;font-size:.8rem">${esc(JSON.stringify(profile, null, 2))}</textarea>
+          <div class="row" style="margin-top:8px;justify-content:flex-end"><button class="primary" id="saveProfile">Save</button></div>
+        </div>
+      </div>
+    </details>`
   view.querySelectorAll('[data-ff]').forEach(b => b.addEventListener('click', async () => {
     const r = await api('/api/clock/advance', { days: Number(b.dataset.ff) })
     await refreshState()
-    toast(r.fired ? `${r.fired} scheduled ${r.fired === 1 ? 'item' : 'items'} fired` : 'Nothing due yet')
+    toast(r.fired ? `Ran ${r.fired} ${r.fired === 1 ? 'reminder or check-in' : 'reminders and check-ins'}` : 'Nothing due yet')
     renderSettings()
   }))
   view.querySelectorAll('[data-persona]').forEach(b => b.addEventListener('click', async () => {
@@ -801,7 +816,7 @@ async function renderSettings() {
       await api('/api/profile', JSON.parse(view.querySelector('#profile').value))
       toast('Profile saved')
     } catch (e) {
-      toast(`Could not save: ${e.message}`)
+      toast("That didn't save. Check the format and try again.")
     }
   })
 }
