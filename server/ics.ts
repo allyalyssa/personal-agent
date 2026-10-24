@@ -1,7 +1,7 @@
 import { db } from './db.ts'
 
 function esc(s: string) {
-  return s.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n')
+  return s.replace(/\r/g, '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n')
 }
 
 function day(iso: string) {
@@ -16,6 +16,23 @@ export function calendarFeed(caseId?: string) {
   const stamp = new Date().toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z'
   const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Handled//EN', 'X-WR-CALNAME:Handled', 'CALSCALE:GREGORIAN']
   for (const d of rows) {
+    if (d.due_at.length > 10) {
+      const start = d.due_at.slice(0, 16).replace(/[-:]/g, '')
+      const [h, m] = d.due_at.slice(11, 16).split(':').map(Number)
+      const endMin = Math.min(h * 60 + m + 30, 23 * 60 + 59)
+      const end = `${start.slice(0, 9)}${String(Math.floor(endMin / 60)).padStart(2, '0')}${String(endMin % 60).padStart(2, '0')}`
+      lines.push(
+        'BEGIN:VEVENT',
+        `UID:handled-${d.id}@handled.local`,
+        `DTSTAMP:${stamp}`,
+        `DTSTART;TZID=America/Los_Angeles:${start}00`,
+        `DTEND;TZID=America/Los_Angeles:${end}00`,
+        `SUMMARY:${esc(d.title)}`,
+        `DESCRIPTION:${esc(`${d.case_title}${d.note ? `\n${d.note}` : ''}`)}`,
+        'END:VEVENT'
+      )
+      continue
+    }
     const end = new Date(`${d.due_at.slice(0, 10)}T12:00:00Z`)
     end.setUTCDate(end.getUTCDate() + 1)
     lines.push(

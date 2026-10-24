@@ -154,7 +154,7 @@ export function setFields(caseId: string, fields: Record<string, any>) {
     for (const [k, v] of Object.entries(clean)) {
       const f = p.required_fields[k]
       if (!f?.profile || v == null || v === '' || get(profile, f.profile) != null) continue
-      setPath(profile, f.profile, v)
+      setPath(profile, f.profile.split('|')[0], v)
       changed = true
     }
     if (changed) setProfile(profile)
@@ -197,8 +197,10 @@ export async function runLookups(caseId: string) {
   const p = playbook(c.playbook!)
   for (const [name, spec] of Object.entries(p.lookups ?? {})) {
     const ctx = getCase(caseId).fields
-    if (ctx[name] && !ctx[name].error) continue
+    const stale = spec.refresh_days && ctx[name]?.checked_at && Date.parse(ctx[name].checked_at) < now().getTime() - spec.refresh_days * 86400000
+    if (ctx[name] && !ctx[name].error && ctx[name].found !== false && !stale) continue
     const args: Record<string, any> = { dataset: spec.dataset, keyword: spec.keyword }
+    for (const [k, path] of Object.entries(spec.with ?? {})) args[k] = get(ctx, path)
     if (spec.address) args.address = get(ctx, spec.address)
     if (spec.number) args.number = get(ctx, spec.number)
     if (spec.date) args.date = get(ctx, spec.date)
@@ -220,7 +222,7 @@ export function runCompute(c: Case) {
   const computed: Record<string, any> = {}
   const rules = Object.fromEntries(allRules().map(r => [r.id, r]))
   for (const [name, spec] of Object.entries(p.compute ?? {})) {
-    const args = Object.fromEntries(Object.entries(spec.args).map(([k, path]) => [k, typeof path === 'number' ? path : get({ ...c.fields, ...computed, rule: rules }, path)]))
+    const args = Object.fromEntries(Object.entries(spec.args).map(([k, path]) => [k, typeof path === 'number' ? path : get({ ...c.fields, ...computed, rule: rules, profile: getProfile() }, path)]))
     computed[name] = computeFns[spec.fn](args)
   }
   return computed
@@ -307,12 +309,12 @@ export function caseView(id: string) {
 
 export function listCases() {
   const cases = db.prepare('select id, playbook, pack, title, status, summary, money_at_stake, money_recovered, busy, updated_at from cases order by updated_at desc').all() as any[]
-  const next = db.prepare(`select d.*, c.title as case_title from deadlines d join cases c on c.id = d.case_id where d.done = 0 and d.due_at >= ? and c.status != 'resolved' order by d.due_at limit 1`).get(today())
+  const next = db.prepare(`select d.*, c.title as case_title from deadlines d join cases c on c.id = d.case_id where d.done = 0 and d.kind != 'meal' and d.due_at >= ? and c.status != 'resolved' order by d.due_at limit 1`).get(today())
   const pending = db.prepare(`select case_id, count(*) n from actions where status = 'proposed' group by case_id`).all() as any[]
   const pendingBy = Object.fromEntries(pending.map(p => [p.case_id, p.n]))
   for (const c of cases) {
     c.pending_approvals = pendingBy[c.id] ?? 0
-    c.next_deadline = db.prepare(`select title, due_at from deadlines where case_id = ? and done = 0 and due_at >= ? order by due_at limit 1`).get(c.id, today()) ?? null
+    c.next_deadline = db.prepare(`select title, due_at from deadlines where case_id = ? and done = 0 and kind != 'meal' and due_at >= ? order by due_at limit 1`).get(c.id, today()) ?? null
   }
   const open = cases.filter(c => c.status !== 'resolved')
   return {

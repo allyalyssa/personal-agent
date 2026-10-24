@@ -4,7 +4,8 @@ import { extname } from 'node:path'
 import { db } from './db.ts'
 import { loadRules, allRules } from './rules.ts'
 import { loadPlaybooks, allPlaybooks, playbook, PACKS } from './playbooks.ts'
-import { createCase, caseView, listCases, resolveCase, getProfile, setProfile, getCase } from './engine.ts'
+import { createCase, caseView, listCases, resolveCase, getProfile, setProfile, getCase, setFields, plan, remember } from './engine.ts'
+import { FOODS } from './nutrition.ts'
 import { intake, reply } from './agent.ts'
 import { executeAction, rejectAction, completeAction } from './actions.ts'
 import { civicReport } from './civic.ts'
@@ -72,6 +73,26 @@ const routes: [string, RegExp, (m: RegExpMatchArray, req: IncomingMessage, res: 
     if (getCase(m[1]).busy) return send(res, 409, { error: 'Handled is still working on this case' })
     reply(m[1], b).catch(e => console.error('reply', e))
     send(res, 200, { ok: true })
+  }],
+  // Like or swap a food in the meal plan. Handled keeps it in the profile, so every later plan starts from it.
+  ['POST', /^\/api\/cases\/(\w+)\/food$/, async (m, req, res) => {
+    const b = await body(req)
+    const food = FOODS.foods.find(f => f.id === b.food)
+    if (!food) return send(res, 400, { error: 'Unknown food' })
+    if (!db.prepare('select 1 from cases where id = ?').get(m[1])) return send(res, 404, { error: 'Case not found' })
+    const c = getCase(m[1])
+    const name = food.name.toLowerCase()
+    const split = (v: any) => String(v ?? '').split(/[;,]/).map(s => s.trim().toLowerCase()).filter(Boolean)
+    const likes = split(c.fields.likes).filter(x => x !== name)
+    const dislikes = split(c.fields.dislikes).filter(x => x !== name)
+    if (b.like) likes.push(name)
+    else dislikes.push(name)
+    setFields(m[1], { likes: likes.join(', '), dislikes: dislikes.join(', ') })
+    const profile = getProfile()
+    profile.food = { ...profile.food, likes: likes.join(', '), dislikes: dislikes.join(', ') }
+    setProfile(profile)
+    remember(b.like ? 'foods_you_like' : 'foods_you_skip', (b.like ? likes : dislikes).join(', '), 'meal plan feedback')
+    send(res, 200, plan(m[1]))
   }],
   ['POST', /^\/api\/cases\/(\w+)\/resolve$/, async (m, req, res) => {
     const b = await body(req)

@@ -1,0 +1,96 @@
+id: eat_well
+pack: food
+title: Eat well near you
+pitch: Tell Handled about your body, training and health. It works out your calories and nutrients from cited sources, explains them in plain words, and builds a day of meals from what's on sale within walking distance.
+depth: deep
+featured: true
+triggers:
+  documents: [smart scale screenshot, body composition report, lab results, grocery receipt]
+  phrases: [how many calories, calories a day, calories, what should i eat, what to eat, meal plan, nutrition, macros, how much protein, eat healthy, eat healthier, grocery deals, lose weight, lose fat, lose a little fat, build muscle, gain muscle, cuántas calorías, calorías, qué debo comer, qué comer, plan de comidas, nutrición, comer sano, bajar de peso, ganar músculo, quantas calorias, calorias, o que devo comer, plano alimentar, nutrição, comer melhor, perder peso, ganhar músculo]
+offline_extract: body_facts
+required_fields:
+  age: { type: number, label: Age, get: extract or ask, profile: body.age }
+  sex: { type: string, label: Sex for the calorie equation (female/male/other), get: extract or ask, profile: body.sex }
+  height: { type: string, label: "Height (e.g. 5'6\" or 168 cm)", get: extract or ask, profile: body.height }
+  weight: { type: string, label: Weight (lb or kg), get: extract or ask, profile: body.weight }
+  goal: { type: string, label: Goal (lose fat, maintain, build muscle), get: extract or ask, profile: body.goal }
+  allergies: { type: string, label: Food allergies or intolerances (or none), get: extract or ask, profile: food.allergies }
+  food_area: { type: string, label: Where you shop or eat most days (street address), get: extract or profile, profile: food.area|address }
+  exercise: { type: string, label: What exercise you do and how often, get: extract or ask, optional: true, profile: body.exercise }
+  activity: { type: string, label: Activity level (sedentary, light, moderate, active, very active), get: extract, optional: true, profile: body.activity }
+  body_fat_pct: { type: number, label: Body fat % (from a smart scale or scan), get: extract, optional: true, profile: body.body_fat_pct }
+  muscle_mass: { type: string, label: Muscle mass (from a smart scale or scan), get: extract, optional: true, profile: body.muscle_mass }
+  conditions: { type: string, label: Health conditions (anemia, diabetes, pregnancy...), get: extract, optional: true, profile: body.conditions }
+  trimester: { type: number, label: Trimester (if pregnant), get: extract, optional: true }
+  ethnicity: { type: string, label: Ethnicity (optional; only used for BMI cutoffs), get: extract, optional: true, profile: body.ethnicity }
+  diet: { type: string, label: Diet (vegetarian, vegan, halal...), get: extract, optional: true, profile: food.diet }
+  likes: { type: string, label: Foods you like, get: extract, optional: true, profile: food.likes }
+  dislikes: { type: string, label: Foods you won't eat, get: extract, optional: true, profile: food.dislikes }
+  max_walk_minutes: { type: number, label: Longest walk to a store (minutes), get: extract, optional: true, profile: food.max_walk_minutes, default: 15 }
+  max_cook_minutes: { type: number, label: Longest you want to cook (minutes), get: extract, optional: true, profile: food.max_cook_minutes, default: 30 }
+  delivery: { type: boolean, label: Want delivery options, get: extract, optional: true, profile: food.delivery }
+  meal_times: { type: string, label: Usual meal times, get: extract, optional: true, profile: food.meal_times, default: "08:00, 12:30, 19:00" }
+  food_budget_tight: { type: boolean, label: Is money for food tight, get: extract, optional: true }
+rules: [nutrition_energy, nutrition_dri, nutrition_conditions, sf_food_help]
+lookups:
+  nearby:
+    dataset: food_nearby
+    address: food_area
+    refresh_days: 3
+    with: { walk_minutes: max_walk_minutes, diet: diet, allergies: allergies, conditions: conditions, dislikes: dislikes, max_cook_minutes: max_cook_minutes, delivery: delivery }
+compute:
+  targets:
+    fn: nutrition_targets
+    args: { age: age, sex: sex, height: height, weight: weight, body_fat_pct: body_fat_pct, muscle_mass: muscle_mass, activity: activity, exercise: exercise, goal: goal, conditions: conditions, diet: diet, ethnicity: ethnicity, trimester: trimester, language: profile.language, area: food_area, walk_minutes: max_walk_minutes }
+  plan:
+    fn: meal_plan
+    args: { targets: targets, nearby: nearby, diet: diet, allergies: allergies, conditions: conditions, likes: likes, dislikes: dislikes, max_cook_minutes: max_cook_minutes, meal_times: meal_times, delivery: delivery }
+guidance: >
+  Lead with targets.explanation, in plain words, in the user's language. Keep it to five short lines.
+  These are information with sources, not medical advice; for each item in targets.conditions, say who to confirm with.
+  If targets.no_calorie_target is true, never mention calorie numbers. Do not ask for ethnicity, body fat or muscle mass;
+  use them only if the user offers them. Mention CalFresh and Market Match only if the user says money is tight.
+actions:
+  - id: meal_calendar
+    tool: create_calendar_event
+    title: Put your meal times on your calendar for the next week
+    needs_approval: true
+    when: plan.ready
+    payload:
+      title: "Meal time ({{targets.headline}})"
+      times: "{{plan.meal_times_text}}"
+      days: 7
+      date: "{{today}}"
+      note: "Protein {{targets.protein.target}} g today. Plan by Handled from USDA and NIH sources."
+  - id: text_list
+    tool: send_sms
+    title: Text yourself the grocery list ({{plan.on_sale_count}} items on sale nearby)
+    needs_approval: true
+    when: plan.ready
+    payload:
+      to: "{{profile.phone}}"
+      body: "Handled grocery list: {{plan.shopping_text}}"
+  - id: calfresh
+    tool: open_url_prefilled
+    title: Check CalFresh (money for groceries) and Market Match at farmers markets
+    needs_approval: true
+    when: food_budget_tight
+    payload:
+      url: https://www.getcalfresh.org/
+deadlines:
+  - title: "Sale ends: {{plan.first_expiry.item}} at {{plan.first_expiry.store}}"
+    due: plan.first_expiry.date
+    when: plan.first_expiry
+    remind_days_before: [1]
+    remind_hour: 18
+    note: From this week's store flyer.
+  - title: New week of deals and an updated plan
+    due: today + 7 days
+    note: Handled refreshes the deals near you and keeps what you liked.
+followups:
+  - after_action: text_list
+    wait: 7 days
+    check: How did this week's meals go? Anything to swap?
+    resolved_when: The user says the plan works
+sample: |
+  How many calories should I eat? I'm 29, female, 5'5" and 140 lb. I lift weights 3 times a week and want to lose a little fat. I'm anemic. No allergies. I shop near 1000 Guerrero St, I don't want to walk more than 15 minutes or cook more than 30.

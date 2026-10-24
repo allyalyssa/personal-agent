@@ -23,5 +23,8 @@
   { "lang": "pt", "text": "Acabei de chegar em San Francisco", "playbook": "arrival_kit" },
   { "lang": "en", "text": "Got a text saying I owe a FasTrak toll, pay at this link", "playbook": "toll_text_check" },
   { "lang": "en", "text": "My car got towed from outside my apartment", "playbook": "towed" },
-  { "lang": "en", "text": "My landlord is raising my rent by 6 percent", "playbook": "rent_increase_check" }
+  { "lang": "en", "text": "My landlord is raising my rent by 6 percent", "playbook": "rent_increase_check" },
+  { "lang": "en", "text": "I want to lose fat, what should I eat and how much protein do I need", "playbook": "eat_well" },
+  { "lang": "es", "text": "Quiero bajar de peso, ¿qué debo comer?", "playbook": "eat_well" },
+  { "lang": "pt", "text": "Quero ganhar músculo, quantas calorias preciso?", "playbook": "eat_well" }
 ]

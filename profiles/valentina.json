@@ -39,6 +39,25 @@
   ],
   "business": null,
   "library_card": false,
+  "body": {
+    "age": 29,
+    "sex": "female",
+    "height": "165 cm",
+    "weight": "62 kg",
+    "exercise": "pesas 3 veces por semana",
+    "goal": "bajar un poco de grasa",
+    "conditions": "anemia",
+    "ethnicity": "Latina"
+  },
+  "food": {
+    "allergies": "none",
+    "diet": "",
+    "likes": "lentils, eggs, avocado",
+    "max_walk_minutes": 15,
+    "max_cook_minutes": 30,
+    "delivery": false,
+    "meal_times": "08:00, 13:00, 20:00"
+  },
   "memory": {
     "origin_country": {
       "value": "Uruguay",

@@ -1,0 +1,38 @@
+{
+  "id": "nutrition_dri",
+  "title": "How much of each nutrient you need (Dietary Reference Intakes)",
+  "jurisdiction": "General (US)",
+  "rule": "Daily needs for adults come from the National Academies' Dietary Reference Intakes, published by the NIH Office of Dietary Supplements. Protein is 0.8 g per kg for most adults and 1.4 to 2.0 g per kg for people who exercise regularly. Carbs are 45 to 65% of calories and fat 20 to 35%. Fiber is 14 g per 1,000 calories. People who eat no meat need 1.8 times the iron, because iron from plants is absorbed less.",
+  "params": {
+    "protein_g_per_kg": { "rda": 0.8, "exercise_min": 1.4, "exercise_max": 2.0, "pregnancy": 1.1 },
+    "amdr_percent": { "carbs": [45, 65], "fat": [20, 35], "protein": [10, 35] },
+    "fiber_g_per_1000_kcal": 14,
+    "water_l_total": { "male": 3.7, "female": 2.7 },
+    "iron_mg": { "male": 8, "female_19_50": 18, "female_51_plus": 8, "pregnant": 27, "vegetarian_multiplier": 1.8 },
+    "calcium_mg": { "default": 1000, "female_51_plus": 1200, "male_71_plus": 1200 },
+    "vitamin_d_mcg": { "default": 15, "age_71_plus": 20 },
+    "b12_mcg": { "default": 2.4, "pregnant": 2.6, "breastfeeding": 2.8 },
+    "folate_mcg": { "default": 400, "pregnant": 600, "breastfeeding": 500 },
+    "magnesium_mg": { "male_19_30": 400, "male_31_plus": 420, "female_19_30": 310, "female_31_plus": 320, "pregnant": 350 },
+    "potassium_mg": { "male": 3400, "female": 2600, "pregnant": 2900 },
+    "vitamin_c_mg": { "male": 90, "female": 75, "pregnant": 85, "breastfeeding": 120 },
+    "sodium_limit_mg": 2300,
+    "zinc_mg": { "male": 11, "female": 8, "pregnant": 11 },
+    "protein_per_meal_g": [20, 40],
+    "calcium_absorbed_best_mg": 500
+  },
+  "source_url": "https://ods.od.nih.gov/HealthInformation/nutrientrecommendations.aspx",
+  "sources": [
+    "https://ods.od.nih.gov/factsheets/Iron-HealthProfessional/",
+    "https://ods.od.nih.gov/factsheets/Calcium-HealthProfessional/",
+    "https://ods.od.nih.gov/factsheets/VitaminD-HealthProfessional/",
+    "https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/",
+    "https://jissn.biomedcentral.com/articles/10.1186/s12970-017-0177-8",
+    "https://www.dietaryguidelines.gov/"
+  ],
+  "verify_phrase": "Dietary Reference Intakes",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "your doctor or a registered dietitian",
+  "notes": "Exercise protein range from the International Society of Sports Nutrition position stand (2017). Fiber per 1,000 calories from the Dietary Guidelines for Americans. Values are for adults 19 and older; Handled does not plan for children. Not re-checked today."
+}

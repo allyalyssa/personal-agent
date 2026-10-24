@@ -425,3 +425,31 @@ main { max-width: 680px; margin: 0 auto; padding: 16px; outline: none; }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; }
 }
+
+.food .explain { padding-left: 18px; margin: 6px 0; }
+.food .explain li { margin: 3px 0; }
+.food .note { margin-top: 6px; padding: 8px 10px; border-radius: 10px; background: var(--warn-bg); }
+.nutrients { width: 100%; border-collapse: collapse; margin-top: 6px; }
+.nutrients th, .nutrients td { text-align: left; vertical-align: top; padding: 6px 4px; border-top: 1px solid var(--line); }
+.nutrients th { white-space: nowrap; }
+.nutrients td:nth-child(2) { white-space: nowrap; font-weight: 600; }
+.nutrients tr.priority th { color: var(--money); }
+.meal-item { display: flex; justify-content: space-between; gap: 8px; align-items: center; padding: 6px 0; border-top: 1px solid var(--line); }
+.meal-item:first-of-type { border-top: 0; }
+.meal-item .row { gap: 10px; flex-shrink: 0; }
+.bar-row { display: grid; grid-template-columns: 7.5em 1fr auto; gap: 8px; align-items: center; margin-top: 5px; }
+.bar { height: 7px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.bar > div { height: 100%; border-radius: 4px; }
+.shop { padding: 5px 0; border-top: 1px solid var(--line); gap: 8px; }
+.shop:first-child { border-top: 0; }
+.shop > span:last-child { text-align: right; }
+.button-like { display: inline-block; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; }
+
+.helper { position: fixed; right: 14px; bottom: 112px; z-index: 30; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; pointer-events: none; }
+.helper[hidden] { display: none; }
+.helper-body { pointer-events: auto; border: 0; background: none; padding: 0; cursor: pointer; filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .2)); animation: helper-bob 3.2s ease-in-out infinite; }
+.helper-body img { width: 56px; height: 56px; object-fit: contain; }
+.helper-bubble { pointer-events: auto; max-width: min(280px, calc(100vw - 40px)); background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 14px 14px 4px 14px; padding: 9px 12px; font-size: .85rem; line-height: 1.35; box-shadow: var(--shadow); animation: helper-pop .18s ease-out; }
+@keyframes helper-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes helper-pop { from { transform: scale(.9); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .helper-body, .helper-bubble { animation: none; } }

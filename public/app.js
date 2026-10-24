@@ -42,7 +42,7 @@ const SPEECH_LANG = { en: 'en-US', es: 'es-US', pt: 'pt-BR', zh: 'zh-CN', tl: 'f
 const t = key => (STRINGS[state?.profile?.language] ?? STRINGS.en)[key] ?? STRINGS.en[key] ?? key
 const STATUS = new Proxy({}, { get: (_, k) => t(k) })
 const TOOL = new Proxy({}, { get: (_, k) => t(k) })
-const PACK_LABEL = { renter: 'Renter', car: 'Car', work: 'Work', everyday: 'Everyday', care: 'Care', business: 'Business', newcomer: 'Newcomer', city: 'City', good: 'Good stuff' }
+const PACK_LABEL = { renter: 'Renter', car: 'Car', work: 'Work', everyday: 'Everyday', care: 'Care', business: 'Business', newcomer: 'Newcomer', city: 'City', food: 'Food', good: 'Good stuff' }
 
 async function api(path, body) {
   const res = await fetch(path, body === undefined ? {} : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
@@ -109,11 +109,89 @@ async function refreshState() {
   sessionStorage.setItem('lastNotification', String(lastNotification))
 }
 
+// A small customizable character in the corner that explains what is on screen in one line at a time.
+const HELPER_DEFAULT = { name: 'Pip', color: '#2bb673', hat: 'sprout', image: null, hidden: false }
+let helperTip = 0
+let currentCase = null
+
+function helperSettings() {
+  try {
+    return { ...HELPER_DEFAULT, ...JSON.parse(localStorage.getItem('handledHelper') ?? '{}') }
+  } catch {
+    return { ...HELPER_DEFAULT }
+  }
+}
+
+function saveHelper(s) {
+  try {
+    localStorage.setItem('handledHelper', JSON.stringify(s))
+  } catch {}
+  drawHelper()
+}
+
+const HATS = {
+  none: '',
+  sprout: '<path d="M32 16 v-8" stroke="#2f7d32" stroke-width="3"/><path d="M32 9 q-9 -6 -13 2 q8 3 13 -2" fill="#4caf50"/><path d="M32 9 q9 -6 13 2 q-8 3 -13 -2" fill="#66bb6a"/>',
+  chef: '<rect x="20" y="10" width="24" height="9" rx="2" fill="#fff" stroke="#ccc"/><circle cx="24" cy="9" r="6" fill="#fff" stroke="#ccc"/><circle cx="32" cy="6" r="7" fill="#fff" stroke="#ccc"/><circle cx="40" cy="9" r="6" fill="#fff" stroke="#ccc"/>',
+  cap: '<path d="M12 22 q20 -18 40 0 z" fill="#1e5aa8"/><rect x="34" y="19" width="20" height="4" rx="2" fill="#1e5aa8"/>',
+  bow: '<path d="M32 18 l-10 -6 v12 z M32 18 l10 -6 v12 z" fill="#e5484d"/><circle cx="32" cy="18" r="3" fill="#b91c1c"/>',
+  glasses: '<circle cx="24" cy="34" r="7" fill="none" stroke="#123" stroke-width="2"/><circle cx="40" cy="34" r="7" fill="none" stroke="#123" stroke-width="2"/><path d="M31 34 h2" stroke="#123" stroke-width="2"/>'
+}
+
+function helperSvg(s) {
+  return `<svg viewBox="0 0 64 64" width="56" height="56" aria-hidden="true">
+    <ellipse cx="32" cy="40" rx="24" ry="21" fill="${esc(s.color)}"/>
+    <ellipse cx="32" cy="48" rx="13" ry="8" fill="#fff" opacity=".25"/>
+    <circle cx="24" cy="34" r="4.5" fill="#fff"/><circle cx="40" cy="34" r="4.5" fill="#fff"/>
+    <circle cx="25" cy="35" r="2.2" fill="#123"/><circle cx="41" cy="35" r="2.2" fill="#123"/>
+    <path d="M26 45 q6 5 12 0" stroke="#123" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    ${HATS[s.hat] ?? ''}
+  </svg>`
+}
+
+function helperTips() {
+  const s = helperSettings()
+  const c = route.startsWith('/case/') ? currentCase : null
+  if (c?.computed?.targets?.ready) return c.computed.targets.explanation
+  if (c) {
+    const next = c.actions?.find(a => a.status === 'proposed')
+    return [c.summary, next ? `Next: ${next.title}. Nothing goes out until you tap Approve.` : null].filter(Boolean)
+  }
+  if (route === '/gallery') return ['Pick a playbook and tap "Try with a sample" to see it run on live City data.', 'Eat well near you plans meals from what is on sale within walking distance.']
+  if (route === '/settings') return [`You can rename me, change my color and hat, or upload your own picture below.`]
+  const d = state?.next_deadline
+  return [`Hi, I'm ${s.name}. Snap a notice, or tell me what you want to eat this week.`, d ? `Next up: ${d.title}, ${relDay(d.due_at)}.` : 'Nothing due right now.']
+}
+
+function drawHelper(say = false) {
+  let el = document.getElementById('helper')
+  if (!el) {
+    el = document.createElement('div')
+    el.id = 'helper'
+    el.className = 'helper'
+    document.body.appendChild(el)
+    el.addEventListener('click', () => {
+      helperTip++
+      drawHelper(true)
+    })
+  }
+  const s = helperSettings()
+  el.hidden = s.hidden
+  const tips = helperTips()
+  const tip = tips.length ? tips[helperTip % tips.length] : ''
+  el.innerHTML = `
+    ${say && tip ? `<div class="helper-bubble" role="status"><strong>${esc(s.name)}</strong> ${esc(tip)}</div>` : ''}
+    <button class="helper-body" aria-label="${esc(s.name)}, tap for a tip">${s.image ? `<img src="${esc(s.image)}" alt="">` : helperSvg(s)}</button>`
+}
+
 async function render() {
   clearTimeout(caseTimer)
+  helperTip = 0
+  currentCase = null
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', (t.dataset.go === 'home' && (route === '/' || route.startsWith('/case'))) || route === `/${t.dataset.go}`))
   if (!state) await refreshState()
   translateChrome()
+  drawHelper(!route.startsWith('/case/'))
   if (route.startsWith('/case/')) return renderCase(route.split('/')[2])
   if (route === '/gallery') return renderGallery()
   if (route === '/settings') return renderSettings()
@@ -311,7 +389,59 @@ function eventLine(e) {
   return `<li class="${esc(e.kind)}"><div class="small">${esc(e.title)}${extra}</div><div class="tiny muted">${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} ${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</div></li>`
 }
 
+const MEAL = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', snack: 'Snack' }
+
+function foodCard(c) {
+  const tg = c.computed.targets
+  const p = c.computed.plan
+  const near = c.fields.nearby
+  if (!tg.ready) return `<div class="card" style="margin-top:10px"><div class="small">${esc(tg.reason ?? `Handled needs your ${tg.missing.join(', ')} to work out your targets.`)}</div></div>`
+  const macro = [tg.protein ? `Protein ${tg.protein.target} g` : null, tg.carbs_g ? `Carbs ${tg.carbs_g} g` : null, tg.fat_g ? `Fat ${tg.fat_g} g` : null, `Fiber ${tg.needs.fiber} g`, `Water about ${tg.water_l} L`].filter(Boolean)
+  return `
+    <div class="card food" style="margin-top:10px">
+      <div class="muted small">What your body needs</div>
+      <div class="headline-money">${esc(tg.headline)}</div>
+      <div class="row small" style="margin:6px 0">${macro.map(m => `<span class="chip">${esc(m)}</span>`).join('')}</div>
+      <ul class="small explain">${tg.explanation.map(l => `<li>${esc(l)}</li>`).join('')}</ul>
+      ${tg.conditions.map(n => `<div class="small note"><strong>${esc(n.label)}.</strong> ${esc(n.note)} <span class="muted">Confirm with ${esc(n.confirm_with)}. <a href="${esc(safeUrl(n.source_url))}" target="_blank" rel="noopener">Source</a></span></div>`).join('')}
+      ${tg.assumptions.length ? `<div class="tiny muted">${tg.assumptions.map(esc).join(' ')}</div>` : ''}
+      <details style="margin-top:8px"><summary class="small"><strong>Every nutrient, and how to get it</strong></summary>
+        <table class="nutrients small">${tg.nutrients.map(n => `<tr class="${n.priority ? 'priority' : ''}"><th>${esc(n.name)}</th><td>${esc(n.amount)} ${esc(n.unit)}</td><td>${esc(n.how)} <span class="muted">From: ${esc(n.foods)}.</span></td></tr>`).join('')}</table>
+        <p class="tiny muted">${esc(tg.formula)} x ${esc(tg.activity_factor)} activity. Sodium under ${esc(tg.sodium_limit_mg)} mg. Information with sources, not medical advice.</p>
+      </details>
+    </div>
+    ${p?.ready ? `
+    <h2>Today's meals</h2>
+    <div class="stack">${p.meals.map(m => `
+      <div class="card meal">
+        <div class="spread"><strong>${esc(MEAL[m.meal])}</strong><span class="muted small">${esc(m.time)}</span></div>
+        ${m.items.map(i => {
+          const deal = p.shopping.find(s => s.id === i.id)?.deal
+          return `<div class="meal-item">
+            <div class="small"><strong>${esc(i.servings)} x</strong> ${esc(i.name)} <span class="muted">(${esc(i.serving)})</span>${deal ? ` <span class="chip money">${esc(deal.price_text)} at ${esc(deal.store)}${deal.walk_minutes != null ? `, ${esc(deal.walk_minutes)} min walk` : ''}</span>` : ''}</div>
+            <div class="row"><button class="link small" data-food="${esc(i.id)}" data-like="1">Like</button><button class="link small" data-food="${esc(i.id)}" data-like="0">Swap</button></div>
+          </div>`
+        }).join('')}
+      </div>`).join('')}
+    </div>
+    ${p.pairs.length ? `<div class="card small" style="margin-top:10px"><strong>Paired for absorption:</strong> ${p.pairs.map(esc).join('; ')}.</div>` : ''}
+    <div class="card" style="margin-top:10px">
+      <div class="small"><strong>How this day covers you</strong></div>
+      ${p.coverage.filter(x => x.need).map(x => `<div class="bar-row small"><span>${esc(x.name)}</span><div class="bar"><div style="width:${Math.min(100, x.percent)}%;background:${x.percent >= 80 ? 'var(--money)' : 'var(--warn)'}"></div></div><span class="muted">${esc(x.have)}/${esc(x.need)} ${esc(x.unit)}</span></div>`).join('')}
+      ${p.gaps.map(g => `<div class="tiny" style="color:var(--warn)">${esc(g.name)} is short. ${esc(g.tip)}</div>`).join('')}
+    </div>
+    <h2>Shopping near ${esc(near?.address ?? c.fields.food_area ?? 'you')}</h2>
+    <div class="card small">
+      ${p.shopping.map(s => `<div class="spread shop"><span>${esc(s.name)}</span><span>${s.deal ? `<span class="money">${esc(s.deal.price_text)}</span> ${esc(s.deal.store)}${s.deal.walk_minutes != null ? ` (${esc(s.deal.walk_minutes)} min)` : ''}${s.deal.valid_to ? ` <span class="muted tiny">until ${esc(prettyDate(s.deal.valid_to.slice(0, 10)))}</span>` : ''}` : '<span class="muted">regular price</span>'}${s.order_url ? ` <a href="${esc(safeUrl(s.order_url))}" target="_blank" rel="noopener">order</a>` : ''}</span></div>`).join('')}
+      ${near?.stores?.length ? `<p class="tiny muted">Within ${esc(near.walk_minutes)} min: ${near.stores.slice(0, 6).map(s => `${esc(s.name)} (${esc(s.walk_minutes)} min)`).join(', ')}.</p>` : ''}
+      ${near?.markets?.length ? `<p class="tiny">Farmers markets nearby: ${near.markets.map(m => `${esc(m.name)} (${esc(m.walk_minutes)} min)`).join(', ')}. Many take CalFresh and add Market Match money for produce.</p>` : ''}
+      ${near?.map_error ? `<p class="tiny" style="color:var(--warn)">Map data was unavailable, so walk times are missing; deals are for your ZIP code.</p>` : ''}
+      <p class="tiny muted">${esc(p.note)} ${esc(near?.note ?? '')}</p>
+    </div>` : ''}`
+}
+
 function computedHeadline(c) {
+  if (c.computed?.targets) return foodCard(c)
   const i = c.computed?.interest
   if (i) return `
     <div class="card" style="margin-top:10px">
@@ -356,14 +486,18 @@ async function renderCase(id, auto = false) {
     return
   }
   if (route !== `/case/${id}`) return
-  const typing = document.activeElement?.closest?.('.edit, .questions, #caseReply')
+  const firstLook = currentCase?.id !== c.id || (!currentCase?.computed?.targets && c.computed?.targets)
+  currentCase = c
+  if (firstLook) drawHelper(true)
+  const typing =document.activeElement?.closest?.('.edit, .questions, #caseReply')
   if (typing || (editing.size && auto)) {
     caseTimer = setTimeout(() => renderCase(id, true), 2000)
     return
   }
   const proposed = c.actions.filter(a => a.status === 'proposed')
   const other = c.actions.filter(a => a.status !== 'proposed')
-  const upcoming = c.deadlines.filter(d => !d.done)
+  const upcoming = c.deadlines.filter(d => !d.done && d.kind !== 'meal')
+  const meals = c.deadlines.filter(d => d.kind === 'meal').length
   view.innerHTML = `
     <button class="back" onclick="location.hash='/'">&larr; Cases</button>
     <div class="spread">
@@ -395,6 +529,7 @@ async function renderCase(id, auto = false) {
             ${d.note ? `<div class="tiny muted" style="margin-top:3px">${esc(d.note)}</div>` : ''}
           </div>
         </div>`).join('')}
+        ${meals ? `<p class="small">${meals} meal times are on your calendar.</p>` : ''}
         <p class="small"><a href="/api/cases/${esc(c.id)}/calendar.ics">Add to calendar</a></p>
       </div>` : ''}
     ${other.length ? `<h2>${esc(t('done'))}</h2><div class="stack">${other.slice().reverse().map(a => actionCard(a, c.events)).join('')}</div>` : ''}
@@ -451,6 +586,12 @@ async function renderCase(id, auto = false) {
   view.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => {
     navigator.clipboard.writeText(b.dataset.copy)
     toast('Copied')
+  }))
+  view.querySelectorAll('[data-food]').forEach(b => b.addEventListener('click', async () => {
+    b.disabled = true
+    await api(`/api/cases/${id}/food`, { food: b.dataset.food, like: b.dataset.like === '1' })
+    toast(b.dataset.like === '1' ? 'Got it. Handled will pick it more often.' : 'Swapped. Handled will skip it from now on.')
+    renderCase(id)
   }))
   view.querySelector('#answer')?.addEventListener('click', async () => {
     const answers = Object.fromEntries([...view.querySelectorAll('[data-q]')].filter(i => i.value.trim()).map(i => [i.dataset.field, i.value.trim()]))
@@ -551,6 +692,19 @@ async function renderSettings() {
         <select id="lang">${Object.entries({ en: 'English', es: 'Español', pt: 'Português', zh: '中文', tl: 'Filipino', vi: 'Tiếng Việt', ru: 'Русский' }).map(([k, v]) => `<option value="${k}" ${profile.language === k ? 'selected' : ''}>${v}</option>`).join('')}</select>
       </div>
     </div>
+    <h2>Your helper</h2>
+    <div class="card stack small">
+      <div class="row"><span id="helperPreview">${helperSettings().image ? `<img src="${esc(helperSettings().image)}" alt="" width="56" height="56" style="object-fit:contain">` : helperSvg(helperSettings())}</span>
+        <label>Name <input id="helperName" value="${esc(helperSettings().name)}" maxlength="20" style="width:8em"></label>
+        <label>Color <input id="helperColor" type="color" value="${esc(helperSettings().color)}"></label>
+        <label>Hat <select id="helperHat">${Object.keys(HATS).map(h => `<option ${helperSettings().hat === h ? 'selected' : ''}>${h}</option>`).join('')}</select></label>
+      </div>
+      <div class="row">
+        <label class="ghost button-like">Use my own picture (PNG) <input id="helperImage" type="file" accept="image/png,image/*" hidden></label>
+        ${helperSettings().image ? '<button class="ghost" id="helperClear">Back to the drawing</button>' : ''}
+        <label class="row"><input type="checkbox" id="helperHidden" ${helperSettings().hidden ? 'checked' : ''}> Hide</label>
+      </div>
+    </div>
     <h2>What Handled knows about you</h2>
     <div class="card small">
       ${Object.keys(profile.memory ?? {}).length ? `<dl class="kv">${Object.entries(profile.memory).map(([k, m]) => `<dt>${esc(k.replace(/_/g, ' '))}</dt><dd>${esc(typeof m.value === 'object' ? JSON.stringify(m.value) : m.value)} <span class="tiny muted">from ${esc(m.from)}, ${esc(m.at)}</span></dd>`).join('')}</dl>` : '<span class="muted">Nothing learned yet. Every answer you give is kept here, so no playbook asks twice.</span>'}
@@ -598,6 +752,23 @@ async function renderSettings() {
     await refreshState()
     translateChrome()
     renderSettings()
+  })
+  const helperChange = patch => {
+    saveHelper({ ...helperSettings(), ...patch })
+    renderSettings()
+  }
+  view.querySelector('#helperName').addEventListener('change', e => helperChange({ name: e.target.value.trim() || 'Pip' }))
+  view.querySelector('#helperColor').addEventListener('change', e => helperChange({ color: e.target.value }))
+  view.querySelector('#helperHat').addEventListener('change', e => helperChange({ hat: e.target.value }))
+  view.querySelector('#helperHidden').addEventListener('change', e => helperChange({ hidden: e.target.checked }))
+  view.querySelector('#helperClear')?.addEventListener('click', () => helperChange({ image: null }))
+  view.querySelector('#helperImage').addEventListener('change', e => {
+    const file = e.target.files[0]
+    if (!file) return
+    if (file.size > 400000) return toast('Pick a picture under 400 KB.')
+    const reader = new FileReader()
+    reader.onload = () => helperChange({ image: reader.result })
+    reader.readAsDataURL(file)
   })
   view.querySelector('#resetClock').addEventListener('click', async () => {
     await api('/api/clock/reset', {})

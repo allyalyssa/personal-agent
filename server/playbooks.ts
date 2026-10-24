@@ -53,11 +53,12 @@ export type Playbook = {
   triggers: { documents: string[], phrases: string[] }
   required_fields: Record<string, Field>
   rules: string[]
-  lookups?: Record<string, { dataset: 'assessor' | 'street_sweeping' | 'temporary_no_parking' | 'nearby_311' | 'citation', address?: string, number?: string, keyword?: string, date?: string }>
+  lookups?: Record<string, { dataset: 'assessor' | 'street_sweeping' | 'temporary_no_parking' | 'nearby_311' | 'citation' | 'food_nearby', address?: string, number?: string, keyword?: string, date?: string, with?: Record<string, string>, refresh_days?: number }>
   compute?: Record<string, { fn: string, args: Record<string, string> }>
   money_at_stake?: string
   guidance?: string
   datasf?: string[]
+  offline_extract?: string
   actions: ActionSpec[]
   deadlines?: DeadlineSpec[]
   followups?: FollowupSpec[]
@@ -94,5 +95,6 @@ export const PACKS: Record<string, string> = {
   business: 'Small business',
   newcomer: 'Newcomers',
   city: 'Give back to the city',
+  food: 'Food and health',
   good: 'The good stuff'
 }

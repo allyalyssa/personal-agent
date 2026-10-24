@@ -1,0 +1,556 @@
+import { readFileSync } from 'node:fs'
+import { rule } from './rules.ts'
+import { today } from './clock.ts'
+
+export type Food = { id: string, name: string, serving: string, search: string, match: string[], exclude: string[], roles: string[], diet: string[], allergens: string[], cook_minutes: number, n: Record<string, number> }
+
+export const FOODS = JSON.parse(readFileSync('nutrition/foods.json', 'utf8')) as { source: string, source_url: string, units: Record<string, string>, foods: Food[] }
+
+const round = (n: number, step = 1) => Number((Math.round(n / step) * step).toFixed(2))
+
+const list = (v: any): string[] => (Array.isArray(v) ? v : String(v ?? '').split(/[;,]| and | y | e /)).map(s => String(s).trim().toLowerCase()).filter(s => s && !/^(none|no|ninguna|nenhuma|n\/a)$/.test(s))
+
+// "5'6", "5 ft 6 in", "168 cm", "1.68 m" or a bare number of centimeters.
+export function parseHeight(v: any) {
+  const s = String(v ?? '').toLowerCase().trim()
+  const ft = s.match(/(\d+)\s*(?:'|ft|feet|foot|pies)\s*(\d+(?:\.\d+)?)?/)
+  if (ft) return { cm: round((Number(ft[1]) * 12 + Number(ft[2] ?? 0)) * 2.54, 0.1), imperial: true }
+  const m = s.match(/^(\d(?:\.\d+)?)\s*m$/)
+  if (m) return { cm: Number(m[1]) * 100, imperial: false }
+  const n = parseFloat(s)
+  return Number.isFinite(n) ? { cm: n, imperial: false } : null
+}
+
+export function parseWeight(v: any, imperialHint: boolean) {
+  const s = String(v ?? '').toLowerCase().trim()
+  const n = parseFloat(s)
+  if (!Number.isFinite(n)) return null
+  if (/lb|pound|libra/.test(s)) return { kg: round(n * 0.4536, 0.1), assumed: false }
+  if (/kg|kilo/.test(s)) return { kg: n, assumed: false }
+  return { kg: imperialHint ? round(n * 0.4536, 0.1) : n, assumed: true }
+}
+
+function parseSex(v: any) {
+  const s = String(v ?? '').toLowerCase()
+  if (/^(f|female|woman|women|mujer|femenin|mulher|feminin)/.test(s)) return 'female'
+  if (/^(m|male|man|men|hombre|masculin|homem|varón)/.test(s)) return 'male'
+  return 'other'
+}
+
+function parseActivity(v: any, exercise: string) {
+  const s = `${v ?? ''} ${exercise}`.toLowerCase()
+  if (/\bvery\b|athlete|twice a day|muy activ|muito ativ/.test(s)) return 'very_active'
+  const days = s.match(/(\d)\s*(?:x|times|days|veces|días|dias|vezes)/)
+  if (days) return Number(days[1]) >= 6 ? 'active' : Number(days[1]) >= 3 ? 'moderate' : 'light'
+  if (/sedentar|desk job|^\s*none\s*$|no exercise|\bnada\b|\bninguno\b/.test(s)) return 'sedentary'
+  if (/light|ligera|leve|walk|camin/.test(s)) return 'light'
+  if (/active|activ|ativ/.test(s)) return 'active'
+  return 'moderate'
+}
+
+function parseGoal(v: any) {
+  const s = String(v ?? '').toLowerCase()
+  if (/lose|loss|cut|bajar|perder|adelgaz|emagrec/.test(s)) return 'lose'
+  if (/gain|bulk|build|muscle|ganar|ganhar|músculo|musculo/.test(s)) return 'gain'
+  return 'maintain'
+}
+
+const CONDITION_WORDS: Record<string, RegExp> = {
+  anemia: /anemi|anémi|iron defic|hierro bajo|ferro baixo/,
+  diabetes: /diabet|prediabet|insulin resist/,
+  hypertension: /hypertens|blood pressure|presión alta|presion alta|pressão alta|hipertens/,
+  cholesterol: /cholest|colesterol|ldl/,
+  celiac: /celiac|coeliac|celíac|celiaq/,
+  kidney: /kidney|\brenal\b|\bckd\b|riñón|riñon|rinon|\brim\b|doença renal/,
+  pregnancy: /pregnan|embaraz|grávida|gravida|gestante/,
+  breastfeeding: /breastfeed|nursing|lactanc|amamant/,
+  lactose: /lactose|lactosa/,
+  osteoporosis: /osteopor|osteopen|bone densit/,
+  ibs: /\bibs\b|irritable bowel|colon irritable/,
+  eating_disorder: /eating disorder|anorex|bulimi|binge|trastorno aliment|transtorno aliment/
+}
+
+export function parseConditions(v: any) {
+  const text = list(v).join(' ')
+  return Object.keys(CONDITION_WORDS).filter(k => CONDITION_WORDS[k].test(text))
+}
+
+const ASIAN = /asian|chinese|filipin|vietnam|korean|japanese|indian|south asian|pakistan|bangladesh|thai|indonesia|malays|taiwan|hmong|cambod|laotian|nepal|asiát|asiat/
+const LACTOSE_GROUPS = /black|african|asian|chinese|filipin|vietnam|korean|japanese|indian|latin|hispan|mexican|native|indigenous|american indian|latino|latina/
+
+function bmiCategory(bmi: number, asian: boolean) {
+  const c = rule('nutrition_energy').params
+  const over = asian ? c.bmi_cutoffs_asian.over : c.bmi_cutoffs.over
+  const obese = asian ? c.bmi_cutoffs_asian.obese : c.bmi_cutoffs.obese
+  if (bmi < c.bmi_cutoffs.under) return 'underweight'
+  if (bmi < over) return 'healthy range'
+  if (bmi < obese) return 'overweight'
+  return 'obesity range'
+}
+
+const NUTRIENTS: Record<string, { name: string, unit: string, foods: string, how: string }> = {
+  iron: { name: 'Iron', unit: 'mg', foods: 'lentils, beans, spinach, beef, sardines, tofu', how: 'Eat iron foods with vitamin C (peppers, oranges, strawberries). Keep coffee and tea an hour away from those meals; calcium at the same meal also blocks some iron.' },
+  calcium: { name: 'Calcium', unit: 'mg', foods: 'yogurt, milk, calcium-set tofu, sardines, fortified soy milk', how: 'Your body absorbs about 500 mg at a time best, so spread it over meals. Vitamin D helps you absorb it. Most of the calcium in spinach is not absorbed.' },
+  vitamin_d: { name: 'Vitamin D', unit: 'mcg', foods: 'salmon, sardines, eggs, fortified milk or soy milk', how: 'Few foods have much. Eat it with a meal that has some fat. Ask your doctor whether to test your level or take a supplement.' },
+  b12: { name: 'Vitamin B12', unit: 'mcg', foods: 'fish, meat, eggs, dairy, fortified soy milk', how: 'Only animal foods and fortified foods have it. If you eat no animal foods, use fortified foods or a supplement every day.' },
+  folate: { name: 'Folate', unit: 'mcg', foods: 'lentils, beans, spinach, broccoli, avocado', how: 'Beans and dark greens are the best sources.' },
+  fiber: { name: 'Fiber', unit: 'g', foods: 'beans, lentils, oats, vegetables, fruit', how: 'Add it slowly over a couple of weeks and drink water with it.' },
+  potassium: { name: 'Potassium', unit: 'mg', foods: 'potatoes, beans, lentils, spinach, bananas', how: 'Get it from food, not pills.' },
+  magnesium: { name: 'Magnesium', unit: 'mg', foods: 'beans, almonds, spinach, brown rice, oats', how: 'Whole grains, nuts and beans cover most of it.' },
+  vitamin_c: { name: 'Vitamin C', unit: 'mg', foods: 'peppers, oranges, strawberries, broccoli', how: 'Raw or lightly cooked keeps more of it. It also helps you absorb iron.' },
+  protein: { name: 'Protein', unit: 'g', foods: 'chicken, fish, eggs, yogurt, tofu, lentils', how: 'Spread it out: about 20 to 40 g at each meal helps your muscles use it.' }
+}
+
+const NUTRIENT_TEXT: Record<string, Record<string, [string, string]>> = {
+  es: {
+    iron: ['Hierro', 'Come el hierro con vitamina C (morrón, naranja, frutillas). Deja el café y el té una hora lejos de esas comidas; el calcio en la misma comida también bloquea parte del hierro.'],
+    vitamin_c: ['Vitamina C', 'Cruda o poco cocida conserva más. También te ayuda a absorber el hierro.'],
+    calcium: ['Calcio', 'El cuerpo absorbe mejor unos 500 mg por vez, así que repártelo en las comidas. La vitamina D ayuda; el calcio de la espinaca casi no se absorbe.'],
+    vitamin_d: ['Vitamina D', 'Pocos alimentos la tienen: salmón, sardinas, huevos, leche fortificada. Pregúntale a tu médico si conviene medirla o suplementar.'],
+    b12: ['Vitamina B12', 'Solo está en alimentos animales y fortificados. Si no comes nada animal, usa fortificados o un suplemento todos los días.'],
+    folate: ['Folato', 'Porotos, lentejas y hojas verdes son la mejor fuente.'],
+    fiber: ['Fibra', 'Súbela de a poco durante un par de semanas y toma agua.'],
+    potassium: ['Potasio', 'Mejor de la comida que de pastillas: papas, porotos, lentejas, bananas.'],
+    magnesium: ['Magnesio', 'Granos integrales, frutos secos y porotos cubren casi todo.']
+  },
+  pt: {
+    iron: ['Ferro', 'Coma o ferro com vitamina C (pimentão, laranja, morango). Deixe café e chá uma hora longe dessas refeições; cálcio na mesma refeição também bloqueia parte do ferro.'],
+    vitamin_c: ['Vitamina C', 'Crua ou pouco cozida conserva mais. Também ajuda a absorver o ferro.'],
+    calcium: ['Cálcio', 'O corpo absorve melhor uns 500 mg por vez, então divida nas refeições. A vitamina D ajuda; o cálcio do espinafre quase não é absorvido.'],
+    vitamin_d: ['Vitamina D', 'Poucos alimentos têm: salmão, sardinha, ovos, leite fortificado. Pergunte ao seu médico sobre exame ou suplemento.'],
+    b12: ['Vitamina B12', 'Só existe em alimentos animais e fortificados. Se você não come nada animal, use fortificados ou suplemento todo dia.'],
+    folate: ['Folato', 'Feijão, lentilha e folhas verdes são as melhores fontes.'],
+    fiber: ['Fibra', 'Aumente aos poucos por duas semanas e beba água.'],
+    potassium: ['Potássio', 'Melhor da comida do que de comprimidos: batata, feijão, lentilha, banana.'],
+    magnesium: ['Magnésio', 'Grãos integrais, castanhas e feijão cobrem quase tudo.']
+  }
+}
+
+const T: Record<string, Record<string, (a: any) => string>> = {
+  en: {
+    burn: a => `You burn about ${a.tdee.toLocaleString('en-US')} calories a day (${a.formula}, ${a.activity}).`,
+    lose: a => `To lose about 1 lb a week, eat about ${a.cal.toLocaleString('en-US')} a day.`,
+    gain: a => `To gain muscle slowly, eat about ${a.cal.toLocaleString('en-US')} a day.`,
+    maintain: a => `To stay where you are, eat about ${a.cal.toLocaleString('en-US')} a day.`,
+    floor: a => `That is the lowest Handled plans without a clinician (${a.cal.toLocaleString('en-US')}).`,
+    nocal: () => 'No calorie counting: the plan is built as balanced plates.',
+    protein: a => `Protein: about ${a.g} g a day (${a.min} to ${a.max} g), split across meals, to ${a.why}.`,
+    priority: a => `${a.name}: ${a.amount} ${a.unit} a day. ${a.how}`,
+    bmi: a => `BMI ${a.bmi} (${a.cat}${a.asian ? ', using the lower cutoffs for Asian adults' : ''}). BMI does not see muscle, so treat it as a rough guide.`,
+    plan: a => a.walk ? `The plan uses foods on sale within about ${a.walk} minutes' walk of ${a.area}.` : 'The plan uses common foods; add your area to see local deals.'
+  },
+  es: {
+    burn: a => `Quemas unas ${a.tdee.toLocaleString('es-US')} calorías al día (${a.formula}, ${a.activity}).`,
+    lose: a => `Para bajar cerca de medio kilo por semana, come unas ${a.cal.toLocaleString('es-US')} al día.`,
+    gain: a => `Para ganar músculo de a poco, come unas ${a.cal.toLocaleString('es-US')} al día.`,
+    maintain: a => `Para mantenerte, come unas ${a.cal.toLocaleString('es-US')} al día.`,
+    floor: a => `Es lo mínimo que Handled planifica sin un profesional (${a.cal.toLocaleString('es-US')}).`,
+    nocal: () => 'Sin contar calorías: el plan son platos balanceados.',
+    protein: a => `Proteína: unos ${a.g} g al día (${a.min} a ${a.max} g), repartidos en las comidas, para ${a.why_es}.`,
+    priority: a => `${a.name}: ${a.amount} ${a.unit} al día. ${a.how}`,
+    bmi: a => `IMC ${a.bmi}. El IMC no distingue músculo; tómalo como guía aproximada.`,
+    plan: a => a.walk ? `El plan usa comida en oferta a unos ${a.walk} minutos a pie de ${a.area}.` : 'El plan usa comida común; agrega tu zona para ver ofertas.'
+  },
+  pt: {
+    burn: a => `Você gasta cerca de ${a.tdee.toLocaleString('pt-BR')} calorias por dia (${a.formula}, ${a.activity}).`,
+    lose: a => `Para perder cerca de meio quilo por semana, coma umas ${a.cal.toLocaleString('pt-BR')} por dia.`,
+    gain: a => `Para ganhar músculo aos poucos, coma umas ${a.cal.toLocaleString('pt-BR')} por dia.`,
+    maintain: a => `Para manter o peso, coma umas ${a.cal.toLocaleString('pt-BR')} por dia.`,
+    floor: a => `É o mínimo que o Handled planeja sem um profissional (${a.cal.toLocaleString('pt-BR')}).`,
+    nocal: () => 'Sem contar calorias: o plano são pratos equilibrados.',
+    protein: a => `Proteína: cerca de ${a.g} g por dia (${a.min} a ${a.max} g), divididos nas refeições, para ${a.why_pt}.`,
+    priority: a => `${a.name}: ${a.amount} ${a.unit} por dia. ${a.how}`,
+    bmi: a => `IMC ${a.bmi}. O IMC não enxerga músculo; use como guia aproximado.`,
+    plan: a => a.walk ? `O plano usa comida em promoção a uns ${a.walk} minutos a pé de ${a.area}.` : 'O plano usa comida comum; adicione sua região para ver promoções.'
+  }
+}
+
+export function nutritionTargets(args: { age: any, sex: any, height: any, weight: any, body_fat_pct?: any, muscle_mass?: any, activity?: any, exercise?: any, goal?: any, conditions?: any, diet?: any, ethnicity?: any, trimester?: any, language?: string, area?: string, walk_minutes?: any }) {
+  const energy = rule('nutrition_energy').params
+  const dri = rule('nutrition_dri').params
+  const cond = rule('nutrition_conditions').params
+  const age = Number(args.age)
+  const sex = parseSex(args.sex)
+  const height = parseHeight(args.height)
+  const weight = height ? parseWeight(args.weight, height.imperial) : null
+  if (!age || !height || !weight) return { ready: false, missing: [!age && 'age', !height && 'height', !weight && 'weight'].filter(Boolean) }
+  // These equations and intakes are for adults; outside these ranges the input is probably a typo.
+  if (age < 18 || age > 100) return { ready: false, missing: [], reason: 'Handled plans for adults 18 and older. For a child or teen, ask their pediatrician.' }
+  if (height.cm < 90 || height.cm > 250 || weight.kg < 25 || weight.kg > 300) return { ready: false, missing: ['height', 'weight'], reason: 'That height or weight looks off. Check the units (lb or kg, ft or cm).' }
+
+  const exercise = String(args.exercise ?? '')
+  const activity = parseActivity(args.activity, exercise)
+  const conditions = parseConditions(args.conditions)
+  const noCalories = conditions.includes('eating_disorder')
+  const goal = noCalories ? 'maintain' : parseGoal(args.goal)
+  const diet = list(args.diet).join(' ')
+  const plantOnly = /vegan|vegetar|plant/.test(diet)
+  const asian = ASIAN.test(String(args.ethnicity ?? '').toLowerCase())
+  const pregnant = conditions.includes('pregnancy')
+  const nursing = conditions.includes('breastfeeding')
+  const assumptions: string[] = []
+  if (weight.assumed) assumptions.push(`Weight read as ${weight.kg} kg.`)
+
+  const kg = weight.kg
+  const cm = height.cm
+  const bmi = round(kg / (cm / 100) ** 2, 0.1)
+  const bodyFat = parseFloat(String(args.body_fat_pct ?? ''))
+  let bmr: number
+  let formula: string
+  if (Number.isFinite(bodyFat) && bodyFat > 3 && bodyFat < 70) {
+    bmr = 370 + 21.6 * kg * (1 - bodyFat / 100)
+    formula = 'Katch-McArdle, from your lean mass'
+  } else {
+    const male = 10 * kg + 6.25 * cm - 5 * age + 5
+    const female = 10 * kg + 6.25 * cm - 5 * age - 161
+    bmr = sex === 'male' ? male : sex === 'female' ? female : (male + female) / 2
+    formula = 'Mifflin-St Jeor'
+    if (sex === 'other') assumptions.push('Used the average of the male and female equations; tell Handled if one fits you better.')
+  }
+  const factor = energy.activity_factors[activity]
+  const tdee = round(bmr * factor, 10)
+  const floor = energy.floor[sex]
+  let calories = tdee
+  let effectiveGoal = goal
+  if ((pregnant || nursing) && goal === 'lose') {
+    effectiveGoal = 'maintain'
+    assumptions.push('No weight-loss target while pregnant or breastfeeding.')
+  }
+  if (goal === 'lose' && bmi < energy.bmi_cutoffs.under) {
+    effectiveGoal = 'maintain'
+    assumptions.push('Your BMI is already under 18.5, so Handled plans to maintain, not lose. Talk to your doctor about your goal.')
+  }
+  if (effectiveGoal === 'lose') calories = tdee - energy.deficit_per_day
+  if (effectiveGoal === 'gain') calories = tdee + energy.surplus_per_day
+  if (pregnant) calories += energy.pregnancy_extra[String(args.trimester ?? 2)] ?? energy.pregnancy_extra['2']
+  if (nursing) calories += energy.breastfeeding_extra
+  const atFloor = calories < floor
+  if (atFloor) calories = floor
+  calories = round(calories, 10)
+
+  const exercises = activity !== 'sedentary' || exercise.length > 0
+  const strength = /lift|weight|gym|strength|crossfit|pesas|gimnasio|muscula|calistenia|resistance/i.test(exercise)
+  const endurance = /run|cycl|bike|swim|soccer|futbol|fútbol|marathon|correr|nadar|row|hike|basket|tennis|climb/i.test(exercise)
+  const proteinKg = bmi >= 30 ? round(25 * (cm / 100) ** 2, 0.1) : kg
+  if (bmi >= 30) assumptions.push(`Protein is based on ${proteinKg} kg (the weight at a BMI of 25), the usual practice at higher weights.`)
+  let pMin = dri.protein_g_per_kg.rda
+  let pMax = 1.0
+  if (exercises && (strength || endurance || activity === 'active' || activity === 'very_active' || goal !== 'maintain')) {
+    pMin = dri.protein_g_per_kg.exercise_min
+    pMax = dri.protein_g_per_kg.exercise_max
+  }
+  if (pregnant) pMin = Math.max(pMin, dri.protein_g_per_kg.pregnancy)
+  const kidney = conditions.includes('kidney')
+  const protein = kidney ? null : {
+    min: round(proteinKg * pMin),
+    max: round(proteinKg * pMax),
+    target: round(proteinKg * Math.min(pMax, strength || goal !== 'maintain' ? (pMin + pMax) / 2 + 0.2 : (pMin + pMax) / 2))
+  }
+  let fatPct = endurance ? 25 : 30
+  if (conditions.includes('cholesterol')) fatPct = 25
+  const fat_g = round(calories * fatPct / 100 / 9)
+  let carbs_g = round((calories - (protein?.target ?? proteinKg * 0.8) * 4 - fat_g * 9) / 4)
+  if (conditions.includes('diabetes')) carbs_g = Math.min(carbs_g, round(calories * cond.diabetes.carbs_percent_max / 100 / 4))
+
+  const female = sex === 'female' || (sex === 'other' && pregnant)
+  const iron = (pregnant ? dri.iron_mg.pregnant : sex === 'male' ? dri.iron_mg.male : age <= 50 ? dri.iron_mg.female_19_50 : dri.iron_mg.female_51_plus) * (plantOnly ? dri.iron_mg.vegetarian_multiplier : 1)
+  let calcium = (female && age > 50) || (sex === 'male' && age > 70) ? 1200 : dri.calcium_mg.default
+  if (conditions.includes('osteoporosis')) calcium = cond.osteoporosis.calcium_mg
+  const needs: Record<string, number | null> = {
+    protein: protein?.target ?? null,
+    fiber: round(calories / 1000 * dri.fiber_g_per_1000_kcal),
+    iron: round(iron, 0.1),
+    calcium,
+    vitamin_d: age > 70 ? dri.vitamin_d_mcg.age_71_plus : dri.vitamin_d_mcg.default,
+    b12: pregnant ? dri.b12_mcg.pregnant : nursing ? dri.b12_mcg.breastfeeding : dri.b12_mcg.default,
+    folate: pregnant ? dri.folate_mcg.pregnant : nursing ? dri.folate_mcg.breastfeeding : dri.folate_mcg.default,
+    magnesium: pregnant ? dri.magnesium_mg.pregnant : sex === 'male' ? (age <= 30 ? dri.magnesium_mg.male_19_30 : dri.magnesium_mg.male_31_plus) : (age <= 30 ? dri.magnesium_mg.female_19_30 : dri.magnesium_mg.female_31_plus),
+    potassium: kidney ? null : pregnant ? dri.potassium_mg.pregnant : sex === 'male' ? dri.potassium_mg.male : dri.potassium_mg.female,
+    vitamin_c: pregnant ? dri.vitamin_c_mg.pregnant : nursing ? dri.vitamin_c_mg.breastfeeding : sex === 'male' ? dri.vitamin_c_mg.male : dri.vitamin_c_mg.female
+  }
+
+  const priority = new Set<string>()
+  for (const c of conditions) for (const p of cond[c]?.priority ?? []) priority.add(p)
+  if (plantOnly) {
+    priority.add('b12')
+    priority.add('iron')
+  }
+  if (female && age <= 50 && !priority.has('iron')) priority.add('iron')
+  if (calcium >= 1200) priority.add('calcium')
+  if (kidney) priority.delete('potassium')
+
+  const lang = args.language && T[args.language] ? args.language : 'en'
+  const say = T[lang]
+  const losing = effectiveGoal === 'lose'
+  const why = losing ? 'keep your muscle while you lose fat' : strength ? 'build and repair muscle' : endurance ? 'recover from training' : 'keep your muscles strong'
+  const why_es = losing ? 'cuidar tu músculo mientras bajas grasa' : strength ? 'construir y reparar músculo' : endurance ? 'recuperarte del entrenamiento' : 'mantener tus músculos fuertes'
+  const why_pt = losing ? 'manter o músculo enquanto perde gordura' : strength ? 'construir e reparar músculo' : endurance ? 'se recuperar do treino' : 'manter os músculos fortes'
+  const activityLabel = activity.replace('_', ' ')
+  const explanation: string[] = []
+  if (noCalories) explanation.push(say.nocal({}))
+  else {
+    explanation.push(say.burn({ tdee, formula, activity: activityLabel }))
+    explanation.push(atFloor ? say.floor({ cal: calories }) : say[effectiveGoal]({ cal: calories }))
+  }
+  if (protein) explanation.push(say.protein({ g: protein.target, min: protein.min, max: protein.max, why, why_es, why_pt }))
+  for (const p of [...priority].slice(0, 2)) {
+    if (needs[p] == null) continue
+    const [name, how] = NUTRIENT_TEXT[lang]?.[p] ?? [NUTRIENTS[p].name, NUTRIENTS[p].how]
+    explanation.push(say.priority({ name, amount: needs[p], unit: NUTRIENTS[p].unit, how }))
+  }
+  if (!pregnant && !noCalories) explanation.push(say.bmi({ bmi, cat: bmiCategory(bmi, asian), asian }))
+  explanation.push(say.plan({ walk: Number(args.walk_minutes) || null, area: args.area }))
+
+  const notes = conditions.map(c => ({ condition: c, label: cond[c].label, note: cond[c].note, source_url: cond[c].source_url, confirm_with: cond[c].confirm_with }))
+  if (args.ethnicity && LACTOSE_GROUPS.test(String(args.ethnicity).toLowerCase()) && !conditions.includes('lactose')) {
+    notes.push({ condition: 'lactose_info', label: 'If dairy bothers you', note: 'Lactose intolerance is more common in many groups. Say so and Handled swaps in fortified soy milk and tofu for calcium.', source_url: cond.lactose.source_url, confirm_with: cond.lactose.confirm_with })
+  }
+
+  return {
+    ready: true,
+    headline: noCalories ? 'Balanced plates, no counting' : `About ${calories.toLocaleString('en-US')} calories a day`,
+    inputs: { age, sex, height_cm: round(cm, 0.1), weight_kg: noCalories ? null : kg, body_fat_pct: Number.isFinite(bodyFat) && !noCalories ? bodyFat : null, muscle_mass: noCalories ? null : args.muscle_mass ?? null, activity, exercise, goal: effectiveGoal, conditions, diet, ethnicity_used_for: asian ? 'BMI cutoffs' : args.ethnicity ? 'not used for targets' : null },
+    bmi: noCalories ? null : bmi,
+    bmi_category: pregnant || noCalories ? null : bmiCategory(bmi, asian),
+    bmr: noCalories ? null : round(bmr, 10),
+    formula,
+    activity_factor: factor,
+    tdee: noCalories ? null : tdee,
+    plan_calories: noCalories ? tdee : null,
+    calories: noCalories ? null : calories,
+    calorie_floor_applied: atFloor,
+    sodium_limit_mg: conditions.includes('hypertension') ? cond.hypertension.sodium_limit_mg : dri.sodium_limit_mg,
+    protein,
+    carbs_g: noCalories ? null : carbs_g,
+    fat_g: noCalories ? null : fat_g,
+    water_l: sex === 'male' ? dri.water_l_total.male : dri.water_l_total.female,
+    needs,
+    priority: [...priority],
+    nutrients: Object.entries(needs).filter(([, v]) => v != null).map(([k, v]) => ({ key: k, name: NUTRIENTS[k].name, amount: v, unit: NUTRIENTS[k].unit, foods: NUTRIENTS[k].foods, how: NUTRIENTS[k].how, priority: priority.has(k) })),
+    conditions: notes,
+    assumptions,
+    explanation,
+    no_calorie_target: noCalories,
+    sources: [rule('nutrition_energy').source_url, rule('nutrition_dri').source_url, FOODS.source_url]
+  }
+}
+
+// Plain facts from a voice note when there is no Claude key: "I'm 29, female, 5'5" and 140 lb, I lift 3 times a week..."
+export function bodyFacts(text: string) {
+  const t = text.replace(/[’‘]/g, "'").replace(/[“”]/g, '"')
+  const lower = t.toLowerCase()
+  const out: Record<string, any> = {}
+  const age = lower.match(/\b(?:i'?m|i am|tengo|tenho|age|edad|idade)\s*(\d{2})\b/) ?? lower.match(/\b(\d{2})\s*(?:years? old|yo\b|años|anos)/)
+  if (age) out.age = Number(age[1])
+  if (/\b(female|woman|mujer|mulher)\b/.test(lower)) out.sex = 'female'
+  else if (/\b(male|man|hombre|homem)\b/.test(lower)) out.sex = 'male'
+  const ft = t.match(/\b(\d)\s*(?:'|ft|feet|foot|pies)\s*(\d{1,2})?\s*(?:"|in\b|inches|pulgadas)?/)
+  const cm = lower.match(/\b(1\d{2})\s*cm\b/) ?? lower.match(/\b(1[.,]\d{2})\s*m\b/)
+  if (ft) out.height = `${ft[1]}'${ft[2] ?? 0}"`
+  else if (cm) out.height = cm[1].includes('.') || cm[1].includes(',') ? `${Math.round(Number(cm[1].replace(',', '.')) * 100)} cm` : `${cm[1]} cm`
+  const w = lower.match(/\b(\d{2,3}(?:\.\d)?)\s*(lbs?|pounds|libras|kg|kilos?)\b/)
+  if (w) out.weight = `${w[1]} ${/kg|kilo/.test(w[2]) ? 'kg' : 'lb'}`
+  const bf = lower.match(/\b(\d{1,2}(?:\.\d)?)\s*%\s*(?:body fat|bf|grasa|gordura)/)
+  if (bf) out.body_fat_pct = Number(bf[1])
+  const ex = lower.match(/\b((?:lift|run|swim|bike|cycle|climb|play|train|go to the gym|do yoga|do crossfit|hago|corro|levanto|entreno|juego|nado|treino|malho|corro)[^.,;]*)/)
+  if (ex) out.exercise = ex[1].trim()
+  if (/\b(sedentary|desk job|sedentari[oa])\b/.test(lower)) out.activity = 'sedentary'
+  if (/\b(lose|bajar|perder|adelgazar|emagrecer)\b/.test(lower)) out.goal = 'lose fat'
+  else if (/\b(gain|build|bulk|ganar|ganhar)\b/.test(lower)) out.goal = 'build muscle'
+  else if (/\b(maintain|mantener|manter)\b/.test(lower)) out.goal = 'maintain'
+  const conditions = parseConditions(lower)
+  if (conditions.length) out.conditions = conditions.join(', ')
+  const tri = lower.match(/\b(first|second|third|1st|2nd|3rd|primer|segundo|tercer)\s*(?:trimester|trimestre)/)
+  if (tri) out.trimester = /first|1st|primer/.test(tri[1]) ? 1 : /second|2nd|segundo/.test(tri[1]) ? 2 : 3
+  if (/\b(no allergies|no food allergies|sin alergias|sem alergias|no allergy)\b/.test(lower)) out.allergies = 'none'
+  else {
+    const al = lower.match(/\b(?:allergic to|allergy to|alérgic[oa] a|alergia a)\s+([^.;]+)/)
+    if (al) out.allergies = al[1].trim()
+  }
+  const diet = lower.match(/\b(vegan[oa]?|vegetarian[oa]?|pescatarian|halal|kosher|gluten[- ]free|sin gluten|sem glúten)\b/)
+  if (diet) out.diet = diet[1]
+  const area = t.match(/\b(?:near|at|on|by|cerca de|en|perto de|na|no)\s+(\d{1,5}\s+[A-Za-z0-9 .]+?\s(?:St|Street|Ave|Avenue|Blvd|Boulevard|Way|Rd|Road|Dr|Drive|Pl|Place|Ter|Terrace)\b\.?)/i)
+  if (area) out.food_area = area[1].replace(/\.$/, '')
+  const walk = lower.match(/\bwalk(?:ing)?\s+(?:more than |over |for |más de |mais de )?(\d{1,2})\s*(?:min|minutes)/) ?? lower.match(/\b(\d{1,2})\s*(?:min|minute|minutes)(?:'s)?\s+(?:walk|a pie|caminando|a pé)/) ?? lower.match(/\bcaminar\s+(?:más de )?(\d{1,2})/)
+  if (walk) out.max_walk_minutes = Number(walk[1])
+  const cook = lower.match(/\bcook(?:ing)?\s+(?:more than |over |for |longer than )?(\d{1,3})/) ?? lower.match(/\bcocinar\s+(?:más de )?(\d{1,3})/) ?? lower.match(/\bcozinhar\s+(?:mais de )?(\d{1,3})/)
+  if (cook) out.max_cook_minutes = Number(cook[1])
+  if (/\b(no delivery|sin entrega|sem entrega)\b/.test(lower)) out.delivery = false
+  else if (/\b(delivery|delivered|a domicilio|entrega)\b/.test(lower)) out.delivery = true
+  if (/\b(tight|on a budget|cheap|can't afford|cannot afford|barato|presupuesto|no me alcanza|sin dinero|apertad|grana curta)\b/.test(lower)) out.food_budget_tight = true
+  const meals = lower.match(/\beat (?:at|around)\s+([\d:apm ,.and]+)/)
+  if (meals) out.meal_times = meals[1].replace(/\band\b/g, ',')
+  return out
+}
+
+// Meal times like "8am, 12:30, 7pm" become 08:00, 12:30, 19:00.
+export function parseTimes(v: any) {
+  const out = list(v).map(s => {
+    const m = s.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm|a\.m\.|p\.m\.)?/)
+    if (!m) return null
+    let h = Number(m[1])
+    if (m[3]?.startsWith('p') && h < 12) h += 12
+    if (m[3]?.startsWith('a') && h === 12) h = 0
+    if (h > 23 || Number(m[2] ?? 0) > 59) return null
+    return `${String(h).padStart(2, '0')}:${m[2] ?? '00'}`
+  }).filter(Boolean) as string[]
+  return out.length ? out.sort() : ['08:00', '12:30', '19:00']
+}
+
+function mealName(time: string) {
+  const h = Number(time.slice(0, 2))
+  if (h < 11) return 'breakfast'
+  if (h < 15) return 'lunch'
+  if (h < 17) return 'snack'
+  return 'dinner'
+}
+
+const SLOTS: Record<string, string[]> = {
+  breakfast: ['breakfast_protein', 'breakfast_carb', 'fruit', 'drink'],
+  lunch: ['protein', 'carb', 'veg'],
+  dinner: ['protein', 'carb', 'veg'],
+  snack: ['snack']
+}
+
+export function allowedFoods(args: { diet?: any, allergies?: any, conditions?: any, dislikes?: any, max_cook_minutes?: any }) {
+  const diet = list(args.diet).join(' ')
+  const allergies = list(args.allergies).join(' ')
+  const conditions = parseConditions(args.conditions)
+  const dislikes = list(args.dislikes)
+  const maxCook = Number(args.max_cook_minutes) || 30
+  const blocked = new Set<string>()
+  if (/peanut|maní|mani|amendoim/.test(allergies)) blocked.add('peanut')
+  if (/(?<!pea)nut|almond|cashew|walnut|pecan|pistachio|hazelnut|nueces|nuez|almendra|castanha|nozes/.test(allergies)) blocked.add('tree_nut')
+  if (/egg|huevo|ovo/.test(allergies)) blocked.add('egg')
+  if (/dairy|milk|lact|lácteo|lacteo|leche|leite/.test(allergies + diet)) blocked.add('dairy')
+  if (/soy|soja/.test(allergies)) blocked.add('soy')
+  if (/fish|pescado|peixe/.test(allergies)) blocked.add('fish')
+  if (/gluten|wheat|trigo|celiac/.test(allergies + diet)) blocked.add('gluten')
+  for (const c of conditions) for (const e of rule('nutrition_conditions').params[c]?.exclude ?? []) blocked.add(e)
+  // FDA fish advice for pregnancy: keep to 2 or 3 servings a week, so daily plans use salmon and sardines, not tuna.
+  if (conditions.includes('pregnancy')) dislikes.push('tuna')
+  return FOODS.foods.filter(f => {
+    if (f.allergens.some(a => blocked.has(a))) return false
+    if (/vegan|plant/.test(diet) && !f.diet.includes('vegan')) return false
+    if (/vegetar/.test(diet) && !f.diet.includes('vegan') && !f.diet.includes('vegetarian')) return false
+    if (/pescatar/.test(diet) && !f.diet.length) return false
+    if (dislikes.some(d => f.id === d || f.name.toLowerCase().includes(d) || d.includes(f.search))) return false
+    if (f.cook_minutes > maxCook) return false
+    return true
+  })
+}
+
+export function mealPlan(args: { targets: any, nearby?: any, diet?: any, allergies?: any, conditions?: any, likes?: any, dislikes?: any, max_cook_minutes?: any, meal_times?: any, delivery?: any }) {
+  const tg = args.targets
+  if (!tg?.ready) return { ready: false }
+  const foods = allowedFoods(args)
+  const likes = list(args.likes)
+  const deals = args.nearby?.deals ?? {}
+  const times = parseTimes(args.meal_times)
+  const meals = times.map(t => ({ time: t, meal: mealName(t) }))
+  if (!meals.some(m => m.meal === 'snack')) meals.push({ time: '', meal: 'snack' })
+  const used = new Set<string>()
+
+  const score = (f: Food, role: string, withIron = false) => {
+    let s = 0
+    if (likes.some(l => f.id === l || f.name.toLowerCase().includes(l) || l.includes(f.search))) s += 6
+    if (deals[f.id]?.length) s += 3
+    for (const p of tg.priority) {
+      const need = tg.needs[p]
+      if (need) s += Math.min(4, (f.n[p] ?? 0) / need * 12)
+    }
+    if (role === 'veg' && withIron) s += f.n.vitamin_c / 30
+    // Protein slots favor foods with more protein per calorie, so the day can reach a high protein target.
+    if ((role === 'protein' || role === 'breakfast_protein') && tg.protein) s += f.n.protein / f.n.kcal * 25
+    if (used.has(f.id)) s -= 8
+    return s
+  }
+
+  const day = meals.map(m => {
+    const items: { food: Food, role: string }[] = []
+    for (const role of SLOTS[m.meal]) {
+      const ironMeal = tg.priority.includes('iron') && items.some(i => i.food.n.iron >= 3)
+      const options = foods.filter(f => f.roles.includes(role))
+      if (!options.length) continue
+      const pick = options.slice().sort((a, b) => score(b, role, ironMeal) - score(a, role, ironMeal) || a.id.localeCompare(b.id))[0]
+      used.add(pick.id)
+      items.push({ food: pick, role })
+    }
+    return { ...m, items: items.map(i => ({ id: i.food.id, name: i.food.name, role: i.role, servings: 1, serving: i.food.serving })) }
+  })
+
+  const byId = Object.fromEntries(FOODS.foods.map(f => [f.id, f]))
+  const total = (key: string) => day.reduce((s, m) => s + m.items.reduce((t, i) => t + (byId[i.id].n[key] ?? 0) * i.servings, 0), 0)
+  const target = tg.calories ?? tg.plan_calories
+  if (!tg.no_calorie_target) {
+    const scale = target / total('kcal')
+    for (const m of day) for (const i of m.items) {
+      if (['protein', 'carb', 'breakfast_carb', 'breakfast_protein', 'snack'].includes(i.role)) i.servings = Math.min(3, Math.max(0.5, round(scale, 0.5)))
+    }
+    for (let n = 0; n < 6 && total('kcal') < target * 0.93; n++) {
+      for (const m of day) for (const i of m.items) if (['carb', 'breakfast_carb'].includes(i.role) && i.servings < 3) i.servings += 0.5
+    }
+    for (let n = 0; n < 6 && total('kcal') > target * 1.07; n++) {
+      for (const m of day) for (const i of m.items) if (['carb', 'breakfast_carb', 'snack'].includes(i.role) && i.servings > 0.5) i.servings -= 0.5
+    }
+    // Trade starch for protein until the day reaches about 90% of the protein target, keeping calories level.
+    for (let n = 0; n < 8 && tg.protein && total('protein') < tg.protein.target * 0.9; n++) {
+      const lean = day.flatMap(m => m.items).filter(i => (i.role === 'protein' || i.role === 'breakfast_protein') && i.servings < 3).sort((a, b) => byId[b.id].n.protein / byId[b.id].n.kcal - byId[a.id].n.protein / byId[a.id].n.kcal)[0]
+      if (!lean) break
+      lean.servings += 0.5
+      const starch = day.flatMap(m => m.items).filter(i => (i.role === 'carb' || i.role === 'breakfast_carb') && i.servings > 0.5).sort((a, b) => b.servings - a.servings)[0]
+      if (starch && total('kcal') > target * 1.05) starch.servings -= 0.5
+    }
+  }
+
+  const keys = ['kcal', 'protein', 'fiber', 'iron', 'calcium', 'vitamin_c', 'potassium', 'magnesium', 'folate', 'b12', 'vitamin_d']
+  const coverage = keys.filter(k => k !== 'kcal' || !tg.no_calorie_target).map(k => {
+    const need = k === 'kcal' ? (tg.calories ?? null) : tg.needs[k]
+    const have = round(total(k), k === 'b12' || k === 'vitamin_d' || k === 'iron' ? 0.1 : 1)
+    return { key: k, name: k === 'kcal' ? 'Calories' : NUTRIENTS[k].name, have, need, unit: k === 'kcal' ? 'kcal' : NUTRIENTS[k].unit, percent: need ? Math.round(have / need * 100) : null }
+  })
+  const gaps = coverage.filter(c => c.key !== 'kcal' && c.percent != null && c.percent < 80).map(c => ({
+    ...c,
+    tip: c.key === 'vitamin_d' || c.key === 'b12' ? `${NUTRIENTS[c.key].how}` : `Add more ${NUTRIENTS[c.key].foods}.`
+  }))
+
+  const pairs: string[] = []
+  for (const m of day) {
+    const iron = m.items.find(i => byId[i.id].n.iron >= 3)
+    const c = m.items.find(i => byId[i.id].n.vitamin_c >= 50)
+    if (iron && c) pairs.push(`${m.meal}: ${byId[iron.id].name.toLowerCase()} with ${byId[c.id].name.toLowerCase()}, so the vitamin C helps you absorb the iron`)
+  }
+
+  const chosen = [...new Set(day.flatMap(m => m.items.map(i => i.id)))]
+  const delivery = args.delivery === true || /^(y|yes|sí|si|sim|true)/i.test(String(args.delivery ?? ''))
+  const shopping = chosen.map(id => {
+    const best = (deals[id] ?? [])[0] ?? null
+    return {
+      id,
+      name: byId[id].name,
+      deal: best ? { item: best.item, price: best.price, price_text: best.price_text, store: best.store ?? best.merchant, walk_minutes: best.walk_minutes, valid_to: best.valid_to, image: best.image } : null,
+      order_url: delivery ? `https://www.instacart.com/store/s?k=${encodeURIComponent(byId[id].search)}` : null
+    }
+  })
+  const onSale = shopping.filter(s => s.deal)
+  const expiring = onSale.filter(s => s.deal!.valid_to).sort((a, b) => a.deal!.valid_to.localeCompare(b.deal!.valid_to))[0] ?? null
+  const shoppingText = shopping.map(s => s.deal ? `${s.name}: ${s.deal.store} ${s.deal.price_text ?? `$${s.deal.price}`}${s.deal.walk_minutes != null ? ` (${s.deal.walk_minutes} min walk)` : ''}` : s.name).join('; ')
+
+  return {
+    ready: true,
+    date: today(),
+    meal_times: times,
+    meal_times_text: times.join('; '),
+    meals: day,
+    coverage,
+    gaps,
+    pairs,
+    shopping,
+    on_sale_count: onSale.length,
+    shopping_text: shoppingText,
+    first_expiry: expiring ? { item: expiring.name, store: expiring.deal!.store, date: expiring.deal!.valid_to.slice(0, 10) } : null,
+    stores: (args.nearby?.stores ?? []).slice(0, 5),
+    markets: (args.nearby?.markets ?? []).slice(0, 3),
+    note: 'Nutrients are USDA FoodData Central averages per serving; deals come from store flyers and can sell out.'
+  }
+}

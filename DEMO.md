@@ -32,6 +32,14 @@ Gallery, Deposit interest, Try with a sample.
 - This one matches, so Handled says so instead of filing a protest that would lose. That's the DoNotPay failure mode we designed against. 25 of 25 real tickets agree (Settings, "How well it works").
 - "Don't get swept": the next sweep on her block is Monday 7am, so she gets a text Sunday evening.
 
+## Optional, 25 s: Eat well near you
+
+Gallery, Eat well near you, Try with a sample (or say it: "¿Cuántas calorías necesito y qué debo comer?").
+- "About 1,610 calories a day, 121 g protein." Five plain lines in Spanish: what she burns, the goal, protein split across meals, and iron with vitamin C, away from coffee, because she is anemic.
+- Today's meals, with what's on sale this week and how many minutes' walk it is (live flyer and map data). "Paired for absorption: lentils with red pepper."
+- Tap Swap on a food; the plan changes and Handled remembers. Approve meal times: 21 go on the calendar.
+- Run it once before going on stage so the store list is cached; the free map server is sometimes slow.
+
 ## 1:55 It follows up on its own (15 s)
 
 Settings, +15 days. The landlord check-in fires, the case escalates, and the second notice is ready to approve.

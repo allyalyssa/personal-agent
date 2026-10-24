@@ -1,0 +1,30 @@
+{
+  "id": "nutrition_energy",
+  "title": "Calories you burn and calorie targets",
+  "jurisdiction": "General (US)",
+  "rule": "Resting calories use the Mifflin-St Jeor equation from weight, height, age and sex, or the Katch-McArdle equation when body fat is known (it uses lean mass, so it fits muscular people better). Daily calories are resting calories times an activity factor. A deficit of about 500 calories a day is the usual starting point for losing about 1 pound a week. Plans below about 1,200 calories a day (women) or 1,500 (men) should be supervised by a clinician. BMI is weight divided by height squared; for Asian adults the WHO expert consultation set lower action points (23 and 27.5).",
+  "params": {
+    "mifflin": "men: 10*kg + 6.25*cm - 5*age + 5; women: 10*kg + 6.25*cm - 5*age - 161",
+    "katch_mcardle": "370 + 21.6 * lean mass kg",
+    "activity_factors": { "sedentary": 1.2, "light": 1.375, "moderate": 1.55, "active": 1.725, "very_active": 1.9 },
+    "deficit_per_day": 500,
+    "surplus_per_day": 300,
+    "floor": { "female": 1200, "male": 1500, "other": 1350 },
+    "pregnancy_extra": { "1": 0, "2": 340, "3": 452 },
+    "breastfeeding_extra": 330,
+    "bmi_cutoffs": { "under": 18.5, "over": 25, "obese": 30 },
+    "bmi_cutoffs_asian": { "over": 23, "obese": 27.5 }
+  },
+  "source_url": "https://www.niddk.nih.gov/bwp",
+  "sources": [
+    "https://pubmed.ncbi.nlm.nih.gov/2305711/",
+    "https://www.ncbi.nlm.nih.gov/books/NBK278991/",
+    "https://pubmed.ncbi.nlm.nih.gov/14726171/",
+    "https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html"
+  ],
+  "verify_phrase": "Body Weight Planner",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "your doctor or a registered dietitian",
+  "notes": "Equations: Mifflin et al. 1990 (PubMed 2305711). Pregnancy extras from the National Academies energy DRIs. Asian BMI action points: WHO expert consultation, Lancet 2004 (PubMed 14726171). The NIH Body Weight Planner gives a more exact weight-loss curve. Not re-checked today."
+}

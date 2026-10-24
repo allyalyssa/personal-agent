@@ -37,6 +37,20 @@
   ],
   "business": null,
   "library_card": false,
+  "body": {
+    "age": 34,
+    "sex": "male",
+    "height": "5'10\"",
+    "weight": "180 lb",
+    "exercise": "runs 3 times a week",
+    "goal": "maintain"
+  },
+  "food": {
+    "allergies": "peanuts",
+    "max_walk_minutes": 10,
+    "max_cook_minutes": 20,
+    "delivery": true
+  },
   "contacts": [
     {
       "name": "Mission Auto Glass (demo line)",

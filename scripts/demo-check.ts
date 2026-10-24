@@ -37,5 +37,12 @@ await flow('break-in call', 'Me rompieron el vidrio del auto anoche en Valencia 
 await flow('311', 'Hay un poste de luz roto frente a 1000 Guerrero St', { problem: 'broken streetlight', location: '1000 Guerrero St', keyword: 'streetlight' }, v =>
   `${v.actions.length} actions; ${v.deadlines.length} deadlines`)
 
-await flow('arrival', 'Hola, acabo de llegar a San Francisco', { staying_for: 'moving', work_authorized: 'yes', visa_waiver: 'no', arrival_date: '2026-10-20', moved_in_date: '2026-10-21' }, v =>
+await flow('eat well', '¿Cuántas calorías necesito y qué debo comer?', {}, v => {
+  const t = v.computed.targets
+  const p = v.computed.plan
+  const n = v.fields.nearby
+  return `${t?.headline}; protein ${t?.protein?.target} g; iron ${t?.needs?.iron} mg; ${n?.stores?.length ?? 0} stores within ${n?.walk_minutes} min, ${n?.deal_count ?? 0} deals; plan: ${p?.meals?.map((m: any) => `${m.meal} ${m.items.map((i: any) => `${i.servings}x ${i.id}`).join('+')}`).join(' | ')}; on sale: ${p?.shopping?.filter((s: any) => s.deal).map((s: any) => `${s.id} ${s.deal.store} $${s.deal.price}`).join(', ')}; ${v.actions.length} actions; error: ${n?.error ?? 'none'}`
+})
+
+await flow('arrival','Hola, acabo de llegar a San Francisco', { staying_for: 'moving', work_authorized: 'yes', visa_waiver: 'no', arrival_date: '2026-10-20', moved_in_date: '2026-10-21' }, v =>
   v.deadlines.map((d: any) => `${d.due_at} ${d.title}`).join('; '))

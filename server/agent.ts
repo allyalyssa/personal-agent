@@ -8,6 +8,10 @@ import { today } from './clock.ts'
 import { redact, redactDeep } from './redact.ts'
 import { getCase, updateCase, logEvent, setFields, prefillFromProfile, missingFields, plan, getProfile, insertAction, context, caseView, remember, createCase, coerceAnswers, runLookups } from './engine.ts'
 import { db } from './db.ts'
+import { bodyFacts } from './nutrition.ts'
+
+// Without Claude, a few playbooks can still read plain facts (numbers, units, keywords) out of what the person said.
+const offlineExtractors: Record<string, (text: string) => Record<string, any>> = { body_facts: bodyFacts }
 
 type Tool = Anthropic.Beta.BetaTool
 
@@ -446,6 +450,13 @@ export async function intakeOffline(caseId: string, text: string) {
   updateCase(caseId, { playbook: p.id, pack: p.pack, title: p.title })
   prefillFromProfile(caseId)
   logEvent(caseId, 'route', `Matched playbook by keywords: ${p.title}`)
+  if (p.offline_extract) {
+    const said = offlineExtractors[p.offline_extract](text)
+    if (Object.keys(said).length) {
+      setFields(caseId, said)
+      logEvent(caseId, 'fields', `Read from what you said: ${Object.keys(said).join(', ')}`, said)
+    }
+  }
   await askMissing(caseId)
   return caseView(caseId)
 }

@@ -1,5 +1,5 @@
 import { db, json } from './db.ts'
-import { now, evalFormula, at9 } from './clock.ts'
+import { now, evalFormula, at9, addDays, today } from './clock.ts'
 import { updateCase, logEvent, scheduleFollowups, getProfile } from './engine.ts'
 import { placeCall, finishCall } from './calls.ts'
 import { redact, redactDeep } from './redact.ts'
@@ -90,6 +90,16 @@ export async function executeAction(id: number, edited?: Record<string, any>) {
     if (a.tool === 'send_email') result = await sendEmail(payload as any)
     else if (a.tool === 'send_sms') result = await sendSms(payload as any)
     else if (a.tool === 'place_call') result = await placeCall(a.case_id, id, payload as any)
+    else if (a.tool === 'create_calendar_event' && payload.times) {
+      // Repeating meal times: one timed event per meal for the next N days.
+      const times = String(payload.times).split(/[;,]\s*/).filter(t => /^\d{2}:\d{2}$/.test(t))
+      const days = Number(payload.days ?? 7)
+      for (let d = 0; d < days; d++) {
+        const date = addDays(payload.date ?? today(), d)
+        for (const time of times) db.prepare(`insert into deadlines (case_id, title, due_at, kind, note) values (?, ?, ?, 'meal', ?)`).run(a.case_id, payload.title ?? a.title, `${date}T${time}`, payload.note ?? null)
+      }
+      result = { calendar: `added ${times.length * days} meal times to the Handled calendar feed`, times, days }
+    }
     else if (a.tool === 'create_calendar_event') {
       db.prepare(`insert into deadlines (case_id, title, due_at, kind, note) values (?, ?, ?, 'event', ?)`).run(a.case_id, payload.title ?? a.title, payload.date ?? a.due_at, payload.note ?? null)
       result = { calendar: 'added to Handled calendar feed', date: payload.date ?? a.due_at }

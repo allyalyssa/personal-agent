@@ -186,7 +186,8 @@ export async function status311(requestId: string) {
   return { found: rows.length > 0, ...(rows[0] ?? {}), source: url }
 }
 
-export async function queryDatasf(args: { dataset: 'assessor' | 'street_sweeping' | 'temporary_no_parking' | 'nearby_311' | 'citation', address?: string, date?: string, keyword?: string, number?: string }) {
+export async function queryDatasf(args: { dataset: 'assessor' | 'street_sweeping' | 'temporary_no_parking' | 'nearby_311' | 'citation' | 'food_nearby', address?: string, date?: string, keyword?: string, number?: string, [k: string]: any }) {
+  if (args.dataset === 'food_nearby') return (await import('./food.ts')).foodNearby(args as any)
   if (args.dataset === 'citation') return citationLookup(args.number!)
   if (args.dataset === 'assessor') return assessorByAddress(args.address!)
   if (args.dataset === 'street_sweeping') return sweepingByAddress(args.address!)

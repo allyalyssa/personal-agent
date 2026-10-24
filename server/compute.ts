@@ -1,5 +1,6 @@
 import { rule } from './rules.ts'
 import { addMonths, addDays, today, daysBetween, now } from './clock.ts'
+import { nutritionTargets, mealPlan } from './nutrition.ts'
 
 type Rate = { start: string, end: string, rate: number, status: string }
 
@@ -264,5 +265,7 @@ export const computeFns: Record<string, (args: any) => any> = {
   vest_schedule: vestSchedule,
   sweeping_check: sweepingCheck,
   next_sweeping: nextSweeping,
-  next_annual: nextAnnual
+  next_annual: nextAnnual,
+  nutrition_targets: nutritionTargets,
+  meal_plan: mealPlan
 }

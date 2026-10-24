@@ -1,0 +1,27 @@
+{
+  "id": "nutrition_conditions",
+  "title": "How health conditions change what you eat",
+  "jurisdiction": "General (US)",
+  "rule": "Some conditions change nutrient targets or how you should eat them. Handled adjusts the plan where public health sources are clear, and otherwise says what to ask your care team. It never sets targets for kidney disease, and it does not show calorie numbers to someone with an eating disorder history.",
+  "params": {
+    "anemia": { "label": "Iron-deficiency anemia", "priority": ["iron", "vitamin_c"], "note": "Eat iron foods with vitamin C, and keep coffee, tea and calcium away from those meals. Iron pills need a dose and a recheck from your doctor.", "source_url": "https://ods.od.nih.gov/factsheets/Iron-Consumer/", "confirm_with": "your doctor" },
+    "diabetes": { "label": "Diabetes or prediabetes", "priority": ["fiber"], "carbs_percent_max": 50, "note": "Keep carbs steady from meal to meal and favor high-fiber carbs. If you take insulin or a sulfonylurea, change your carbs only with your care team.", "source_url": "https://diabetes.org/food-nutrition", "confirm_with": "your doctor or a diabetes educator" },
+    "hypertension": { "label": "High blood pressure", "priority": ["potassium"], "sodium_limit_mg": 1500, "note": "The DASH pattern (vegetables, fruit, beans, low-fat dairy) lowers blood pressure. The American Heart Association's ideal is 1,500 mg of sodium a day.", "source_url": "https://www.nhlbi.nih.gov/education/dash-eating-plan", "confirm_with": "your doctor" },
+    "cholesterol": { "label": "High cholesterol", "priority": ["fiber"], "sat_fat_percent_max": 6, "note": "Keep saturated fat to about 6% of calories and add soluble fiber (oats, beans).", "source_url": "https://www.heart.org/en/healthy-living/healthy-eating/eat-smart/fats/saturated-fats", "confirm_with": "your doctor" },
+    "celiac": { "label": "Celiac disease", "exclude": ["gluten"], "note": "Strictly gluten-free. Oats are left out unless labeled certified gluten-free.", "source_url": "https://www.niddk.nih.gov/health-information/digestive-diseases/celiac-disease/eating-diet-nutrition", "confirm_with": "your gastroenterologist or a dietitian" },
+    "kidney": { "label": "Kidney disease", "no_targets": ["protein", "potassium"], "note": "Protein, potassium and phosphorus limits depend on your stage and labs, so Handled does not set them. Ask for a renal dietitian.", "source_url": "https://www.niddk.nih.gov/health-information/kidney-disease/chronic-kidney-disease-ckd/eating-nutrition", "confirm_with": "your nephrologist or a renal dietitian" },
+    "pregnancy": { "label": "Pregnancy", "priority": ["folate", "iron"], "note": "No weight-loss plan during pregnancy. Avoid high-mercury fish and unpasteurized foods; take the prenatal vitamin your clinician recommends.", "source_url": "https://www.acog.org/womens-health/faqs/nutrition-during-pregnancy", "confirm_with": "your OB or midwife" },
+    "breastfeeding": { "label": "Breastfeeding", "priority": ["b12", "vitamin_c"], "note": "You need about 330 more calories a day in the first 6 months.", "source_url": "https://www.cdc.gov/breastfeeding-special-circumstances/hcp/diet-micronutrients/maternal-diet.html", "confirm_with": "your doctor or a lactation consultant" },
+    "lactose": { "label": "Lactose intolerance", "exclude": ["dairy"], "note": "Swaps: fortified soy milk and calcium-set tofu keep your calcium up.", "source_url": "https://www.niddk.nih.gov/health-information/digestive-diseases/lactose-intolerance", "confirm_with": "your doctor" },
+    "osteoporosis": { "label": "Osteoporosis or low bone density", "priority": ["calcium", "vitamin_d"], "calcium_mg": 1200, "note": "Calcium 1,200 mg and enough vitamin D; split calcium across meals.", "source_url": "https://www.bonehealthandosteoporosis.org/patients/treatment/calciumvitamin-d/", "confirm_with": "your doctor" },
+    "ibs": { "label": "IBS", "note": "A low-FODMAP trial can help, but it works best with a dietitian because it is temporary and strict.", "source_url": "https://www.niddk.nih.gov/health-information/digestive-diseases/irritable-bowel-syndrome/eating-diet-nutrition", "confirm_with": "a registered dietitian" },
+    "eating_disorder": { "label": "Eating disorder history", "no_calories": true, "note": "Handled shows a balanced plate without calorie counts. If food feels hard right now, ANAD runs a free helpline.", "source_url": "https://anad.org/", "confirm_with": "your care team" }
+  },
+  "lactose_more_common_in": ["African American", "American Indian", "Asian American", "Hispanic or Latino"],
+  "source_url": "https://ods.od.nih.gov/factsheets/Iron-Consumer/",
+  "verify_phrase": "vitamin C",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "your doctor or a registered dietitian",
+  "notes": "Each condition carries its own source URL. Information, not medical advice. Not re-checked today."
+}

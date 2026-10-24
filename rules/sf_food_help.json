@@ -1,0 +1,18 @@
+{
+  "id": "sf_food_help",
+  "title": "Help paying for food in San Francisco",
+  "jurisdiction": "San Francisco",
+  "rule": "CalFresh (California's SNAP) puts money for groceries on an EBT card; many working people and students qualify, and immigrants with many visa types or green cards can too. You apply online in about 10 minutes at GetCalFresh.org; Handled cannot submit it for you. Market Match gives you extra money for fruit and vegetables when you pay with CalFresh at participating farmers markets. The SF-Marin Food Bank lists free pantries by neighborhood.",
+  "params": {
+    "calfresh_apply": "https://www.getcalfresh.org/",
+    "market_match": "https://marketmatch.org/",
+    "food_bank": "https://www.sfmfoodbank.org/find-food/"
+  },
+  "source_url": "https://www.getcalfresh.org/",
+  "sources": ["https://marketmatch.org/", "https://www.sfmfoodbank.org/find-food/", "https://www.cdss.ca.gov/calfresh"],
+  "verify_phrase": "CalFresh",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "SF Human Services Agency CalFresh (sfhsa.org) or the SF-Marin Food Bank",
+  "notes": "Income limits change every October and are not computed here; the GetCalFresh screener checks them. Some visas count as public charge questions; ask a free immigration legal service if unsure. Not re-checked today."
+}
