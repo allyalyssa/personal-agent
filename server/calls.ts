@@ -3,6 +3,7 @@ import { now } from './clock.ts'
 import { getCase, getProfile, logEvent, updateCase, setFields, plan } from './engine.ts'
 import { structured } from './llm.ts'
 import { notifyUser } from './actions.ts'
+import { redact, redactDeep } from './redact.ts'
 
 type CallPayload = {
   to: string
@@ -98,7 +99,7 @@ function transcriptOf(call: any): string {
 export async function finishCall(caseId: string, actionId: number, call: any) {
   const a = db.prepare('select * from actions where id = ?').get(actionId) as any
   const payload = json(a.payload, {} as any)
-  const transcript = transcriptOf(call)
+  const transcript = redact(transcriptOf(call))
   const outcomeSchema = {
     type: 'object',
     additionalProperties: false,
@@ -131,7 +132,7 @@ export async function finishCall(caseId: string, actionId: number, call: any) {
     )
     : { reached: false, resolved: false, summary: `No conversation (${call.endedReason}).`, appointment_date: null, appointment_time: null, price: null, next_step: 'Try again or call manually.', fields: [] }
 
-  const result = { call_id: call.id, ended_reason: call.endedReason, duration_s: call.startedAt && call.endedAt ? Math.round((Date.parse(call.endedAt) - Date.parse(call.startedAt)) / 1000) : null, recording_url: call.artifact?.recordingUrl ?? call.recordingUrl ?? null, transcript, outcome }
+  const result = redactDeep({ call_id: call.id, ended_reason: call.endedReason, duration_s: call.startedAt && call.endedAt ? Math.round((Date.parse(call.endedAt) - Date.parse(call.startedAt)) / 1000) : null, recording_url: call.artifact?.recordingUrl ?? call.recordingUrl ?? null, transcript, outcome })
   db.prepare(`update actions set status = ?, result = ?, done_at = ? where id = ?`).run(outcome.resolved ? 'done' : 'failed', JSON.stringify(result), now().toISOString(), actionId)
   logEvent(caseId, 'call_result', `Call with ${payload.contact_name}: ${outcome.summary}`, result)
 
