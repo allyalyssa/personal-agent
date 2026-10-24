@@ -1,5 +1,5 @@
 import { rule } from './rules.ts'
-import { addMonths, addDays, today, daysBetween } from './clock.ts'
+import { addMonths, addDays, today, daysBetween, now } from './clock.ts'
 
 type Rate = { start: string, end: string, rate: number, status: string }
 
@@ -206,7 +206,9 @@ function local(s: string) {
 }
 
 function sweepsAt(s: Sweep, t: ReturnType<typeof local>) {
-  return DAYS.indexOf(s.weekday.slice(0, 2).toLowerCase()) === t.weekday && s.weeks.includes(t.week) && t.hour >= s.from_hour && t.hour < s.to_hour
+  // A row with no week flags is treated as every week, so a gap in City data never produces a protest.
+  const everyWeek = !s.weeks?.length
+  return DAYS.indexOf(s.weekday.slice(0, 2).toLowerCase()) === t.weekday && (everyWeek || s.weeks.includes(t.week)) && t.hour >= s.from_hour && t.hour < s.to_hour
 }
 
 // Was this block actually scheduled for sweeping when the ticket was written?
@@ -230,14 +232,14 @@ export function sweepingCheck(args: { schedules: Sweep[], issued_at: string, sid
 }
 
 export function nextSweeping(args: { schedules: Sweep[], from?: string, side?: string }) {
-  const start = args.from ?? `${today()}T${new Date().toLocaleTimeString('en-GB', { timeZone: 'America/Los_Angeles', hour12: false }).slice(0, 5)}`
+  const start = args.from ?? `${today()}T${now().toLocaleTimeString('en-GB', { timeZone: 'America/Los_Angeles', hourCycle: 'h23' }).slice(0, 5)}`
   const schedules = (args.schedules ?? []).filter(s => !args.side || s.side.toLowerCase() === args.side.toLowerCase())
   for (let i = 0; i < 40; i++) {
     const date = addDays(start.slice(0, 10), i)
     for (const s of schedules.slice().sort((a, b) => a.from_hour - b.from_hour)) {
       const t = local(`${date}T${String(s.from_hour).padStart(2, '0')}:00`)
       if (!sweepsAt(s, t)) continue
-      if (i === 0 && s.from_hour <= local(start).hour) continue
+      if (i === 0 && local(start).hour >= s.to_hour) continue
       return { date, starts: `${String(s.from_hour).padStart(2, '0')}:00`, ends: `${String(s.to_hour).padStart(2, '0')}:00`, side: s.side, when: s.when, move_by: `${date}T${String(s.from_hour).padStart(2, '0')}:00` }
     }
   }

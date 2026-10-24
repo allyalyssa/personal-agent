@@ -128,7 +128,7 @@ const routes: [string, RegExp, (m: RegExpMatchArray, req: IncomingMessage, res: 
     send(res, 200, getProfile())
   }],
   ['GET', /^\/api\/civic$/, async (_, __, res) => send(res, 200, civicReport())],
-  ['GET', /^\/api\/eval$/, async (_, __, res) => send(res, 200, existsSync('data/eval.json') ? JSON.parse(readFileSync('data/eval.json', 'utf8')) : { note: 'Run npm run eval' })],
+  ['GET', /^\/api\/eval$/, async (_, __, res) => send(res, 200, existsSync('data/eval.json') ? JSON.parse(readFileSync('data/eval.json', 'utf8')) : existsSync('eval/latest.json') ? JSON.parse(readFileSync('eval/latest.json', 'utf8')) : { note: 'Run npm run eval' })],
   ['GET', /^\/api\/rules$/, async (_, __, res) => send(res, 200, allRules())],
   ['GET', /^\/api\/profile$/, async (_, __, res) => send(res, 200, getProfile())],
   ['POST', /^\/api\/profile$/, async (_, req, res) => {

@@ -14,7 +14,7 @@ async function soda(dataset: keyof typeof DATASETS, params: Record<string, strin
   for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v)
   const headers: Record<string, string> = {}
   if (process.env.DATASF_APP_TOKEN) headers['X-App-Token'] = process.env.DATASF_APP_TOKEN
-  const res = await fetch(url, { headers })
+  const res = await fetch(url, { headers, signal: AbortSignal.timeout(8000) })
   if (!res.ok) throw new Error(`DataSF ${DATASETS[dataset].id} ${res.status}: ${await res.text()}`)
   return { rows: await res.json() as any[], url: url.toString() }
 }

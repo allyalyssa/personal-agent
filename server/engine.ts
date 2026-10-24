@@ -197,13 +197,19 @@ export async function runLookups(caseId: string) {
   const p = playbook(c.playbook!)
   for (const [name, spec] of Object.entries(p.lookups ?? {})) {
     const ctx = getCase(caseId).fields
-    if (ctx[name]?.found) continue
+    if (ctx[name] && !ctx[name].error) continue
     const args: Record<string, any> = { dataset: spec.dataset, keyword: spec.keyword }
     if (spec.address) args.address = get(ctx, spec.address)
     if (spec.number) args.number = get(ctx, spec.number)
     if (spec.date) args.date = get(ctx, spec.date)
     if ((spec.address && !args.address) || (spec.number && !args.number)) continue
-    const result = await queryDatasf(args as any)
+    // A slow or failed City API should leave the case usable, not stall the whole intake.
+    let result: any
+    try {
+      result = await queryDatasf(args as any)
+    } catch (e: any) {
+      result = { found: false, error: `City data unavailable: ${e.message}` }
+    }
     setFields(caseId, { [name]: result })
     logEvent(caseId, 'data', `Looked up DataSF ${spec.dataset} (${args.address ?? args.number})`, result)
   }
