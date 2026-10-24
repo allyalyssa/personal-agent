@@ -10,7 +10,7 @@ function rateOn(rates: Rate[], date: string) {
 const money = (n: number) => Math.round(n * 100) / 100
 const usd = (n: number) => `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
-export function depositInterest(args: { deposit_amount: number, move_in_date: string, interest_paid_through?: string, as_of?: string }) {
+export function depositInterest(args: { deposit_amount: number, move_in_date: string, interest_paid_through?: string, as_of?: string, year_built?: number, units?: number }) {
   const r = rule('sf_deposit_interest')
   const asOf = args.as_of ?? today()
   const years = []
@@ -34,9 +34,18 @@ export function depositInterest(args: { deposit_amount: number, move_in_date: st
   const nextRate = rateOn(r.params.rates, due)
   const owed = years.filter(y => !y.already_paid && y.interest !== null)
   const unknown = years.filter(y => !y.already_paid && y.interest === null)
+  const total = money(owed.reduce((s, y) => s + (y.interest as number), 0))
+  // Rent-controlled units: the landlord may keep half the yearly Rent Board fee out of each year's interest.
+  const covered = args.year_built ? args.year_built < 1979 && (args.units ?? 2) >= 2 : null
+  const share = r.params.fee_share_per_year.at(-1).amount
+  const deduction = covered ? money(share * owed.length) : 0
   return {
     years,
-    total_owed: money(owed.reduce((s, y) => s + (y.interest as number), 0)),
+    total_owed: total,
+    rent_controlled_likely: covered,
+    fee_deduction_max: deduction,
+    net_minimum: money(Math.max(0, total - deduction)),
+    fee_note: covered ? `Built ${args.year_built}, so the landlord may deduct up to ${usd(share)} a year (half the Rent Board fee): up to ${usd(deduction)}.` : covered === false ? 'Not likely under the Rent Ordinance, so no Rent Board fee deduction.' : 'Building year unknown; the landlord may deduct half the Rent Board fee if the unit is rent controlled.',
     years_owed: owed.length,
     years_needing_confirmation: unknown.map(y => y.period),
     next_payment: { due_date: due, rate_percent: nextRate?.rate ?? null, interest: nextRate ? money(args.deposit_amount * nextRate.rate / 100) : null },
@@ -184,6 +193,57 @@ export function vestSchedule(args: { grant_date: string, total_shares: number, c
   return { events, first_vest: events[0], next_vest: events.find(e => e.date >= today()) ?? null, total: vested }
 }
 
+type Sweep = { side: string, when: string, weekday: string, weeks: number[], from_hour: number, to_hour: number, holidays: boolean }
+const DAYS = ['su', 'mo', 'tu', 'we', 'th', 'fr', 'sa']
+
+// City data times are local wall-clock strings like 2026-10-18T07:17:00.000.
+function local(s: string) {
+  const [d, t = '00:00'] = s.split('T')
+  const [y, m, day] = d.split('-').map(Number)
+  const [h, min] = t.split(':').map(Number)
+  const weekday = new Date(Date.UTC(y, m - 1, day)).getUTCDay()
+  return { date: d, day, weekday, hour: h + min / 60, week: Math.ceil(day / 7) }
+}
+
+function sweepsAt(s: Sweep, t: ReturnType<typeof local>) {
+  return DAYS.indexOf(s.weekday.slice(0, 2).toLowerCase()) === t.weekday && s.weeks.includes(t.week) && t.hour >= s.from_hour && t.hour < s.to_hour
+}
+
+// Was this block actually scheduled for sweeping when the ticket was written?
+export function sweepingCheck(args: { schedules: Sweep[], issued_at: string, side?: string }) {
+  const t = local(args.issued_at)
+  const schedules = (args.schedules ?? []).filter(s => !args.side || s.side.toLowerCase() === args.side.toLowerCase())
+  const matching = schedules.filter(s => sweepsAt(s, t))
+  const label = `${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][t.weekday]} (week ${t.week} of the month) at ${args.issued_at.slice(11, 16)}`
+  return {
+    issued: label,
+    schedules_on_block: schedules.map(s => `${s.side}: ${s.when}`),
+    scheduled: matching.length > 0,
+    contest_grounds: schedules.length > 0 && matching.length === 0,
+    explanation: !schedules.length
+      ? 'No sweeping schedule found for this block in City data; check the posted signs.'
+      : matching.length
+        ? `City data shows sweeping here then (${matching.map(s => s.when).join('; ')}), so the ticket matches the schedule.`
+        : `City data shows no sweeping on this block at ${label}. Scheduled: ${schedules.map(s => `${s.side} ${s.when}`).join('; ')}.`,
+    note: 'Holiday schedules and posted temporary signs are not checked; photos of the signs help a protest.'
+  }
+}
+
+export function nextSweeping(args: { schedules: Sweep[], from?: string, side?: string }) {
+  const start = args.from ?? `${today()}T${new Date().toLocaleTimeString('en-GB', { timeZone: 'America/Los_Angeles', hour12: false }).slice(0, 5)}`
+  const schedules = (args.schedules ?? []).filter(s => !args.side || s.side.toLowerCase() === args.side.toLowerCase())
+  for (let i = 0; i < 40; i++) {
+    const date = addDays(start.slice(0, 10), i)
+    for (const s of schedules.slice().sort((a, b) => a.from_hour - b.from_hour)) {
+      const t = local(`${date}T${String(s.from_hour).padStart(2, '0')}:00`)
+      if (!sweepsAt(s, t)) continue
+      if (i === 0 && s.from_hour <= local(start).hour) continue
+      return { date, starts: `${String(s.from_hour).padStart(2, '0')}:00`, ends: `${String(s.to_hour).padStart(2, '0')}:00`, side: s.side, when: s.when, move_by: `${date}T${String(s.from_hour).padStart(2, '0')}:00` }
+    }
+  }
+  return { date: null, note: 'No sweeping in the next 40 days for this block in City data.' }
+}
+
 export function nextAnnual(args: { month_day: string }) {
   const year = Number(today().slice(0, 4))
   const thisYear = `${year}-${args.month_day}`
@@ -200,5 +260,7 @@ export const computeFns: Record<string, (args: any) => any> = {
   compare_bill: compareBill,
   recurring_charges: recurringCharges,
   vest_schedule: vestSchedule,
+  sweeping_check: sweepingCheck,
+  next_sweeping: nextSweeping,
   next_annual: nextAnnual
 }

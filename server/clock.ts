@@ -24,12 +24,12 @@ export function isoDate(d: Date) {
   return d.toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' })
 }
 
-// 9am Pacific on a date, with the right offset for daylight time.
-export function at9(date: string) {
+// A wall-clock hour in Pacific time on a date, with the right offset for daylight time.
+export function at9(date: string, hour = 9) {
   const probe = new Date(`${date}T17:00:00Z`)
   const name = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', timeZoneName: 'shortOffset' }).formatToParts(probe).find(p => p.type === 'timeZoneName')!.value
   const hours = Number(name.replace('GMT', '') || 0)
-  return new Date(`${date}T09:00:00${hours < 0 ? '-' : '+'}${String(Math.abs(hours)).padStart(2, '0')}:00`).toISOString()
+  return new Date(`${date}T${String(hour).padStart(2, '0')}:00:00${hours < 0 ? '-' : '+'}${String(Math.abs(hours)).padStart(2, '0')}:00`).toISOString()
 }
 
 export function today() {
@@ -72,7 +72,7 @@ export function daysBetween(a: string, b: string) {
 export function evalFormula(formula: string, lookup: (path: string) => any): string | null {
   const [anchor, ...rest] = formula.trim().split(/\s+(?=[+-]\s)/)
   const base = anchor === 'today' ? today() : lookup(anchor.trim())
-  if (!base) return null
+  if (!base || !/^\d{4}-\d{2}-\d{2}/.test(String(base))) return null
   let d = String(base).slice(0, 10)
   for (const term of rest) {
     const m = term.match(/^([+-])\s*(\d+)\s*(business days?|days?|months?|weeks?)$/)

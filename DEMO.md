@@ -1,48 +1,54 @@
-# Demo script (3 minutes, plus a 2-minute backup video)
+# Demo script (about 2.5 minutes)
 
-Built around the kickoff: Puentes fellows are moving to SF this week; the city is not 20 years ahead in the day-to-day; personal agents should offload the work the city puts on people, and give something back to how the city works. Judges asked for live, working, in production, with a GitHub link.
+The kickoff asked for agents that offload the work this city puts on people, that real people would use, and that give something back to how the city works. Live, working, with a GitHub link and a 2-minute backup video.
 
-Before going on stage: Settings, pick **Valentina** with "Start with no cases" checked. Keep Jordan for the renter and car moments.
+One persona the whole time: **Valentina**, who came through Puentes two years ago from Montevideo. She's an engineer on an O-1, rents in the Mission, drives, and speaks Spanish. Settings, Valentina, "Start with no cases" checked.
 
-## 0:00 Open (15 s)
+## 0:00 Open (10 s)
 
-"Most of you landed in San Francisco this week. Nobody told you that you have 10 days to report your address to USCIS, or that your landlord owes you interest on your deposit every year. Handled knows the rules nobody explains, and handles them."
+"San Francisco hands everyone paperwork with deadlines nobody explains: tickets, deposits, layoffs, break-ins. Pine fights companies. SpotAngels watches your car. Handled handles the City."
 
-## 0:15 Valentina, in Spanish (60 s)
+## 0:10 The call (50 s)
 
-Tap **Cuéntale a Handled sobre ti** and speak:
+Valentina taps Voice and says in Spanish:
 
-> "Hola, soy Valentina, acabo de llegar de Montevideo el 20 de octubre con visa O-1 para trabajar en Flux Labs. Me mudé a 1000 Guerrero. No voy a manejar."
+> "Anoche me rompieron el vidrio del auto en Valencia y 20. No se llevaron nada."
 
-Show:
-- Everything comes back in Spanish, but the forms and emails it drafts are in English, each with a one-line Spanish "Lo que dice".
-- Cases it opened by itself: arrival kit (AR-11 due in 10 days, SSN after day 10, I-94 check), first 30 days.
-- Settings, "What Handled knows about you": origin, visa, employer, arrival date. Nothing gets asked twice.
+- The case appears in Spanish: SFPD report prepared, insurance packet, and a call to the glass shop, each waiting for her tap.
+- Approve the call. A phone on stage rings; ask a Flai judge to answer if the organizers agree, otherwise a teammate. The agent says it's an AI calling for Valentina, asks price and earliest slot, and won't go over $400 or take card details.
+- When it hangs up, the price and slot land on the case and the calendar, and she gets the summary in Spanish.
 
-## 1:15 Jordan, the money (30 s)
+## 1:00 The money (30 s)
 
-Switch to Jordan (keep cases). Gallery, deposit interest, Try with a sample.
-- "Your landlord owes you **$408.00**": $4,000 x 5.2% due Nov 1 2024, $4,000 x 5.0% due Nov 1 2025, from the Rent Board's published rates, checked today.
-- Building data is live from DataSF: built 1907, 21 units, so rent control likely applies.
+Gallery, Deposit interest, Try with a sample.
+- "Your landlord owes you **$408**": $4,000 x 5.2% due Nov 1 2024 plus $4,000 x 5.0% due Nov 1 2025, at the Rent Board rate in effect on each due date.
+- City Assessor data, live: built 1907, 21 units, so the landlord may keep up to $29.50 a year of Rent Board fees. **At least $349.**
 - Approve the demand email.
 
-## 1:45 The call (45 s)
+## 1:30 The ticket (25 s)
 
-Break-in sample. Approve the call. A teammate answers as the glass shop.
-- The agent says it's an AI calling for Jordan, gets price and the earliest slot, and won't go over $400 or take card details.
-- When the call ends: outcome, price and booking land on the case and the calendar feed, and Jordan gets a text.
-- No Vapi key? The same card opens the dialer with the script, and the notes typed after the call become the outcome.
+"SF wrote 33,739 street-cleaning tickets in the last 30 days, about $105 each." (DataSF, queried today.)
+- Parking ticket sample, real citation 2007036990. Handled pulls it from City data and checks the block's sweeping schedule for the minute it was written.
+- This one matches, so Handled says so instead of filing a protest that would lose. That's the DoNotPay failure mode we designed against. 25 of 25 real tickets agree (Settings, "How well it works").
+- "Don't get swept": the next sweep on her block is Monday 7am, so she gets a text Sunday evening.
 
-## 2:30 Follow-up fires on its own (15 s)
+## 1:55 It follows up on its own (15 s)
 
 Settings, +15 days. The landlord check-in fires, the case escalates, and the second notice is ready to approve.
 
-## 2:45 Give back to the city (15 s)
+## 2:10 Give back (15 s)
 
-"Fix it on my block" sample (broken streetlight). Live 311 data: how many neighbors already reported, how many are open, the City's median hours to close. Handled watches City data and closes the case when the City does. Settings, "Give back to the City": anonymous counts of where people still need a human because there is no online path.
+"Fix it on my block": a broken streetlight. Live 311 data shows how many neighbors already reported it and the City's median hours to close. Handled watches City data until the case closes. The anonymous civic report shows which City steps still have no online path.
 
-Close: "24 playbooks: renters, car owners, tech workers, families, small businesses, newcomers. Free to run, in your language."
+## 2:25 Close (5 s)
 
-## Backup video
+"Every action waits for your tap. In your language. Free to run."
 
-Record the two-minute version of the same flow at 5:15, with the live call, in case the venue's network or phone line fails.
+## Before going on stage
+
+1. `npm run demo-check` (runs every stage flow against live City data in about 10 seconds) and `npm run eval`.
+2. Keys in `.env`: Anthropic for the Spanish voice note and the call, plus Vapi. Without Vapi the call card opens the dialer with the script; use that as the fallback.
+3. Chrome for voice. If the room is noisy, tap Type and paste the Spanish line.
+4. Record the backup video at **3:30**, not later.
+
+See [COMPETITION.md](COMPETITION.md) for who else does what and the answers to likely questions.

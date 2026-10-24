@@ -31,6 +31,7 @@ export type DeadlineSpec = {
   when?: string
   unless?: string
   remind_days_before?: number[]
+  remind_hour?: number
 }
 
 export type FollowupSpec = {
@@ -48,9 +49,11 @@ export type Playbook = {
   title: string
   pitch: string
   depth: 'deep' | 'standard'
+  featured?: boolean
   triggers: { documents: string[], phrases: string[] }
   required_fields: Record<string, Field>
   rules: string[]
+  lookups?: Record<string, { dataset: 'assessor' | 'street_sweeping' | 'temporary_no_parking' | 'nearby_311' | 'citation', address?: string, number?: string, keyword?: string, date?: string }>
   compute?: Record<string, { fn: string, args: Record<string, string> }>
   money_at_stake?: string
   guidance?: string

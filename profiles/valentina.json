@@ -1,25 +1,33 @@
 {
-  "persona": "Puentes fellow who just arrived from Montevideo for a new job",
+  "persona": "Puentes alum from Montevideo, two years in SF. Engineer on an O-1, rents in the Mission, drives, mom back home. Speaks Spanish.",
   "name": "Valentina Rodríguez",
   "email": "valentina@example.com",
   "phone": "+15555550110",
   "language": "es",
   "address": "1000 Guerrero St, Apt 5, San Francisco, CA 94110",
   "neighborhood": "Mission",
-  "moved_to_sf": "2026-10-21",
+  "moved_to_sf": "2023-10-15",
   "renter": {
     "landlord_name": "Valencia Street Properties",
     "landlord_email": "landlord@example.com",
-    "move_in_date": "2026-10-21",
-    "deposit_amount": 3200,
-    "monthly_rent": 3200
+    "move_in_date": "2023-11-01",
+    "deposit_amount": 4000,
+    "monthly_rent": 3400
   },
   "work": {
     "employer": "Flux Labs",
     "hr_email": "people@example.com",
     "visa": "O-1"
   },
-  "car": null,
+  "car": {
+    "make": "Honda",
+    "model": "Civic",
+    "year": 2019,
+    "color": "blue",
+    "plate": "8ABC123",
+    "insurer": "State Farm",
+    "policy_last4": "4421"
+  },
   "family": [
     {
       "name": "Ana Rodríguez",
@@ -35,12 +43,7 @@
     "origin_country": {
       "value": "Uruguay",
       "from": "demo profile",
-      "at": "2026-10-21"
-    },
-    "arrival_date": {
-      "value": "2026-10-20",
-      "from": "demo profile",
-      "at": "2026-10-21"
+      "at": "2024-10-20"
     }
   },
   "contacts": [

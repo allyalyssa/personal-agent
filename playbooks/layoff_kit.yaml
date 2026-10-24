@@ -3,6 +3,7 @@ pack: work
 title: Layoff kit
 pitch: One voice note becomes every deadline that starts the day you are laid off, plus the email to HR.
 depth: deep
+featured: true
 triggers:
   documents: [termination letter, separation agreement, severance agreement, layoff notice]
   phrases: [laid off, let go, terminated, last day, severance, RIF, my job was eliminated, me despidieron, me echaron, perdí mi trabajo, fui despedido, fui demitido, perdi meu emprego]

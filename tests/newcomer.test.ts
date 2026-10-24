@@ -17,7 +17,7 @@ const { readFileSync } = await import('node:fs')
 
 loadRules()
 loadPlaybooks()
-setProfile(JSON.parse(readFileSync('profiles/valentina.json', 'utf8')))
+setProfile(JSON.parse(readFileSync('profiles/nico.json', 'utf8')))
 
 test('Spanish and Portuguese voice notes route without a key', () => {
   assert.equal(routeByTriggers('Hola, acabo de llegar a San Francisco desde Montevideo')?.id, 'arrival_kit')
@@ -76,7 +76,7 @@ test('without paid providers, approved actions hand off to the phone and still s
   const email = v.actions.find((a: any) => a.tool === 'send_email')
   const r: any = await executeAction(email.id)
   assert.equal(r.result.handoff, 'email')
-  assert.match(r.result.url, /^mailto:landlord%40example\.com\?subject=/)
+  assert.match(r.result.url, /^mailto:rentals%40example\.com\?subject=/)
   await completeAction(email.id)
   const jobs = db.prepare(`select * from jobs where case_id = ? and kind = 'followup'`).all(id)
   assert.equal(jobs.length, 1)
@@ -87,8 +87,8 @@ test('civic report has counts and no personal details', () => {
   const r = civicReport()
   const text = JSON.stringify(r)
   assert.ok(r.obligations.length > 0)
-  assert.ok(!text.includes('Valentina'))
-  assert.ok(!text.includes('Guerrero'))
+  assert.ok(!text.includes('Nicol'))
+  assert.ok(!text.includes('Valencia St'))
   assert.ok(r.steps_with_no_online_path.some((s: any) => s.host === 'www.uscis.gov'))
 })
 

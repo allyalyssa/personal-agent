@@ -1,0 +1,18 @@
+{
+  "run_at": "2026-10-24T17:48:23.378Z",
+  "routing_keyword_mode": {
+    "total": "25/25",
+    "by_language": {
+      "en": "11/11",
+      "es": "8/8",
+      "pt": "6/6"
+    },
+    "misses": []
+  },
+  "routing_claude": "not run (no ANTHROPIC_API_KEY)",
+  "sweeping_rule_vs_city_tickets": {
+    "tickets_checked": 25,
+    "schedule_matches": 25,
+    "meaning": "Share of real street-cleaning tickets this week that the sweeping check says were written during a scheduled window. High agreement means Handled will not push protests the City would reject."
+  }
+}

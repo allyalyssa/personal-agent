@@ -3,6 +3,7 @@ pack: city
 title: Fix it on my block (311)
 pitch: Snap the broken streetlight, pothole or dumped mattress. Handled checks what neighbors already reported, prepares the 311 report, and watches City data until it's closed.
 depth: standard
+featured: true
 triggers:
   documents: [photo of street problem, photo of pothole, photo of dumped items]
   phrases: [pothole, streetlight, street light, dumped, illegal dumping, mattress on the sidewalk, broken sidewalk, overflowing trash, graffiti on, 311, bache, basura en la calle, poste de luz, buraco na rua]

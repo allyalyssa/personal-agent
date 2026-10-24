@@ -1,0 +1,66 @@
+id: parking_ticket
+pack: car
+title: Parking ticket check and protest
+pitch: Snap the ticket. Handled pulls it from City data, checks the block's sweeping schedule for the minute it was written, and if the City's own data says no sweeping, drafts the protest before the 21-day deadline.
+depth: deep
+featured: true
+triggers:
+  documents: [parking ticket, parking citation, SFMTA notice]
+  phrases: [parking ticket, got a ticket, citation, street cleaning ticket, street sweeping ticket, multa de estacionamiento, me pusieron una multa, multa, multa de estacionamento]
+required_fields:
+  citation_number: { type: string, label: Citation number (on the ticket), get: extract or ask }
+  plate: { type: string, label: License plate, get: profile, profile: car.plate }
+  issued_at: { type: string, label: When it was written (YYYY-MM-DDTHH:MM), get: extract or lookup, optional: true }
+  ticket_address: { type: string, label: Street address on the ticket, get: extract or lookup, optional: true }
+  side: { type: string, label: Side of the street you parked on (North/South/East/West), get: ask, optional: true }
+rules: [sfmta_citation_contest, sf_street_sweeping_data]
+lookups:
+  citation: { dataset: citation, number: citation_number }
+  sweeping: { dataset: street_sweeping, address: "ticket_address|citation.location" }
+guidance: >
+  If the ticket photo shows the address and time, set ticket_address and issued_at from it. Otherwise set them from
+  the citation lookup (citation.location, citation.issued_at) after plan_actions and call plan_actions again.
+  Lead with the verdict from check.explanation, then the deadline. Only call a protest likely to succeed when
+  check.contest_grounds is true, and say holiday schedules and temporary signs were not checked.
+compute:
+  check:
+    fn: sweeping_check
+    args: { schedules: sweeping.schedules, issued_at: "issued_at|citation.issued_at", side: side }
+money_at_stake: citation.fine
+actions:
+  - id: protest
+    tool: prepare_form
+    title: Prepare your protest of citation {{citation_number}} (you submit)
+    needs_approval: true
+    when: check.contest_grounds
+    due: issued_at|citation.issued_at + 20 days
+    waits_on_other_party: true
+    payload:
+      form_name: SFMTA parking citation protest (first-level review)
+      official_url: https://prdwmq.etimspayments.com/pbw/include/sanfrancisco/dispute_request.jsp
+      fields:
+        Citation number: "{{citation_number}}"
+        License plate: "{{plate}}"
+        Reason: "Street cleaning was not scheduled at this location at the time of the citation. The City's published street sweeping schedule (DataSF dataset yhqp-riqs) for {{sweeping.block}} lists: {{check.schedules_on_block}}. The citation was issued {{check.issued}}."
+        Evidence: Screenshot of the City's sweeping schedule for this block; photos of the posted signs if you have them.
+      instructions: Do not pay the ticket if you protest. The citation is placed on hold while SFMTA reviews it, which can take up to 90 days.
+  - id: pay_or_waive
+    tool: open_url_prefilled
+    title: The ticket matches the schedule; see payment and low-income options
+    needs_approval: true
+    unless: check.contest_grounds
+    payload:
+      url: https://www.sfmta.com/getting-around/drive-park/citations
+      search_for: "Citation {{citation_number}}. Ask about payment plans and low-income discounts before late penalties apply."
+deadlines:
+  - title: Last day to protest citation {{citation_number}}
+    due: issued_at|citation.issued_at + 21 days
+    rule: sfmta_citation_contest
+    remind_days_before: [7, 2]
+followups:
+  - after_action: protest
+    wait: 30 days
+    check: Did SFMTA decide on your protest of citation {{citation_number}}? If denied, you have 25 days to request a hearing.
+    resolved_when: Protest granted, or you decide to pay
+sample: |
+  Got a street cleaning ticket, citation 2007036990, at 425 Eddy St on Sunday October 18 at 7:09am. Is it legit?

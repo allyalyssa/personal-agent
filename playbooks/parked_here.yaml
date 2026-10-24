@@ -1,0 +1,38 @@
+id: parked_here
+pack: car
+title: Don't get swept
+pitch: Say where you parked. Handled reads that block's sweeping schedule from City data and texts you the evening before you have to move.
+depth: standard
+featured: true
+triggers:
+  documents: [photo of street sign]
+  phrases: [I parked, parked on, parked at, street sweeping, move my car, estacioné en, dejé el auto en, estacionei]
+required_fields:
+  parked_address: { type: string, label: Where you parked (nearest street address), get: extract or ask, profile: address }
+  side: { type: string, label: Side of the street (North/South/East/West), get: extract or ask, optional: true }
+rules: [sf_street_sweeping_data, sfmta_citation_contest]
+lookups:
+  sweeping: { dataset: street_sweeping, address: parked_address }
+compute:
+  next:
+    fn: next_sweeping
+    args: { schedules: sweeping.schedules, side: side }
+guidance: Tell the user the exact next sweeping window from next, and that a street cleaning ticket averages about $105 (DataSF, last 30 days). If the block has two sides with different days and side is unknown, ask which side.
+actions:
+  - id: calendar
+    tool: create_calendar_event
+    title: "Move your car from {{parked_address}} by {{next.starts}} on {{date next.date}}"
+    needs_approval: false
+    when: next.date
+    payload:
+      title: "Move car: sweeping {{next.starts}}-{{next.ends}} ({{next.side}} side)"
+      date: "{{next.date}}"
+      note: "{{sweeping.block}}. From the City's street sweeping schedule."
+deadlines:
+  - title: "Move your car before street sweeping ({{next.starts}}, {{next.side}} side)"
+    due: next.date
+    rule: sf_street_sweeping_data
+    remind_days_before: [1]
+    remind_hour: 19
+sample: |
+  I just parked in front of 1000 Guerrero St, west side.

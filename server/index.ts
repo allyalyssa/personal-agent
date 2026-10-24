@@ -98,7 +98,7 @@ const routes: [string, RegExp, (m: RegExpMatchArray, req: IncomingMessage, res: 
   }],
   ['GET', /^\/api\/playbooks$/, async (_, __, res) => send(res, 200, {
     packs: PACKS,
-    playbooks: allPlaybooks().map(p => ({ id: p.id, pack: p.pack, title: p.title, pitch: p.pitch, depth: p.depth, sample: p.sample, rules: p.rules, actions: p.actions.map(a => a.tool) }))
+    playbooks: allPlaybooks().map(p => ({ id: p.id, pack: p.pack, title: p.title, pitch: p.pitch, depth: p.depth, featured: Boolean(p.featured), sample: p.sample, rules: p.rules, actions: p.actions.map(a => a.tool) }))
   })],
   ['POST', /^\/api\/playbooks\/(\w+)\/try$/, async (m, __, res) => {
     const p = playbook(m[1])
@@ -128,6 +128,7 @@ const routes: [string, RegExp, (m: RegExpMatchArray, req: IncomingMessage, res: 
     send(res, 200, getProfile())
   }],
   ['GET', /^\/api\/civic$/, async (_, __, res) => send(res, 200, civicReport())],
+  ['GET', /^\/api\/eval$/, async (_, __, res) => send(res, 200, existsSync('data/eval.json') ? JSON.parse(readFileSync('data/eval.json', 'utf8')) : { note: 'Run npm run eval' })],
   ['GET', /^\/api\/rules$/, async (_, __, res) => send(res, 200, allRules())],
   ['GET', /^\/api\/profile$/, async (_, __, res) => send(res, 200, getProfile())],
   ['POST', /^\/api\/profile$/, async (_, req, res) => {

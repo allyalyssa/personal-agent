@@ -9,7 +9,15 @@ Built for the Puentes hackathon ("Personal Agents for San Francisco"): people wh
 - **Free to run:** without paid providers it drafts everything and hands the last tap to your phone (mail app, messages, dialer with the call script). Without an Anthropic key it routes by keywords and asks with a form.
 - **Gives back:** "Fix it on my block" checks live 311 data before you report, then watches the City's own records until the case closes. An anonymous civic report shows where people still need a human because there is no online path.
 
-See [DEMO.md](DEMO.md) for the stage script.
+See [DEMO.md](DEMO.md) for the stage script and [COMPETITION.md](COMPETITION.md) for who else does what.
+
+## Evidence
+
+`npm run eval` (results in [eval/latest.json](eval/latest.json), also shown in Settings):
+- Routing in keyword mode across English, Spanish and Portuguese captures: 25/25.
+- Sweeping check against real street-cleaning tickets the City wrote in the last 10 days: 25/25 agree.
+
+`npm run demo-check` runs every stage flow end to end against live City data.
 
 ## Run
 
@@ -20,6 +28,8 @@ cp profiles/jordan.json profile.json   # optional: your own profile
 npm start                   # http://localhost:3000
 npm test                    # engine tests, no keys needed
 npm run check-datasf -- "1000 Guerrero St"
+npm run demo-check          # stage flows against live City data
+npm run eval                # routing and rule accuracy
 ```
 
 Requires Node 24 (built-in SQLite, runs TypeScript directly, no build step).

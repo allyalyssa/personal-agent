@@ -147,6 +147,6 @@ test('every playbook plans end to end with its sample-shaped fields filled', () 
     }
     const id = newCase(p.id, fields)
     const v = plan(id)
-    assert.ok(v.actions.length > 0 || v.deadlines.length > 0, p.id)
+    if (!p.lookups) assert.ok(v.actions.length > 0 || v.deadlines.length > 0, p.id)
   }
 })

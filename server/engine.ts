@@ -5,6 +5,7 @@ import { playbook, type ActionSpec } from './playbooks.ts'
 import { rule, allRules } from './rules.ts'
 import { computeFns } from './compute.ts'
 import { redactDeep } from './redact.ts'
+import { queryDatasf } from './datasf.ts'
 
 export type Case = {
   id: string
@@ -67,7 +68,9 @@ export function logEvent(caseId: string, kind: string, title: string, detail?: a
   db.prepare('insert into events (case_id, at, kind, title, detail) values (?, ?, ?, ?, ?)').run(caseId, now().toISOString(), kind, title, detail === undefined ? null : JSON.stringify(detail))
 }
 
-export function get(ctx: any, path: string) {
+// 'a|b' means a, or b when a is empty.
+export function get(ctx: any, path: string): any {
+  if (path.includes('|')) return path.split('|').map(p => get(ctx, p.trim())).find(v => v != null && v !== '')
   return path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), ctx)
 }
 
@@ -91,6 +94,7 @@ export function render(template: string, ctx: any): string {
     if (v === undefined || v === null) return `[${path}]`
     if (helper === '$') return fmtMoney(v)
     if (helper === 'date') return fmtDate(v)
+    if (Array.isArray(v) && v.every(x => typeof x !== 'object')) return v.join('; ')
     return typeof v === 'object' ? JSON.stringify(v) : String(v)
   })
 }
@@ -186,6 +190,25 @@ export function prefillFromProfile(caseId: string) {
   updateCase(caseId, { fields })
 }
 
+// Live City data the playbook declares (building records, sweeping schedule, the citation itself),
+// fetched once per case and saved as fields so compute steps and drafts can use them.
+export async function runLookups(caseId: string) {
+  const c = getCase(caseId)
+  const p = playbook(c.playbook!)
+  for (const [name, spec] of Object.entries(p.lookups ?? {})) {
+    const ctx = getCase(caseId).fields
+    if (ctx[name]?.found) continue
+    const args: Record<string, any> = { dataset: spec.dataset, keyword: spec.keyword }
+    if (spec.address) args.address = get(ctx, spec.address)
+    if (spec.number) args.number = get(ctx, spec.number)
+    if (spec.date) args.date = get(ctx, spec.date)
+    if ((spec.address && !args.address) || (spec.number && !args.number)) continue
+    const result = await queryDatasf(args as any)
+    setFields(caseId, { [name]: result })
+    logEvent(caseId, 'data', `Looked up DataSF ${spec.dataset} (${args.address ?? args.number})`, result)
+  }
+}
+
 export function runCompute(c: Case) {
   const p = playbook(c.playbook!)
   const computed: Record<string, any> = {}
@@ -224,7 +247,7 @@ export function plan(caseId: string) {
     const info = db.prepare('insert into deadlines (case_id, title, due_at, rule_id, note) values (?, ?, ?, ?, ?)').run(caseId, render(d.title, ctx), due, d.rule ?? null, note)
     for (const n of d.remind_days_before ?? []) {
       const at = addDays(due, -n)
-      if (at >= today()) db.prepare(`insert into jobs (case_id, kind, run_at, payload) values (?, 'reminder', ?, ?)`).run(caseId, at9(at), JSON.stringify({ deadline_id: Number(info.lastInsertRowid), days_before: n }))
+      if (at >= today()) db.prepare(`insert into jobs (case_id, kind, run_at, payload) values (?, 'reminder', ?, ?)`).run(caseId, at9(at, d.remind_hour), JSON.stringify({ deadline_id: Number(info.lastInsertRowid), days_before: n }))
     }
   }
 

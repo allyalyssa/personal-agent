@@ -3,9 +3,10 @@ pack: car
 title: Car break-in
 pitch: Police report pre-filled, insurance packet built, and a live call to a glass shop for price and the earliest slot.
 depth: deep
+featured: true
 triggers:
   documents: [photo of broken car window, police report, insurance claim]
-  phrases: [broke into my car, car break-in, smashed window, broken window, bipping, stole from my car, me rompieron el vidrio, me robaron del auto, rompieron la ventana del auto, quebraram o vidro do carro]
+  phrases: [broke into my car, smashed my car, car window, my car window, car break-in, smashed window, broken window, bipping, stole from my car, me rompieron el vidrio, me robaron del auto, rompieron la ventana del auto, quebraram o vidro do carro]
 required_fields:
   incident_date: { type: date, label: When it happened, get: extract or ask }
   incident_location: { type: string, label: Where the car was parked, get: extract or ask }

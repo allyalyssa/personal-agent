@@ -1,0 +1,55 @@
+{
+  "persona": "Puentes fellow who landed this week from Buenos Aires for a new job. Speaks Spanish. No car yet.",
+  "name": "Nicolás Pereyra",
+  "email": "nico@example.com",
+  "phone": "+15555550120",
+  "language": "es",
+  "address": "455 Valencia St, Apt 2, San Francisco, CA 94103",
+  "neighborhood": "Mission",
+  "moved_to_sf": "2026-10-21",
+  "renter": {
+    "landlord_name": "Mission Rentals",
+    "landlord_email": "rentals@example.com",
+    "move_in_date": "2026-10-21",
+    "deposit_amount": 3000,
+    "monthly_rent": 3000
+  },
+  "work": {
+    "employer": "Flux Labs",
+    "hr_email": "people@example.com",
+    "visa": "O-1"
+  },
+  "car": null,
+  "family": [],
+  "business": null,
+  "library_card": false,
+  "memory": {
+    "origin_country": {
+      "value": "Argentina",
+      "from": "demo profile",
+      "at": "2026-10-21"
+    },
+    "arrival_date": {
+      "value": "2026-10-20",
+      "from": "demo profile",
+      "at": "2026-10-21"
+    }
+  },
+  "contacts": [
+    {
+      "name": "Mission Auto Glass (demo line)",
+      "kind": "auto_glass",
+      "phone": "+15555550102"
+    },
+    {
+      "name": "SF Paratransit reservations (demo line)",
+      "kind": "paratransit",
+      "phone": "+15555550103"
+    },
+    {
+      "name": "Hospital billing office (demo line)",
+      "kind": "medical_billing",
+      "phone": "+15555550104"
+    }
+  ]
+}

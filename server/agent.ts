@@ -6,7 +6,7 @@ import { computeFns } from './compute.ts'
 import { queryDatasf } from './datasf.ts'
 import { today } from './clock.ts'
 import { redact, redactDeep } from './redact.ts'
-import { getCase, updateCase, logEvent, setFields, prefillFromProfile, missingFields, plan, getProfile, insertAction, context, caseView, remember, createCase, coerceAnswers } from './engine.ts'
+import { getCase, updateCase, logEvent, setFields, prefillFromProfile, missingFields, plan, getProfile, insertAction, context, caseView, remember, createCase, coerceAnswers, runLookups } from './engine.ts'
 import { db } from './db.ts'
 
 type Tool = Anthropic.Beta.BetaTool
@@ -215,6 +215,7 @@ async function runTool(caseId: string, name: string, input: any): Promise<{ resu
     const c = getCase(caseId)
     const missing = missingFields(c)
     if (missing.length) return { result: { error: 'Required fields missing', missing } }
+    await runLookups(caseId)
     const view = plan(caseId)
     return {
       result: {
@@ -420,7 +421,7 @@ export function routeByTriggers(text: string): Playbook | null {
   return best
 }
 
-function askMissing(caseId: string) {
+async function askMissing(caseId: string) {
   const c = getCase(caseId)
   const missing = missingFields(c)
   if (missing.length) {
@@ -429,12 +430,13 @@ function askMissing(caseId: string) {
     return
   }
   updateCase(caseId, { questions: null })
+  await runLookups(caseId)
   const v = plan(caseId)
   const lines = v.deadlines.slice(0, 6).map((d: any) => `${d.due_at}: ${d.title}`)
   updateCase(caseId, { summary: `Planned ${v.actions.filter((x: any) => x.status === 'proposed').length} actions.${lines.length ? '\n' + lines.join('\n') : ''}` })
 }
 
-export function intakeOffline(caseId: string, text: string) {
+export async function intakeOffline(caseId: string, text: string) {
   logEvent(caseId, 'user', redact(text))
   const p = routeByTriggers(text)
   if (!p) {
@@ -444,12 +446,12 @@ export function intakeOffline(caseId: string, text: string) {
   updateCase(caseId, { playbook: p.id, pack: p.pack, title: p.title })
   prefillFromProfile(caseId)
   logEvent(caseId, 'route', `Matched playbook by keywords: ${p.title}`)
-  askMissing(caseId)
+  await askMissing(caseId)
   return caseView(caseId)
 }
 
-export function replyOffline(caseId: string) {
+export async function replyOffline(caseId: string) {
   const c = getCase(caseId)
-  if (c.playbook) askMissing(caseId)
+  if (c.playbook) await askMissing(caseId)
   return caseView(caseId)
 }

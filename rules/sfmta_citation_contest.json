@@ -1,0 +1,14 @@
+{
+  "id": "sfmta_citation_contest",
+  "title": "Contesting an SF parking ticket",
+  "jurisdiction": "San Francisco",
+  "rule": "A parking citation must be protested within 21 days from the date it was issued (or of the first courtesy notice). Don't pay it if you plan to protest. Protest online or by mail to SFMTA Citation Review, 11 South Van Ness Avenue. The citation is placed on hold during review, which can take up to 90 days. If denied, request a second-level administrative hearing within 25 calendar days of the denial letter; a deposit equal to the fine is required unless you qualify for a waiver (for example income at or below 200% of the federal poverty level). After the hearing you can appeal to Superior Court within 30 days ($25 fee, refunded if you win).",
+  "params": { "protest_days": 21, "hearing_days": 25, "court_days": 30, "court_fee": 25, "waiver_fpl_percent": 200 },
+  "source_url": "https://www.sfmta.com/getting-around/drive-park/citations/contest-citation",
+  "protest_url": "https://prdwmq.etimspayments.com/pbw/include/sanfrancisco/dispute_request.jsp",
+  "verify_phrase": "21 days",
+  "status": "verified",
+  "last_verified": "2026-10-24",
+  "confirm_with": "SFMTA Customer Service Center",
+  "notes": "Read on the SFMTA contest page on 2026-10-24. Street cleaning citations in the last 30 days: 33,739, average fine about $105 (DataSF ab4h-6ztd, queried 2026-10-24)."
+}

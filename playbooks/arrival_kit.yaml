@@ -3,6 +3,7 @@ pack: newcomer
 title: Just landed in SF
 pitch: Tell Handled where you're from, your visa and your address, in any language. It builds every first-weeks deadline (USCIS address report, SSN, I-94, CA license) and prepares each one.
 depth: deep
+featured: true
 triggers:
   documents: [visa, I-94, I-797 approval notice, offer letter, passport stamp, lease]
   phrases: [just landed, just arrived, just moved to San Francisco, new to SF, moved here, my visa, relocating, acabo de llegar, llegué a San Francisco, me mudé a San Francisco, me mudé a SF, acabei de chegar, me mudei para San Francisco]

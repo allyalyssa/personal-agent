@@ -5,7 +5,8 @@ export const DATASETS = {
   assessor: { id: 'wv5m-vpq2', name: 'Assessor Historical Secured Property Tax Rolls' },
   street_sweeping: { id: 'yhqp-riqs', name: 'Street Sweeping Schedule' },
   temporary_no_parking: { id: 'sftu-nd43', name: 'Parking Signs / Street Space Permits' },
-  cases_311: { id: 'vw6y-z8j6', name: '311 Cases' }
+  cases_311: { id: 'vw6y-z8j6', name: '311 Cases' },
+  citations: { id: 'ab4h-6ztd', name: 'SFMTA - Parking Citations & Fines' }
 }
 
 async function soda(dataset: keyof typeof DATASETS, params: Record<string, string>) {
@@ -36,13 +37,16 @@ export function parseAddress(address: string) {
   return { number: m[1], street, type }
 }
 
-export async function lookupAddress(address: string) {
-  const { number, street, type } = parseAddress(address)
+export async function lookupAddress(address: string, anyType = false): Promise<{ match: any, candidates: number, query_url: string }> {
+  const parsed = parseAddress(address)
+  const { number, street } = parsed
+  const type = anyType ? null : parsed.type
   const { rows, url } = await soda('addresses', {
     $where: `address_number=${Number(number)} and upper(street_name)='${street.replace(/'/g, "''")}'${type ? ` and upper(street_type)='${type}'` : ''}`,
     $select: 'address,cnn,parcel_number,nhood,zip_code,latitude,longitude',
     $limit: '5'
   })
+  if (!rows.length && type) return lookupAddress(address, true)
   return { match: rows[0] ?? null, candidates: rows.length, query_url: url }
 }
 
@@ -74,17 +78,49 @@ export async function assessorByAddress(address: string) {
 export async function sweepingByAddress(address: string) {
   const addr = await lookupAddress(address)
   if (!addr.match) return { found: false, address, sources: [addr.query_url] }
-  const { rows, url } = await soda('street_sweeping', {
-    $where: `cnn='${addr.match.cnn}'`,
-    $select: 'corridor,limits,blockside,cnnrightleft,fullname,weekday,fromhour,tohour,holidays'
-  })
+  const select = 'corridor,limits,blockside,cnnrightleft,fullname,weekday,fromhour,tohour,holidays,week1,week2,week3,week4,week5'
+  const first = await soda('street_sweeping', { $where: `cnn='${addr.match.cnn}'`, $select: select })
+  // Each side of a block can be its own segment, so fetch the whole block by street and limits.
+  const block = first.rows[0]
+    ? await soda('street_sweeping', { $where: `corridor='${first.rows[0].corridor.replace(/'/g, "''")}' and upper(limits) like '${first.rows[0].limits.toUpperCase().split('-').map((p: string) => p.trim()).join('%').replace(/'/g, "''")}'`, $select: select })
+    : first
+  const rows = block.rows
   return {
     found: rows.length > 0,
     address: addr.match.address,
     block: rows[0] ? `${rows[0].corridor}, ${rows[0].limits.replace(/\s+/g, ' ')}` : null,
-    schedules: rows.map(r => ({ side: r.blockside, when: `${r.fullname}, ${r.fromhour}:00-${r.tohour}:00`, weekday: r.weekday, from_hour: Number(r.fromhour), to_hour: Number(r.tohour), holidays: r.holidays === '1' })),
+    schedules: rows.map(r => ({
+      side: r.blockside,
+      when: `${r.fullname}, ${r.fromhour}:00-${r.tohour}:00`,
+      weekday: r.weekday,
+      weeks: [1, 2, 3, 4, 5].filter(n => r[`week${n}`] === '1'),
+      from_hour: Number(r.fromhour),
+      to_hour: Number(r.tohour),
+      holidays: r.holidays === '1'
+    })),
     dataset: DATASETS.street_sweeping,
-    sources: [addr.query_url, url]
+    sources: [addr.query_url, block.url]
+  }
+}
+
+// Parking citations are public on DataSF by citation number.
+export async function citationLookup(number: string) {
+  const { rows, url } = await soda('citations', {
+    $where: `citation_number='${String(number).replace(/\D/g, '')}'`,
+    $select: 'citation_number,citation_issued_datetime,violation,violation_desc,citation_location,fine_amount'
+  })
+  const r = rows[0]
+  return {
+    found: Boolean(r),
+    number,
+    issued_at: r?.citation_issued_datetime ?? null,
+    violation: r?.violation_desc ?? null,
+    code: r?.violation ?? null,
+    location: r?.citation_location ?? null,
+    fine: r ? Number(r.fine_amount) : null,
+    dataset: DATASETS.citations,
+    sources: [url],
+    note: r ? null : 'Not in City data yet; new citations can take a few days to appear.'
   }
 }
 
@@ -150,9 +186,10 @@ export async function status311(requestId: string) {
   return { found: rows.length > 0, ...(rows[0] ?? {}), source: url }
 }
 
-export async function queryDatasf(args: { dataset: 'assessor' | 'street_sweeping' | 'temporary_no_parking' | 'nearby_311', address: string, date?: string, keyword?: string }) {
-  if (args.dataset === 'assessor') return assessorByAddress(args.address)
-  if (args.dataset === 'street_sweeping') return sweepingByAddress(args.address)
-  if (args.dataset === 'nearby_311') return nearby311(args.address, args.keyword)
-  return noParkingByAddress(args.address, args.date ?? new Date().toISOString().slice(0, 10))
+export async function queryDatasf(args: { dataset: 'assessor' | 'street_sweeping' | 'temporary_no_parking' | 'nearby_311' | 'citation', address?: string, date?: string, keyword?: string, number?: string }) {
+  if (args.dataset === 'citation') return citationLookup(args.number!)
+  if (args.dataset === 'assessor') return assessorByAddress(args.address!)
+  if (args.dataset === 'street_sweeping') return sweepingByAddress(args.address!)
+  if (args.dataset === 'nearby_311') return nearby311(args.address!, args.keyword)
+  return noParkingByAddress(args.address!, args.date ?? new Date().toISOString().slice(0, 10))
 }

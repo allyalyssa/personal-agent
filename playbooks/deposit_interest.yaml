@@ -3,6 +3,7 @@ pack: renter
 title: Deposit interest your landlord owes you
 pitch: SF landlords owe you interest on your security deposit every year. Most never pay it.
 depth: deep
+featured: true
 triggers:
   documents: [lease, deposit receipt, move-in statement, rent ledger]
   phrases: [security deposit, deposit interest, my deposit, move-in, depósito de garantía, mi depósito, interés del depósito, depósito caução]
@@ -15,6 +16,8 @@ required_fields:
   interest_paid_through: { type: date, label: Date interest was last paid (if ever), get: ask, optional: true }
 rules: [sf_deposit_interest, sf_rent_control_coverage]
 datasf: [assessor]
+lookups:
+  building: { dataset: assessor, address: rental_address }
 guidance: >
   Look up the building in DataSF assessor data to confirm it is a residential rental in SF.
   If the user has never been paid interest, leave interest_paid_through empty; do not ask about it
@@ -22,8 +25,8 @@ guidance: >
 compute:
   interest:
     fn: deposit_interest
-    args: { deposit_amount: deposit_amount, move_in_date: move_in_date, interest_paid_through: interest_paid_through }
-money_at_stake: interest.total_owed
+    args: { deposit_amount: deposit_amount, move_in_date: move_in_date, interest_paid_through: interest_paid_through, year_built: building.year_built, units: building.units }
+money_at_stake: interest.net_minimum
 actions:
   - id: demand
     tool: send_email
@@ -44,7 +47,7 @@ actions:
 
         {{lines interest.years.math}}
 
-        Total owed: ${{$ interest.total_owed}}
+        Total owed: ${{$ interest.total_owed}}. If this unit is covered by the Rent Ordinance and you deduct the tenant share of the Rent Board fee, please show that deduction.
 
         Rates are from the SF Rent Board: {{interest.source_url}}
 

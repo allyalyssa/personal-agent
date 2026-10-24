@@ -480,14 +480,15 @@ let galleryPack = sessionStorage.getItem('galleryPack') ?? 'all'
 
 async function renderGallery() {
   const { packs, playbooks } = await api('/api/playbooks')
-  const shown = playbooks.filter(p => galleryPack === 'all' || p.pack === galleryPack)
+  const shown = playbooks.filter(p => galleryPack === 'all' ? p.featured : galleryPack === 'more' ? !p.featured : p.pack === galleryPack)
   const order = Object.keys(packs)
   shown.sort((a, b) => order.indexOf(a.pack) - order.indexOf(b.pack) || (a.depth === 'deep' ? -1 : 1))
   view.innerHTML = `
-    <h1>${playbooks.length} playbooks</h1>
+    <h1>Playbooks</h1>
     <p class="muted small">Each one is a declarative file: triggers, required fields, rules with sources, actions with deadlines, and follow-ups. One engine runs them all.</p>
     <div class="gallery-scroll" role="tablist">
-      <button class="chip ${galleryPack === 'all' ? 'on' : ''}" data-pack="all">All</button>
+      <button class="chip ${galleryPack === 'all' ? 'on' : ''}" data-pack="all">Featured ${playbooks.filter(p => p.featured).length}</button>
+      <button class="chip ${galleryPack === 'more' ? 'on' : ''}" data-pack="more">More ${playbooks.filter(p => !p.featured).length}</button>
       ${order.map(k => `<button class="chip ${galleryPack === k ? 'on' : ''}" data-pack="${esc(k)}">${esc(packs[k])} ${playbooks.filter(p => p.pack === k).length}</button>`).join('')}
     </div>
     <div class="pack-grid" style="margin-top:12px">
@@ -514,7 +515,7 @@ async function renderGallery() {
 }
 
 async function renderSettings() {
-  const [profile, personas, civic] = await Promise.all([api('/api/profile'), api('/api/personas'), api('/api/civic')])
+  const [profile, personas, civic, evals] = await Promise.all([api('/api/profile'), api('/api/personas'), api('/api/civic'), api('/api/eval')])
   const i = state.integrations
   const cal = `${location.origin}/calendar.ics`
   view.innerHTML = `
@@ -563,6 +564,14 @@ async function renderSettings() {
         <dt>311 reports</dt><dd>${civic.reports_311.prepared} prepared, ${civic.reports_311.closed_by_city} closed by the City</dd>
       </dl>
       <a href="/api/civic" download="handled-civic-report.json">Download the anonymous report</a>
+    </div>
+    <h2>How well it works</h2>
+    <div class="card small">
+      ${evals.routing_keyword_mode ? `<dl class="kv">
+        <dt>Routing, keyword mode</dt><dd>${esc(evals.routing_keyword_mode.total)} (${Object.entries(evals.routing_keyword_mode.by_language).map(([k, v]) => `${esc(k)} ${esc(v)}`).join(', ')})</dd>
+        <dt>Routing, Claude</dt><dd>${typeof evals.routing_claude === 'string' ? esc(evals.routing_claude) : `${esc(evals.routing_claude.total)} (${Object.entries(evals.routing_claude.by_language).map(([k, v]) => `${esc(k)} ${esc(v)}`).join(', ')})`}</dd>
+        <dt>Sweeping check vs real City tickets</dt><dd>${evals.sweeping_rule_vs_city_tickets.schedule_matches}/${evals.sweeping_rule_vs_city_tickets.tickets_checked} agree</dd>
+      </dl><p class="tiny muted">Run ${esc(evals.run_at.slice(0, 16).replace('T', ' '))} UTC with npm run eval.</p>` : esc(evals.note)}
     </div>
     <h2>Your profile</h2>
     <div class="card settings">
