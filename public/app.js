@@ -406,7 +406,7 @@ function recipeBlock(r) {
   const copy = [r.name, r.url, '', ...lines.map(l => `- ${l}`)].join('\n')
   return `<div class="recipe">
     <a class="recipe-title" href="${esc(safeUrl(r.url))}" target="_blank" rel="noopener">${esc(r.name)}</a>
-    <div class="meta num"><span>${esc(r.minutes)} min</span>${r.kcal != null ? `<span>${esc(r.kcal)} kcal</span>` : ''}<span>${esc(r.protein_g)} g protein</span><span>${esc(r.rating)} stars, ${esc(r.reviews)} reviews</span></div>
+    <div class="meta num"><span>${esc(r.minutes)} min</span>${r.kcal != null ? `<span>${esc(r.kcal)} kcal</span>` : ''}${r.protein_g != null ? `<span>${esc(r.protein_g)} g protein</span>` : ''}<span>${esc(r.rating)} stars, ${esc(r.reviews)} reviews</span></div>
     <details><summary class="small">Ingredients, sized for you (${esc(r.servings)} serving${r.servings === 1 ? '' : 's'})</summary><ul class="small">${lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul></details>
     <div class="recipe-foot">
       <button class="link small" data-copy="${esc(copy)}">Copy list</button>
@@ -481,7 +481,7 @@ function computedHeadline(c) {
   const ticket = c.fields.citation
   if (chk && 'contest_grounds' in chk) return `
     <div class="card" style="margin-top:16px">
-      <div class="label">Street-cleaning check${ticket?.found ? ` · citation ${esc(ticket.citation_number ?? c.fields.citation_number)}` : ''}</div>
+      <div class="label">Street-cleaning check${ticket?.found ? ` · citation ${esc(ticket.number ?? ticket.citation_number ?? c.fields.citation_number)}` : ''}</div>
       <div class="hero-number" style="margin-top:4px;font-size:1.75rem;color:${chk.contest_grounds ? 'var(--money)' : 'var(--ink)'}">${chk.contest_grounds ? 'You have grounds to protest' : chk.scheduled ? 'The ticket matches the schedule' : 'No schedule found'}</div>
       ${ticket?.found ? `<div class="meta num" style="margin-top:8px"><span>${usd2(ticket.fine)}</span><span>${esc(ticket.location)}</span><span>${esc(chk.issued)}</span></div>` : ''}
       <p class="small" style="margin-bottom:0">${esc(chk.explanation)}</p>

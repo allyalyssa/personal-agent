@@ -38,7 +38,7 @@
       </div>
     </div>
     <div id="composer" class="composer" hidden>
-      <textarea id="text" rows="4" placeholder="Paste an email or text, or describe what happened"></textarea>
+      <textarea id="text" rows="4" aria-label="Describe what happened" placeholder="Paste an email or text, or describe what happened"></textarea>
       <div id="attachments" class="attachments"></div>
       <div class="row">
         <button id="closeComposer" class="ghost">Cancel</button>
@@ -47,7 +47,7 @@
     </div>
     <div class="capture-bar">
       <label class="cap" title="Photo of a notice, bill or letter">
-        <input id="photo" type="file" accept="image/*,application/pdf" capture="environment" multiple hidden>
+        <input id="photo" type="file" accept="image/*,application/pdf" capture="environment" multiple class="sr-only">
         <span class="cap-icon cam" aria-hidden="true"></span><span>Photo</span>
       </label>
       <button id="voice" class="cap cap-main" title="Voice note">
