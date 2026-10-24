@@ -1,0 +1,14 @@
+{
+  "id": "ca_voter_registration",
+  "title": "California voter registration",
+  "jurisdiction": "California",
+  "rule": "Register online at least 15 days before an election. After that, conditional same-day registration is available at county election offices and vote centers.",
+  "params": {
+    "days_before_election": 15
+  },
+  "source_url": "https://registertovote.ca.gov/",
+  "verify_phrase": "15 days",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "SF Department of Elections"
+}

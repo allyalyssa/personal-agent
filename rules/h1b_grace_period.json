@@ -1,0 +1,14 @@
+{
+  "id": "h1b_grace_period",
+  "title": "Work visa grace period",
+  "jurisdiction": "Federal",
+  "rule": "Workers in H-1B, L-1, O-1, TN, E and some other statuses may get a grace period of up to 60 consecutive days after employment ends, or until their authorized stay ends if sooner, to change status, find a new sponsor, or leave. This is information only. Talk to an immigration attorney right away.",
+  "params": {
+    "max_days": 60
+  },
+  "source_url": "https://www.ecfr.gov/current/title-8/chapter-I/subchapter-B/part-214/section-214.1",
+  "verify_phrase": "60 consecutive days",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "An immigration attorney"
+}

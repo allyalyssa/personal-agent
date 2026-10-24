@@ -1,0 +1,60 @@
+id: paratransit_ride
+pack: care
+title: Book a paratransit ride for a parent
+pitch: Books an SF Paratransit ride by phone, confirms the pickup window, and texts you and your parent.
+depth: standard
+triggers:
+  documents: [appointment card, appointment reminder]
+  phrases: [ride for my mom, ride for my dad, paratransit, needs a ride to her appointment, needs a ride to his appointment]
+required_fields:
+  rider_name: { type: string, label: Who is riding, get: extract or profile, profile: family.0.name }
+  rider_phone: { type: phone, label: Rider's phone, get: profile, profile: family.0.phone }
+  pickup_address: { type: string, label: Pickup address, get: extract or profile, profile: family.0.address }
+  destination: { type: string, label: Destination (name and address), get: extract or ask }
+  appointment_date: { type: date, label: Appointment date, get: extract or ask }
+  appt_time: { type: string, label: Appointment time, get: extract or ask }
+  return_trip: { type: boolean, label: Book a return trip too?, get: ask, default: true }
+  paratransit_phone: { type: phone, label: Paratransit reservations line, get: profile, profile: contacts.1.phone }
+rules: [sf_paratransit]
+actions:
+  - id: book_call
+    tool: place_call
+    title: Call SF Paratransit to book {{rider_name}}'s ride on {{date appointment_date}}
+    needs_approval: true
+    due: today
+    payload:
+      to: "{{paratransit_phone}}"
+      contact_name: SF Paratransit reservations
+      opener: "I'd like to book a paratransit ride for {{rider_name}}, who is an eligible rider."
+      goal: "Book a ride for {{rider_name}} from {{pickup_address}} to {{destination}} arriving before {{appt_time}} on {{appointment_date}}, plus a return trip if return_trip is {{return_trip}}. Get the pickup window and confirmation number."
+      facts:
+        - "Rider: {{rider_name}}, phone {{rider_phone}}"
+        - "Pickup: {{pickup_address}}"
+        - "Destination: {{destination}}"
+        - "Appointment: {{appointment_date}} at {{appt_time}}"
+        - "Caller is booking for a family member; caregiver {{profile.name}}, {{profile.phone}}"
+      must_not:
+        - Share the rider's ID or eligibility numbers (you do not have them; ask the agent to look up by name and phone)
+        - Accept a pickup window that arrives after the appointment time
+      ask:
+        - Pickup window
+        - Return pickup time or window
+        - Confirmation number
+    outcome:
+      appointment_date: YYYY-MM-DD (the ride date)
+      appointment_time: pickup window
+      confirmation_number: string
+  - id: text_parent
+    tool: send_sms
+    title: Text {{rider_name}} the pickup window
+    needs_approval: true
+    due: today
+    payload:
+      to: "{{rider_phone}}"
+      body: "Hi {{rider_name}}, your paratransit ride to {{destination}} on {{appointment_date}} is booked. Pickup window: {{appointment_time}}. Be ready for the whole window. - {{profile.name}} (sent with Handled)"
+deadlines:
+  - title: "{{rider_name}}'s appointment at {{destination}}"
+    due: appointment_date
+    remind_days_before: [1]
+sample: |
+  My mom needs a ride to her appointment at UCSF Parnassus, 400 Parnassus Ave, next Tuesday at 10:30am. Round trip please.

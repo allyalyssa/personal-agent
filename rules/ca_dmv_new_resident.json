@@ -1,0 +1,15 @@
+{
+  "id": "ca_dmv_new_resident",
+  "title": "New California resident DMV deadlines",
+  "jurisdiction": "California",
+  "rule": "New residents should get a California driver license within 10 days of becoming a resident, and register an out-of-state vehicle within 20 days.",
+  "params": {
+    "license_days": 10,
+    "registration_days": 20
+  },
+  "source_url": "https://www.dmv.ca.gov/portal/",
+  "verify_phrase": "resident",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "California DMV"
+}

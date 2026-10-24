@@ -1,0 +1,54 @@
+id: 83b_election
+pack: work
+title: 83(b) election
+pitch: Thirty days, no extensions. Handled computes the deadline from your grant, pre-fills the letter, and nags until you mail it.
+depth: standard
+triggers:
+  documents: [restricted stock purchase agreement, early exercise notice, stock grant]
+  phrases: [83b, 83(b), early exercise, restricted stock, founder shares]
+required_fields:
+  transfer_date: { type: date, label: Date the shares were transferred (grant or early exercise date), get: extract or ask }
+  company_name: { type: string, label: Company, get: extract or ask }
+  shares: { type: number, label: Number of shares, get: extract or ask }
+  price_paid_per_share: { type: number, label: Price you paid per share, get: extract or ask }
+  fmv_per_share: { type: number, label: Fair market value per share at transfer, get: extract or ask }
+  vesting_summary: { type: string, label: Vesting restrictions, get: extract or ask }
+  taxpayer_address: { type: string, label: Your address, get: profile, profile: address }
+rules: [irs_83b]
+guidance: Always say there are no extensions and recommend confirming with a tax professional. Never ask for or store an SSN; the letter leaves a blank for it.
+compute:
+  deadline:
+    fn: add_days
+    args: { date: transfer_date, days: 30 }
+actions:
+  - id: letter
+    tool: prepare_form
+    title: Pre-fill your 83(b) election letter
+    needs_approval: true
+    due: today
+    payload:
+      form_name: 83(b) election (IRS Form 15620 or letter)
+      official_url: https://www.irs.gov/forms-pubs/about-form-15620
+      fields:
+        Taxpayer: "{{profile.name}}, {{taxpayer_address}}"
+        Taxpayer ID: "(write your SSN by hand; Handled does not store it)"
+        Property: "{{shares}} shares of common stock of {{company_name}}"
+        Date of transfer: "{{transfer_date}}"
+        Restrictions: "{{vesting_summary}}"
+        Fair market value at transfer: "${{fmv_per_share}} per share"
+        Amount paid: "${{price_paid_per_share}} per share"
+      instructions: "Checklist: 1) sign and date, 2) mail to the IRS by certified mail, return receipt requested, by {{date deadline.date}}, 3) keep the postmarked receipt, 4) give a copy to {{company_name}}. Confirm with a tax professional."
+  - id: mailed
+    tool: schedule_followup
+    title: Check in until you confirm it was mailed
+    needs_approval: false
+    payload:
+      wait: 7 days
+      check: Did you mail your 83(b) by certified mail?
+deadlines:
+  - title: 83(b) election must be postmarked (no extensions)
+    due: transfer_date + 30 days
+    rule: irs_83b
+    remind_days_before: [21, 14, 7, 3, 1]
+sample: |
+  I early exercised 100,000 shares at Lumen Labs today at $0.01 a share, which is also the current FMV. 4 year vesting with a 1 year cliff, company can repurchase unvested shares.

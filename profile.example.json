@@ -1,0 +1,57 @@
+{
+  "name": "Jordan Lee",
+  "email": "jordan@example.com",
+  "phone": "+15555550100",
+  "address": "1000 Guerrero St, Apt 3, San Francisco, CA 94110",
+  "neighborhood": "Mission",
+  "moved_to_sf": "2023-10-15",
+  "renter": {
+    "landlord_name": "Valencia Street Properties",
+    "landlord_email": "landlord@example.com",
+    "move_in_date": "2023-11-01",
+    "deposit_amount": 4000,
+    "monthly_rent": 3400
+  },
+  "work": {
+    "employer": "Northwind AI",
+    "hr_email": "people@example.com",
+    "visa": null
+  },
+  "car": {
+    "make": "Honda",
+    "model": "Civic",
+    "year": 2019,
+    "color": "blue",
+    "plate": "8ABC123",
+    "insurer": "State Farm",
+    "policy_last4": "4421"
+  },
+  "family": [
+    {
+      "name": "Mei Lee",
+      "relation": "mother",
+      "phone": "+15555550101",
+      "address": "455 Grand View Ave, San Francisco, CA 94114",
+      "paratransit_eligible": true
+    }
+  ],
+  "business": null,
+  "library_card": false,
+  "contacts": [
+    {
+      "name": "Mission Auto Glass (demo line)",
+      "kind": "auto_glass",
+      "phone": "+15555550102"
+    },
+    {
+      "name": "SF Paratransit reservations (demo line)",
+      "kind": "paratransit",
+      "phone": "+15555550103"
+    },
+    {
+      "name": "Hospital billing office (demo line)",
+      "kind": "medical_billing",
+      "phone": "+15555550104"
+    }
+  ]
+}

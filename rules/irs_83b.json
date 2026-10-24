@@ -1,0 +1,14 @@
+{
+  "id": "irs_83b",
+  "title": "83(b) election deadline",
+  "jurisdiction": "Federal",
+  "rule": "An 83(b) election must be filed with the IRS within 30 days after restricted stock is transferred to you (including early-exercised options). There are no extensions. Send it by certified mail with return receipt or use IRS Form 15620, keep proof of mailing, and give a copy to your employer.",
+  "params": {
+    "days_after_transfer": 30
+  },
+  "source_url": "https://www.irs.gov/forms-pubs/about-form-15620",
+  "verify_phrase": "30 days",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "A tax professional"
+}

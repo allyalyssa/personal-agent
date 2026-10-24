@@ -1,0 +1,46 @@
+id: lost_and_found
+pack: everyday
+title: Lost something on BART or Muni
+pitch: Files the claim with your item details and checks back on a schedule.
+depth: standard
+triggers:
+  documents: [photo of the item, receipt]
+  phrases: [left my, lost my, on BART, on the bus, on Muni, lost and found]
+required_fields:
+  item: { type: string, label: What you lost, get: extract or ask }
+  description: { type: string, label: Color, brand, distinguishing marks, get: ask }
+  system: { type: string, label: BART or Muni, get: extract or ask }
+  route_or_station: { type: string, label: Line, route or station, get: extract or ask }
+  lost_date: { type: date, label: When, get: extract or ask }
+rules: [transit_lost_found]
+actions:
+  - id: claim
+    tool: prepare_form
+    title: Prepare the {{system}} lost item report
+    needs_approval: true
+    due: today
+    waits_on_other_party: true
+    payload:
+      form_name: "{{system}} lost and found report"
+      official_url: https://www.bart.gov/guide/lostandfound
+      fields:
+        Item: "{{item}}"
+        Description: "{{description}}"
+        Where: "{{route_or_station}}"
+        Date lost: "{{lost_date}}"
+        Contact: "{{profile.name}}, {{profile.phone}}, {{profile.email}}"
+      instructions: For Muni, report through SF 311. Paste these details and submit.
+followups:
+  - after_action: claim
+    wait: 3 days
+    check: Has {{system}} found your {{item}}?
+    resolved_when: Item recovered
+    escalate:
+      tool: send_sms
+      title: Remind yourself to call {{system}} lost and found
+      needs_approval: true
+      payload:
+        to: "{{profile.phone}}"
+        body: "Call {{system}} lost and found about your {{item}} ({{description}}), lost {{lost_date}} at {{route_or_station}}."
+sample: |
+  Left my black North Face jacket on BART yesterday, Richmond line, got off at 16th St Mission around 6pm.

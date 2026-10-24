@@ -1,0 +1,130 @@
+id: break_in
+pack: car
+title: Car break-in
+pitch: Police report pre-filled, insurance packet built, and a live call to a glass shop for price and the earliest slot.
+depth: deep
+triggers:
+  documents: [photo of broken car window, police report, insurance claim]
+  phrases: [broke into my car, car break-in, smashed window, broken window, bipping, stole from my car]
+required_fields:
+  incident_date: { type: date, label: When it happened, get: extract or ask }
+  incident_location: { type: string, label: Where the car was parked, get: extract or ask }
+  damage: { type: string, label: What was damaged (e.g. rear passenger window), get: extract or ask }
+  items_stolen: { type: list, label: What was taken, get: extract or ask, optional: true }
+  car: { type: string, label: Car, get: profile, profile: car.model }
+  car_make: { type: string, label: Make, get: profile, profile: car.make }
+  car_year: { type: number, label: Year, get: profile, profile: car.year }
+  car_color: { type: string, label: Color, get: profile, profile: car.color }
+  plate: { type: string, label: License plate, get: profile, profile: car.plate }
+  insurer: { type: string, label: Insurer, get: profile or ask, profile: car.insurer }
+  policy_last4: { type: string, label: Policy number (last 4), get: profile or ask, profile: car.policy_last4 }
+  shop_name: { type: string, label: Glass shop, get: profile, profile: contacts.0.name }
+  shop_phone: { type: phone, label: Glass shop phone, get: profile, profile: contacts.0.phone }
+  max_price: { type: number, label: Most you'll approve for the repair, get: ask, default: 400 }
+rules: [sfpd_online_report]
+guidance: >
+  Keep it fast; the user is standing next to a broken window. Do not ask about items_stolen if they
+  already said nothing was taken. The call agent must not agree to a price above max_price or to any
+  upfront payment. After plan_actions, tailor the call opener to the exact window and car.
+actions:
+  - id: glass_call
+    tool: place_call
+    title: Call {{shop_name}} for a price and the earliest slot to fix the {{damage}}
+    needs_approval: true
+    due: today
+    payload:
+      to: "{{shop_phone}}"
+      contact_name: "{{shop_name}}"
+      opener: "I'm calling to get a quote and book a repair for a {{car_year}} {{car_make}} {{car}} with a broken {{damage}}. Do you have a minute?"
+      goal: "Get the price for replacing the {{damage}} on a {{car_year}} {{car_make}} {{car}}, find the earliest appointment, and book it if the total is ${{max_price}} or less. Ask whether they can come to the car (mobile service)."
+      facts:
+        - "Car: {{car_year}} {{car_make}} {{car}}, {{car_color}}"
+        - "Damage: {{damage}} from a break-in on {{incident_date}}"
+        - "Car is parked near {{incident_location}}"
+        - "Customer name: {{profile.name}}; callback number {{profile.phone}}"
+        - "Insurance: {{insurer}} (may file a glass claim)"
+      must_not:
+        - "Agree to a total above ${{max_price}}"
+        - "Agree to pay a deposit or give payment details"
+        - "Agree to extra services beyond the {{damage}}"
+      ask:
+        - Total price including parts, labor and tax
+        - Earliest date and time window
+        - Mobile service or drop-off
+        - Whether they bill {{insurer}} directly
+    outcome:
+      price: number
+      appointment_date: YYYY-MM-DD
+      appointment_time: window
+      mobile_service: yes or no
+      bills_insurer: yes or no
+  - id: police_report
+    tool: prepare_form
+    title: Prepare the SFPD online report (you press submit)
+    needs_approval: true
+    due: today
+    payload:
+      form_name: SFPD online police report, auto break-in
+      official_url: https://www.sanfranciscopolice.org/reports
+      fields:
+        Incident type: Auto burglary / vehicle break-in
+        Date: "{{incident_date}}"
+        Location: "{{incident_location}}"
+        Vehicle: "{{car_year}} {{car_make}} {{car}}, {{car_color}}, plate {{plate}}"
+        Damage: "{{damage}}"
+        Items taken: "{{items_stolen}}"
+        Suspects or witnesses: None known
+      instructions: Online reports are for incidents with no suspect information and no injuries. Copy each field into the form and submit. Save the report number; your insurer will ask for it.
+  - id: insurance_packet
+    tool: prepare_form
+    title: Build the {{insurer}} claim packet
+    needs_approval: true
+    due: today + 2 days
+    payload:
+      form_name: "{{insurer}} auto glass / comprehensive claim"
+      fields:
+        Policy: "ending {{policy_last4}}"
+        Date of loss: "{{incident_date}}"
+        Location: "{{incident_location}}"
+        Vehicle: "{{car_year}} {{car_make}} {{car}}, plate {{plate}}"
+        Damage: "{{damage}}"
+        Items taken: "{{items_stolen}}"
+        Police report: SFPD online report (number pending)
+        Repair quote: "{{quoted_price}} from {{shop_name}}"
+      instructions: File in your insurer's app or website. Glass is usually under comprehensive coverage; check your deductible before filing. Attach photos of the damage and the shop invoice.
+deadlines:
+  - title: File the SFPD report and save the report number
+    due: incident_date + 2 days
+    rule: sfpd_online_report
+    note: Handled's target so your insurer has the number; not a legal deadline.
+followups:
+  - after_action: police_report
+    wait: 2 days
+    check: Did you get your SFPD report number for the {{insurer}} claim?
+    resolved_when: Report number saved to the case
+    escalate:
+      tool: send_sms
+      title: Text yourself the steps to finish the SFPD report
+      needs_approval: true
+      payload:
+        to: "{{profile.phone}}"
+        body: "Finish your SFPD online report for the {{incident_date}} break-in: {{incident_location}}. Then add the report number in Handled."
+  - after_action: glass_call
+    wait: 3 days
+    check: Was the {{damage}} repaired and do you have the invoice?
+    resolved_when: Repair done and invoice attached
+    escalate:
+      tool: send_email
+      title: Send the claim packet to {{insurer}}
+      needs_approval: true
+      payload:
+        to: "{{profile.email}}"
+        subject: "Glass claim packet: {{car_year}} {{car_make}} {{car}}, {{incident_date}}"
+        body: |
+          Claim details to forward to {{insurer}}:
+          Policy ending {{policy_last4}}
+          Date of loss {{incident_date}} at {{incident_location}}
+          Damage: {{damage}}
+          Repair: {{shop_name}}, quoted ${{quoted_price}}, appointment {{appointment_date}} {{appointment_time}}
+sample: |
+  Someone smashed my rear passenger window last night on Valencia near 20th. Nothing taken except a gym bag.

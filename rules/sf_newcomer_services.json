@@ -1,0 +1,12 @@
+{
+  "id": "sf_newcomer_services",
+  "title": "SF newcomer services",
+  "jurisdiction": "San Francisco",
+  "rule": "SF residents can get a free SF Public Library card, apply for an SF City ID card, apply for a Residential Parking Permit if their block is in a permit area, and check Clipper discounts (youth, senior, disability, low income through Clipper START).",
+  "params": {},
+  "source_url": "https://sfpl.org/",
+  "verify_phrase": "library",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "SFPL, the SF County Clerk, SFMTA"
+}

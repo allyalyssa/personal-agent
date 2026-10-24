@@ -1,0 +1,12 @@
+{
+  "id": "transit_lost_found",
+  "title": "BART and Muni lost and found",
+  "jurisdiction": "San Francisco",
+  "rule": "BART takes lost item reports online and holds found items for a limited time. Muni lost items are handled through SFMTA and 311.",
+  "params": {},
+  "source_url": "https://www.bart.gov/guide/lostandfound",
+  "verify_phrase": "Lost",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "BART Lost and Found or SF 311"
+}

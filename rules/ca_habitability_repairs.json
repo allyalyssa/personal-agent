@@ -1,0 +1,14 @@
+{
+  "id": "ca_habitability_repairs",
+  "title": "Repairs and habitability",
+  "jurisdiction": "California / San Francisco",
+  "rule": "Landlords must keep rentals habitable (working plumbing, heat, weatherproofing, no pests, safe electrical). Tenants should request repairs in writing and keep dated copies. If repairs are not made in a reasonable time, tenants can file a complaint with SF Department of Building Inspection (DBI), which can inspect and issue a notice of violation. State law presumes 30 days is a reasonable time for repair-and-deduct.",
+  "params": {
+    "reasonable_days_presumed": 30
+  },
+  "source_url": "https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1942",
+  "verify_phrase": "30 days",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "SF DBI Housing Inspection Services or SF Tenants Union"
+}

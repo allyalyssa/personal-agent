@@ -1,0 +1,26 @@
+id: review_triage
+pack: business
+title: Review triage
+pitch: Sorts pasted reviews by theme and drafts owner responses for your approval.
+depth: standard
+triggers:
+  documents: [screenshot of reviews]
+  phrases: [reviews, bad review, Yelp, Google reviews, respond to reviews]
+required_fields:
+  business_name: { type: string, label: Business name, get: extract or ask }
+  reviews: { type: list, label: "Reviews [{author, rating, text}]", get: extract }
+rules: []
+guidance: >
+  Group complaints by theme (wait time, staff, quality, price, cleanliness) with counts. Draft one short, specific,
+  non-defensive response per negative review with propose_action as prepare_form (form_name "Response to <author>",
+  fields {response}) so the owner can copy and post. Never invent facts about the business.
+actions:
+  - id: weekly_check
+    tool: schedule_followup
+    title: Triage new reviews again next week
+    needs_approval: false
+    payload:
+      wait: 7 days
+      check: Paste this week's new reviews for {{business_name}}
+sample: |
+  Reviews for Fog & Foam: "Waited 20 min for a latte, staff ignored us" (2 stars, Dana). "Best croissant in the Mission" (5, Lee). "Line out the door and only one barista" (2, Sam). "Pricey but great" (4, Ana).

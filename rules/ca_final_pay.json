@@ -1,0 +1,15 @@
+{
+  "id": "ca_final_pay",
+  "title": "California final paycheck",
+  "jurisdiction": "California",
+  "rule": "An employee who is discharged or laid off must be paid all final wages immediately at the time of termination, including all earned and unused vacation or PTO. If the employer pays late on purpose, a waiting time penalty of one day of wages per day late, for up to 30 days, can apply.",
+  "params": {
+    "due_days_after_discharge": 0,
+    "penalty_max_days": 30
+  },
+  "source_url": "https://www.dir.ca.gov/dlse/faq_paydays.htm",
+  "verify_phrase": "immediately",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "California Labor Commissioner (DLSE) or an employment attorney"
+}

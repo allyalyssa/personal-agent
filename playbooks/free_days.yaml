@@ -1,0 +1,34 @@
+id: free_days
+pack: good
+title: Free museum days and library passes
+pitch: Suggests free resident days and SF Public Library museum passes that fit your calendar and neighborhood.
+depth: standard
+triggers:
+  documents: [museum flyer]
+  phrases: [free museum, something to do this weekend, free things to do, museum pass]
+required_fields:
+  neighborhood: { type: string, label: Neighborhood, get: profile, profile: neighborhood }
+  free_dates: { type: string, label: When you're free, get: ask }
+  has_library_card: { type: boolean, label: Do you have an SFPL card?, get: profile or ask, profile: library_card }
+  interests: { type: string, label: Art, science, history, kids?, get: ask, optional: true }
+rules: [sf_free_museum_days]
+guidance: >
+  Do not state specific free-day dates from memory; schedules change. Suggest checking each museum's site and the SFPL
+  museum pass program, and prepare the links. Say what to bring (ID with SF address, library card).
+actions:
+  - id: library_passes
+    tool: open_url_prefilled
+    title: Browse SFPL museum passes
+    needs_approval: true
+    when: has_library_card
+    payload:
+      url: https://sfpl.org/
+  - id: get_card
+    tool: open_url_prefilled
+    title: Get a free library card first (it unlocks museum passes)
+    needs_approval: true
+    unless: has_library_card
+    payload:
+      url: https://sfpl.org/
+sample: |
+  Anything free to do this weekend? I like art and science.

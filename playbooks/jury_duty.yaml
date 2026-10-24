@@ -1,0 +1,45 @@
+id: jury_duty
+pack: everyday
+title: Jury summons
+pitch: Reads the summons, puts the dates on your calendar, and prepares the postponement or excuse request.
+depth: standard
+triggers:
+  documents: [jury summons]
+  phrases: [jury duty, jury summons, summoned for jury]
+required_fields:
+  service_date: { type: date, label: Service date, get: extract or ask }
+  juror_id_last4: { type: string, label: Juror ID (last 4), get: extract, optional: true }
+  request: { type: string, label: Serve, postpone, or request excuse, get: ask }
+  reason: { type: string, label: Reason (for postponement or excuse), get: ask, optional: true }
+  preferred_date: { type: date, label: Preferred new date, get: ask, optional: true }
+rules: [sf_jury_service]
+actions:
+  - id: court_request
+    tool: prepare_form
+    title: Prepare your SF Superior Court jury {{request}} request
+    needs_approval: true
+    due: service_date - 5 days
+    payload:
+      form_name: SF Superior Court jury service request
+      official_url: https://sfsuperiorcourt.org/jury
+      fields:
+        Juror ID: "ending {{juror_id_last4}} (enter the full number from your summons)"
+        Request: "{{request}}"
+        Reason: "{{reason}}"
+        Preferred date: "{{preferred_date}}"
+      instructions: Submit on the court's juror portal before your service date.
+  - id: calendar
+    tool: create_calendar_event
+    title: Jury service on {{date service_date}}
+    needs_approval: false
+    payload:
+      title: Jury service, SF Superior Court
+      date: "{{service_date}}"
+      note: Check the court's call-in instructions the evening before.
+deadlines:
+  - title: Respond to jury summons before service date
+    due: service_date - 5 days
+    rule: sf_jury_service
+    remind_days_before: [3]
+sample: |
+  Got a jury summons for December 7 2026 at the Hall of Justice. I'd like to postpone, I'm traveling for work that week. Any date in January works.

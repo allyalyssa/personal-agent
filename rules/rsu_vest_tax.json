@@ -1,0 +1,12 @@
+{
+  "id": "rsu_vest_tax",
+  "title": "Taxes when equity vests",
+  "jurisdiction": "Federal / California",
+  "rule": "RSUs are taxed as wages when they vest, based on the share value that day. Employers usually withhold at the flat supplemental rate, which can be lower than your actual bracket, so a balance can be due at filing. Consider estimated payments.",
+  "params": {},
+  "source_url": "https://www.irs.gov/publications/p525",
+  "verify_phrase": "restricted stock",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "A tax professional"
+}

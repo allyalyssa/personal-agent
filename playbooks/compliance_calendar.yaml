@@ -1,0 +1,49 @@
+id: compliance_calendar
+pack: business
+title: Small business compliance calendar
+pitch: From your business type and address, the yearly City deadlines with sources and reminders.
+depth: standard
+triggers:
+  documents: [business registration certificate, health permit, tax notice]
+  phrases: [my business, my shop, my restaurant, business registration, gross receipts, permits]
+required_fields:
+  business_name: { type: string, label: Business name, get: extract or ask }
+  business_type: { type: string, label: Type of business (e.g. cafe, salon, retail), get: extract or ask }
+  business_address: { type: string, label: Business address, get: extract or ask }
+  serves_food: { type: boolean, label: Prepares or serves food?, get: ask }
+rules: [sf_business_compliance]
+compute:
+  registration:
+    fn: next_annual
+    args: { month_day: rule.sf_business_compliance.params.registration_due }
+  gross_receipts:
+    fn: next_annual
+    args: { month_day: rule.sf_business_compliance.params.gross_receipts_due }
+guidance: Present the calendar in date order and say every date is from the Treasurer's published schedule, unverified today.
+actions:
+  - id: registration_reminder
+    tool: create_calendar_event
+    title: SF business registration renewal due {{date registration.date}}
+    needs_approval: false
+    payload:
+      title: "{{business_name}}: SF business registration renewal"
+      date: "{{registration.date}}"
+      note: Renew with the SF Treasurer and Tax Collector.
+  - id: health_permit
+    tool: open_url_prefilled
+    title: Check your SF health permit renewal
+    needs_approval: true
+    when: serves_food
+    payload:
+      url: https://www.sf.gov/departments--department-public-health
+deadlines:
+  - title: SF business registration renewal
+    due: registration.date
+    rule: sf_business_compliance
+    remind_days_before: [30, 7]
+  - title: SF gross receipts tax annual return (if required)
+    due: gross_receipts.date
+    rule: sf_business_compliance
+    remind_days_before: [30, 7]
+sample: |
+  I run a small coffee shop called Fog & Foam at 2100 Mission St. We make drinks and pastries on site.

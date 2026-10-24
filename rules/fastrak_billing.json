@@ -1,0 +1,16 @@
+{
+  "id": "fastrak_billing",
+  "title": "How Bay Area bridge tolls are billed",
+  "jurisdiction": "Bay Area",
+  "rule": "Bay Area bridges are all-electronic. Without a FasTrak tag, the toll is charged to a license plate account or mailed as an invoice to the registered owner. The official site is bayareafastrak.org. Texts with payment links from other domains are a common scam.",
+  "params": {
+    "official_domains": [
+      "bayareafastrak.org"
+    ]
+  },
+  "source_url": "https://www.bayareafastrak.org/",
+  "verify_phrase": "FasTrak",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "Bay Area FasTrak customer service via bayareafastrak.org"
+}

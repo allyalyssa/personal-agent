@@ -1,0 +1,12 @@
+{
+  "id": "sf_jury_service",
+  "title": "SF jury service postponement",
+  "jurisdiction": "San Francisco",
+  "rule": "If you get an SF Superior Court jury summons, you can usually request one postponement online before your service date. Excuses are granted for hardship, which you must explain.",
+  "params": {},
+  "source_url": "https://sfsuperiorcourt.org/jury",
+  "verify_phrase": "postpone",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "SF Superior Court Jury Services"
+}

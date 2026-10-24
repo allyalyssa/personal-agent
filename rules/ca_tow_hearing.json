@@ -1,0 +1,14 @@
+{
+  "id": "ca_tow_hearing",
+  "title": "Tow hearing window",
+  "jurisdiction": "California / San Francisco",
+  "rule": "After a tow, the registered owner can request a post-storage hearing to contest it, generally within 10 days of the notice. In San Francisco, towed cars go to AutoReturn; bring ID, proof of ownership, and payment for tow and storage fees, which grow daily.",
+  "params": {
+    "hearing_request_days": 10
+  },
+  "source_url": "https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=VEH&sectionNum=22852",
+  "verify_phrase": "10 days",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "SFMTA Hearings or AutoReturn"
+}

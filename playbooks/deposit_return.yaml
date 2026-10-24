@@ -1,0 +1,65 @@
+id: deposit_return
+pack: renter
+title: Get your deposit back after move-out
+pitch: Tracks the 21-day clock after you move out, then demands the itemized statement or the deposit.
+depth: standard
+triggers:
+  documents: [move-out inspection, deposit statement, lease termination]
+  phrases: [moved out, move out, get my deposit back, deposit back]
+required_fields:
+  move_out_date: { type: date, label: Move-out date, get: extract or ask }
+  deposit_amount: { type: number, label: Deposit amount, get: extract or profile, profile: renter.deposit_amount }
+  landlord_name: { type: string, label: Landlord, get: extract or profile, profile: renter.landlord_name }
+  landlord_email: { type: email, label: Landlord email, get: extract or profile, profile: renter.landlord_email }
+  forwarding_address: { type: string, label: Your forwarding address, get: ask }
+  rental_address: { type: string, label: Rental address, get: profile, profile: address }
+rules: [ca_deposit_return]
+money_at_stake: deposit_amount
+actions:
+  - id: forwarding
+    tool: send_email
+    title: Send {{landlord_name}} your forwarding address for the deposit
+    needs_approval: true
+    due: today
+    waits_on_other_party: true
+    payload:
+      to: "{{landlord_email}}"
+      subject: "Forwarding address for security deposit, {{rental_address}}"
+      body: |
+        Hello {{landlord_name}},
+
+        I moved out of {{rental_address}} on {{date move_out_date}}. Please send my ${{$ deposit_amount}} security deposit, or an itemized statement of any deductions with receipts, to:
+
+        {{forwarding_address}}
+
+        California Civil Code 1950.5 requires this within 21 days of move-out.
+
+        Thank you,
+        {{profile.name}}
+deadlines:
+  - title: Landlord's 21-day deadline to return deposit or itemize
+    due: move_out_date + 21 days
+    rule: ca_deposit_return
+    remind_days_before: [0]
+followups:
+  - after_action: forwarding
+    wait: 22 days
+    check: Did {{landlord_name}} return the deposit or send an itemized statement?
+    resolved_when: Deposit received, or an itemized statement you accept
+    escalate:
+      tool: send_email
+      title: Send a formal demand for the ${{$ deposit_amount}} deposit
+      needs_approval: true
+      payload:
+        to: "{{landlord_email}}"
+        subject: "Demand for return of security deposit, {{rental_address}}"
+        body: |
+          Hello {{landlord_name}},
+
+          More than 21 days have passed since I moved out on {{date move_out_date}}, and I have not received my ${{$ deposit_amount}} deposit or an itemized statement. Under California Civil Code 1950.5, a landlord who keeps a deposit in bad faith can owe up to twice the deposit in damages.
+
+          Please return the full deposit within 7 days to {{forwarding_address}}.
+
+          {{profile.name}}
+sample: |
+  I moved out of my apartment at 1000 Guerrero St yesterday. Landlord is Valencia Street Properties, deposit was $4,000. Send it to 88 Ocean Ave, Oakland CA 94610.

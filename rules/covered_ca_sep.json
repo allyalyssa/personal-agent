@@ -1,0 +1,14 @@
+{
+  "id": "covered_ca_sep",
+  "title": "Covered California special enrollment",
+  "jurisdiction": "California",
+  "rule": "Losing job-based health coverage is a qualifying life event. You have 60 days after losing coverage to enroll in a Covered California plan outside open enrollment.",
+  "params": {
+    "days_after_loss": 60
+  },
+  "source_url": "https://www.coveredca.com/",
+  "verify_phrase": "60 days",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "Covered California or a certified enrollment counselor"
+}

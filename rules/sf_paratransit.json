@@ -1,0 +1,12 @@
+{
+  "id": "sf_paratransit",
+  "title": "SF Paratransit rides",
+  "jurisdiction": "San Francisco",
+  "rule": "People with ADA paratransit eligibility can book SF Access van rides by phone in advance. You get a pickup window, and the rider must be ready for the whole window.",
+  "params": {},
+  "source_url": "https://www.sfmta.com/getting-around/accessibility/paratransit",
+  "verify_phrase": "paratransit",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "SF Paratransit"
+}

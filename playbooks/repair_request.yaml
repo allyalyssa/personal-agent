@@ -1,0 +1,54 @@
+id: repair_request
+pack: renter
+title: Repair request that gets results
+pitch: A dated written request, a follow-up, then a DBI complaint ready to file.
+depth: standard
+triggers:
+  documents: [photo of mold, leak, broken heater, pest evidence]
+  phrases: [landlord won't fix, repair, no heat, leak, mold, broken, pests, cockroaches, mice]
+required_fields:
+  problem: { type: string, label: What needs repair, get: extract or ask }
+  first_noticed: { type: date, label: When you first noticed it, get: ask }
+  landlord_name: { type: string, label: Landlord, get: profile, profile: renter.landlord_name }
+  landlord_email: { type: email, label: Landlord email, get: profile, profile: renter.landlord_email }
+  rental_address: { type: string, label: Rental address, get: profile, profile: address }
+rules: [ca_habitability_repairs]
+actions:
+  - id: written_request
+    tool: send_email
+    title: Send a dated written repair request to {{landlord_name}}
+    needs_approval: true
+    due: today
+    waits_on_other_party: true
+    payload:
+      to: "{{landlord_email}}"
+      subject: "Repair request, {{rental_address}}: {{problem}}"
+      body: |
+        Hello {{landlord_name}},
+
+        I am writing on {{date today}} to request repair of the following at {{rental_address}}: {{problem}}. I first noticed it on {{date first_noticed}}.
+
+        Please let me know within 7 days when the repair will be scheduled. I am available to provide access with reasonable notice.
+
+        Thank you,
+        {{profile.name}}
+followups:
+  - after_action: written_request
+    wait: 14 days
+    check: Has {{landlord_name}} fixed the {{problem}}?
+    resolved_when: Repair completed
+    escalate:
+      tool: prepare_form
+      title: Prepare an SF DBI housing complaint
+      needs_approval: true
+      payload:
+        form_name: SF Department of Building Inspection housing complaint
+        official_url: https://sfdbi.org/
+        fields:
+          Address: "{{rental_address}}"
+          Problem: "{{problem}}"
+          First noticed: "{{first_noticed}}"
+          Written request sent: 14 days ago, no repair
+        instructions: DBI can inspect and issue a notice of violation. Attach photos and your dated request.
+sample: |
+  There's mold spreading on the bathroom ceiling and the fan doesn't work. Noticed it three weeks ago.

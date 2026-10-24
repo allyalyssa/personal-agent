@@ -1,0 +1,12 @@
+{
+  "id": "ca_auto_renewal",
+  "title": "California automatic renewal law",
+  "jurisdiction": "California",
+  "rule": "If you signed up for a subscription online, the business must let you cancel online, and it must clearly disclose renewal terms. Keep the cancellation confirmation.",
+  "params": {},
+  "source_url": "https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=BPC&sectionNum=17602",
+  "verify_phrase": "cancel",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "The California Attorney General consumer unit"
+}

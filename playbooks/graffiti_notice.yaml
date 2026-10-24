@@ -1,0 +1,63 @@
+id: graffiti_notice
+pack: business
+title: Graffiti notice from Public Works
+pitch: Reads the notice, starts the removal clock, prepares the 311 report and a vendor call.
+depth: standard
+triggers:
+  documents: [Public Works graffiti notice, notice of violation]
+  phrases: [graffiti, tagged my wall, public works notice]
+required_fields:
+  property_address: { type: string, label: Property address, get: extract or ask }
+  notice_date: { type: date, label: Notice date, get: extract or ask }
+  removal_deadline: { type: date, label: Removal deadline on the notice, get: extract, optional: true }
+  location_on_property: { type: string, label: Where the graffiti is, get: extract or ask }
+  vendor_phone: { type: phone, label: Painter or removal vendor phone, get: ask, optional: true }
+rules: [sf_graffiti_removal]
+guidance: Use the deadline printed on the notice if there is one; otherwise use the rule's 30 days and say it is unverified.
+actions:
+  - id: report_311
+    tool: prepare_form
+    title: Prepare the SF 311 graffiti report
+    needs_approval: true
+    due: today
+    payload:
+      form_name: SF 311 graffiti on private property
+      official_url: https://sf311.org/
+      fields:
+        Address: "{{property_address}}"
+        Where: "{{location_on_property}}"
+        Notice date: "{{notice_date}}"
+      instructions: Ask about free paint or abatement options when you submit.
+  - id: vendor_call
+    tool: place_call
+    title: Call a vendor for a removal quote
+    needs_approval: true
+    when: vendor_phone
+    payload:
+      to: "{{vendor_phone}}"
+      contact_name: Graffiti removal vendor
+      opener: "I'm looking for a quote to remove graffiti from a building wall in San Francisco."
+      goal: "Get a price and the earliest date to remove graffiti at {{property_address}} ({{location_on_property}}) before {{removal_deadline}}."
+      facts:
+        - "Address: {{property_address}}"
+        - "Location: {{location_on_property}}"
+      must_not:
+        - Agree to a price or schedule without the owner
+      ask:
+        - Price
+        - Earliest date
+    outcome:
+      price: number
+      appointment_date: YYYY-MM-DD
+deadlines:
+  - title: Remove graffiti (notice deadline)
+    due: removal_deadline
+    rule: sf_graffiti_removal
+    remind_days_before: [7, 2]
+  - title: Remove graffiti (30 days from notice, if no date printed)
+    due: notice_date + 30 days
+    rule: sf_graffiti_removal
+    unless: removal_deadline
+    remind_days_before: [7, 2]
+sample: |
+  Got a Public Works notice dated October 20, 2026 for graffiti on the side wall of my shop at 2100 Mission St. It says remove within 30 days.

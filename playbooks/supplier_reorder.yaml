@@ -1,0 +1,72 @@
+id: supplier_reorder
+pack: business
+title: Supplier reorder
+pitch: When stock runs low, calls or emails the supplier with the order and confirms delivery.
+depth: standard
+triggers:
+  documents: [inventory sheet, low stock alert, invoice from supplier]
+  phrases: [running low, reorder, out of, order more, supplier]
+required_fields:
+  supplier_name: { type: string, label: Supplier, get: extract or ask }
+  supplier_phone: { type: phone, label: Supplier phone, get: extract or ask, optional: true }
+  supplier_email: { type: email, label: Supplier email, get: extract or ask, optional: true }
+  order_items: { type: string, label: What and how much, get: extract or ask }
+  needed_by: { type: date, label: Needed by, get: ask }
+  business_name: { type: string, label: Your business, get: ask }
+rules: []
+actions:
+  - id: order_email
+    tool: send_email
+    title: Email {{supplier_name}} the order
+    needs_approval: true
+    when: supplier_email
+    due: today
+    waits_on_other_party: true
+    payload:
+      to: "{{supplier_email}}"
+      subject: "Order from {{business_name}}: needed by {{needed_by}}"
+      body: |
+        Hello {{supplier_name}},
+
+        Please send the following to {{business_name}} by {{date needed_by}}:
+
+        {{order_items}}
+
+        Please reply to confirm the delivery date and total.
+
+        Thank you,
+        {{profile.name}}
+  - id: order_call
+    tool: place_call
+    title: Call {{supplier_name}} to place the order
+    needs_approval: true
+    when: supplier_phone
+    unless: supplier_email
+    payload:
+      to: "{{supplier_phone}}"
+      contact_name: "{{supplier_name}}"
+      opener: "I'd like to place an order for {{business_name}}."
+      goal: "Order {{order_items}} for delivery by {{needed_by}} and confirm the delivery date and total."
+      facts:
+        - "Business: {{business_name}}"
+        - "Items: {{order_items}}"
+        - "Needed by {{needed_by}}"
+      must_not:
+        - Give payment details
+        - Agree to substitutions without the owner
+      ask:
+        - Total
+        - Delivery date
+    outcome:
+      price: number
+      appointment_date: YYYY-MM-DD (delivery date)
+deadlines:
+  - title: "Delivery needed from {{supplier_name}}"
+    due: needed_by
+followups:
+  - after_action: order_email
+    wait: 1 days
+    check: Did {{supplier_name}} confirm the delivery?
+    resolved_when: Delivery confirmed
+sample: |
+  We're almost out of oat milk. Order 6 cases from Bay Dairy Supply, orders@example.com, need it by Friday. Business is Fog & Foam.

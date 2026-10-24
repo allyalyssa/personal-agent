@@ -1,0 +1,12 @@
+{
+  "id": "sfpd_online_report",
+  "title": "SFPD online police report",
+  "jurisdiction": "San Francisco",
+  "rule": "SFPD accepts some reports online, including auto break-ins with no suspect information and no injuries. Insurers usually ask for the report number.",
+  "params": {},
+  "source_url": "https://www.sanfranciscopolice.org/reports",
+  "verify_phrase": "online",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "SFPD non-emergency line"
+}

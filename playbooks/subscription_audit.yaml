@@ -1,0 +1,31 @@
+id: subscription_audit
+pack: everyday
+title: Subscription audit
+pitch: Finds recurring and duplicate charges in a statement, then prepares each cancellation.
+depth: standard
+triggers:
+  documents: [bank statement, credit card statement]
+  phrases: [subscriptions, recurring charges, cancel subscriptions, what am I paying for]
+required_fields:
+  charges: { type: list, label: "Charges [{merchant, amount, date}]", get: extract }
+  to_cancel: { type: list, label: Which ones to cancel, get: ask, optional: true }
+rules: [ca_auto_renewal]
+guidance: >
+  Extract every charge into charges. After compute, list recurring ones with yearly cost and ask which to cancel.
+  For each one the user picks, use propose_action with open_url_prefilled to that company's cancellation page if you
+  know it, otherwise its account settings page, and say it must be confirmed. Never use card numbers beyond last 4.
+compute:
+  found:
+    fn: recurring_charges
+    args: { charges: charges }
+money_at_stake: found.yearly_total
+actions:
+  - id: next_cycle_check
+    tool: schedule_followup
+    title: Check next statement that cancelled charges stopped
+    needs_approval: false
+    payload:
+      wait: 35 days
+      check: Did the cancelled subscriptions stop charging this cycle?
+sample: |
+  Statement lines: Netflix $22.99 9/3; Netflix $22.99 10/3; Spotify Premium $11.99 9/8; Spotify Premium $11.99 10/8; Hulu $17.99 9/15; Hulu $17.99 10/15; Disney+ Hulu bundle $16.99 10/15; Equinox $260 10/1; Equinox $260 9/1; Trader Joe's $84.12 10/12

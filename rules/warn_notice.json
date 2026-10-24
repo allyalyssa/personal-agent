@@ -1,0 +1,17 @@
+{
+  "id": "warn_notice",
+  "title": "WARN layoff notice",
+  "jurisdiction": "California / Federal",
+  "rule": "California WARN generally requires 60 days written notice before a mass layoff (50 or more workers in 30 days) at a covered establishment with 75 or more employees. Federal WARN applies to employers with 100 or more employees. Without notice, workers may be owed up to 60 days of back pay and benefits.",
+  "params": {
+    "notice_days": 60,
+    "ca_min_employees": 75,
+    "ca_min_laid_off": 50,
+    "federal_min_employees": 100
+  },
+  "source_url": "https://edd.ca.gov/en/jobs_and_training/Layoff_Services_WARN/",
+  "verify_phrase": "WARN",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "An employment attorney or the California Labor Commissioner"
+}

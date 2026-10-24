@@ -1,0 +1,14 @@
+{
+  "id": "iso_post_termination",
+  "title": "Stock option exercise after leaving",
+  "jurisdiction": "Federal",
+  "rule": "Your option plan sets the post-termination exercise window (often 90 days, sometimes longer). Incentive stock options keep ISO tax treatment only if exercised within 3 months after employment ends; after that they are taxed as non-qualified options. Unexercised options expire at the end of the plan window.",
+  "params": {
+    "iso_months": 3
+  },
+  "source_url": "https://www.law.cornell.edu/uscode/text/26/422",
+  "verify_phrase": "3 months",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "Your equity administrator and a tax professional"
+}

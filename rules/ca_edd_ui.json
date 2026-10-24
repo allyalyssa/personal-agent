@@ -1,0 +1,14 @@
+{
+  "id": "ca_edd_ui",
+  "title": "California unemployment insurance",
+  "jurisdiction": "California",
+  "rule": "File an unemployment claim with EDD as soon as you stop working. Benefits generally start from the week you file and are not backdated, and the first week is an unpaid waiting week. Severance and final pay can affect timing.",
+  "params": {
+    "file_within_days": 7
+  },
+  "source_url": "https://edd.ca.gov/en/unemployment/",
+  "verify_phrase": "unemployment",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "California EDD"
+}

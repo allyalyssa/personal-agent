@@ -1,0 +1,17 @@
+{
+  "id": "cobra_election",
+  "title": "COBRA election window",
+  "jurisdiction": "Federal",
+  "rule": "If you had employer health coverage, you usually get a COBRA election notice. You have at least 60 days to elect, counted from the later of the date coverage ends or the date the notice is sent. The employer has 30 days to tell the plan, and the plan has 14 days to send the notice. The first premium is due 45 days after you elect, and coverage is retroactive.",
+  "params": {
+    "election_days": 60,
+    "employer_notice_days": 30,
+    "admin_notice_days": 14,
+    "first_premium_days": 45
+  },
+  "source_url": "https://www.dol.gov/general/topic/health-plans/cobra",
+  "verify_phrase": "60 days",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "Your plan administrator or the US Department of Labor EBSA (askebsa.dol.gov)"
+}

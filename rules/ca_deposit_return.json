@@ -1,0 +1,16 @@
+{
+  "id": "ca_deposit_return",
+  "title": "California deposit return deadline",
+  "jurisdiction": "California",
+  "rule": "After a tenant moves out, the landlord has 21 days to return the deposit or send an itemized statement of deductions. Deductions over $125 need receipts or invoices. Bad-faith retention can cost the landlord up to twice the deposit in damages.",
+  "params": {
+    "days_after_move_out": 21,
+    "receipts_threshold": 125,
+    "bad_faith_multiplier": 2
+  },
+  "source_url": "https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1950.5",
+  "verify_phrase": "21 calendar days",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "SF Rent Board counseling or a tenant attorney"
+}

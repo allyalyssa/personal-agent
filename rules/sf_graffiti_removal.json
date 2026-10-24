@@ -1,0 +1,14 @@
+{
+  "id": "sf_graffiti_removal",
+  "title": "SF graffiti removal notice",
+  "jurisdiction": "San Francisco",
+  "rule": "Property owners must remove graffiti from their property after a Public Works notice, generally within 30 days, or the City may abate it and bill the owner. Report graffiti through 311. Free paint programs have been offered to owners.",
+  "params": {
+    "days_after_notice": 30
+  },
+  "source_url": "https://sfpublicworks.org/services/graffiti",
+  "verify_phrase": "graffiti",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "SF Public Works via 311"
+}

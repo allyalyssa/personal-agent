@@ -1,0 +1,14 @@
+{
+  "id": "ca_hospital_fair_billing",
+  "title": "California hospital fair billing",
+  "jurisdiction": "California",
+  "rule": "California hospitals must have charity care and discount payment policies. Patients with income at or below 400% of the federal poverty level may qualify for free or discounted care. You can ask for an itemized bill and an application for financial assistance.",
+  "params": {
+    "fpl_percent_max": 400
+  },
+  "source_url": "https://hcai.ca.gov/affordability/hospital-fair-billing-program/",
+  "verify_phrase": "400",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "The hospital financial assistance office or HCAI"
+}

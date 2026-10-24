@@ -1,0 +1,12 @@
+{
+  "id": "sf_free_museum_days",
+  "title": "Free museum access in SF",
+  "jurisdiction": "San Francisco",
+  "rule": "Several SF museums offer free days for Bay Area or SF residents, and SF Public Library cardholders can reserve free museum passes through the library. Bring ID with an SF address and your library card.",
+  "params": {},
+  "source_url": "https://sfpl.org/",
+  "verify_phrase": "museum",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "Each museum website; schedules change"
+}

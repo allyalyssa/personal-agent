@@ -1,0 +1,624 @@
+const view = document.getElementById('view')
+let state = null
+let route = location.hash.slice(1) || '/'
+let lastNotification = Number(sessionStorage.getItem('lastNotification') ?? 0)
+let caseTimer = null
+let editing = new Set()
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
+const usd = n => `$${Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`
+const usd2 = n => `$${Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+const STATUS = { open: 'Open', waiting_on_other_party: 'Waiting on them', escalated: 'Escalated', resolved: 'Resolved' }
+const TOOL = { send_email: 'Email', send_sms: 'Text message', place_call: 'Phone call', create_calendar_event: 'Calendar', prepare_form: 'Form, ready for you to submit', open_url_prefilled: 'Link', schedule_followup: 'Follow-up' }
+const PACK_LABEL = { renter: 'Renter', car: 'Car', work: 'Work', everyday: 'Everyday', care: 'Care', business: 'Business', newcomer: 'Newcomer', good: 'Good stuff' }
+
+async function api(path, body) {
+  const res = await fetch(path, body === undefined ? {} : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error ?? res.statusText)
+  return data
+}
+
+function toast(text) {
+  const el = document.createElement('div')
+  el.className = 'toast'
+  el.textContent = text
+  document.getElementById('toasts').append(el)
+  setTimeout(() => el.remove(), 6000)
+}
+
+function parseDay(s) {
+  return new Date(`${String(s).slice(0, 10)}T12:00:00`)
+}
+
+function daysFromToday(s) {
+  return Math.round((parseDay(s) - parseDay(state?.clock.today ?? new Date().toISOString())) / 86400000)
+}
+
+function relDay(s) {
+  const d = daysFromToday(s)
+  if (d === 0) return 'today'
+  if (d === 1) return 'tomorrow'
+  if (d === -1) return 'yesterday'
+  return d > 0 ? `in ${d} days` : `${-d} days ago`
+}
+
+function prettyDate(s) {
+  return parseDay(s).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+function dateBox(s) {
+  const d = parseDay(s)
+  const n = daysFromToday(s)
+  return `<div class="date-box ${n < 0 ? 'past' : n <= 3 ? 'soon' : ''}"><div class="m">${d.toLocaleDateString('en-US', { month: 'short' })}</div><div class="d">${d.getDate()}</div></div>`
+}
+
+function go(path) {
+  location.hash = path
+}
+
+window.addEventListener('hashchange', () => {
+  route = location.hash.slice(1) || '/'
+  editing = new Set()
+  render()
+  view.focus()
+})
+
+document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go === 'home' ? '/' : `/${b.dataset.go}`)))
+
+async function refreshState() {
+  state = await api('/api/state')
+  for (const n of [...state.notifications].reverse()) {
+    if (n.id > lastNotification) {
+      if (lastNotification) toast(n.title)
+      lastNotification = n.id
+    }
+  }
+  sessionStorage.setItem('lastNotification', String(lastNotification))
+}
+
+async function render() {
+  clearTimeout(caseTimer)
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', (t.dataset.go === 'home' && (route === '/' || route.startsWith('/case'))) || route === `/${t.dataset.go}`))
+  if (!state) await refreshState()
+  if (route.startsWith('/case/')) return renderCase(route.split('/')[2])
+  if (route === '/gallery') return renderGallery()
+  if (route === '/settings') return renderSettings()
+  return renderHome()
+}
+
+function integrationWarning() {
+  const i = state.integrations
+  const off = []
+  if (!i.claude) off.push('Claude (ANTHROPIC_API_KEY)')
+  if (!i.email) off.push('email (RESEND_API_KEY)')
+  if (!i.sms) off.push('texts (TWILIO_*)')
+  if (!i.calls) off.push('calls (VAPI_*)')
+  if (!off.length) return ''
+  return `<div class="card small" style="background:var(--warn-bg);color:var(--warn);margin-bottom:10px">Not connected yet: ${off.map(esc).join(', ')}. Add keys to .env and restart.</div>`
+}
+
+function renderHome() {
+  const s = state
+  const next = s.next_deadline
+  const soon = next && daysFromToday(next.due_at) <= 3
+  view.innerHTML = `
+    ${integrationWarning()}
+    ${next ? `
+      <button class="banner ${soon ? 'soon' : ''}" data-case="${esc(next.case_id)}">
+        <div class="label">Next deadline, ${esc(relDay(next.due_at))}</div>
+        <div class="what">${esc(next.title)}</div>
+        <div class="small" style="opacity:.85">${esc(prettyDate(next.due_at))} &middot; ${esc(next.case_title)}</div>
+      </button>` : `
+      <div class="banner"><div class="label">Next deadline</div><div class="what">Nothing due. Capture anything below.</div></div>`}
+    <div class="totals">
+      <div class="card total"><div class="muted small">Money at stake</div><div class="n">${usd(s.totals.at_stake)}</div></div>
+      <div class="card total money"><div class="muted small">Recovered</div><div class="n">${usd(s.totals.recovered)}</div></div>
+    </div>
+    <h2>Cases <span class="muted small">${s.totals.open} open</span></h2>
+    <div class="stack">
+      ${s.cases.length ? s.cases.map(caseCard).join('') : `
+        <div class="card empty">
+          <div class="big">Life in SF comes with rules nobody explains.</div>
+          <p class="muted">Snap a notice, bill or letter, forward an email, or say what happened. Handled finds the deadlines and the money, and does the follow-up.</p>
+          <button class="link" data-go-gallery>See what it can handle</button>
+        </div>`}
+    </div>`
+  view.querySelectorAll('[data-case]').forEach(el => el.addEventListener('click', () => go(`/case/${el.dataset.case}`)))
+  view.querySelector('[data-go-gallery]')?.addEventListener('click', () => go('/gallery'))
+}
+
+function caseCard(c) {
+  return `
+    <button class="card case-card" data-case="${esc(c.id)}">
+      <div class="spread">
+        <div class="case-title">${esc(c.title)}</div>
+        <span class="status ${esc(c.status)}">${esc(STATUS[c.status])}</span>
+      </div>
+      <div class="row small muted" style="margin-top:6px">
+        ${c.pack ? `<span class="chip">${esc(PACK_LABEL[c.pack] ?? c.pack)}</span>` : ''}
+        ${c.money_at_stake > 0 ? `<span class="chip money">${usd(c.money_at_stake)} at stake</span>` : ''}
+        ${c.money_recovered > 0 ? `<span class="chip money">${usd(c.money_recovered)} recovered</span>` : ''}
+        ${c.pending_approvals ? `<span class="chip alert">${c.pending_approvals} to approve</span>` : ''}
+        ${c.busy ? `<span class="working"><span class="spinner"></span>working</span>` : ''}
+      </div>
+      ${c.next_deadline ? `<div class="small" style="margin-top:6px">Next: ${esc(c.next_deadline.title)} &middot; <strong>${esc(relDay(c.next_deadline.due_at))}</strong></div>` : ''}
+    </button>`
+}
+
+function hasPlaceholder(v) {
+  return /\[[a-z_.0-9]+\]/.test(JSON.stringify(v))
+}
+
+function markPlaceholders(text) {
+  return esc(text).replace(/\[([a-z_.0-9]+)\]/g, '<span class="placeholder">needs $1</span>')
+}
+
+function actionBody(a, isEditing) {
+  const p = a.payload
+  if (a.tool === 'send_email') {
+    if (isEditing) return `
+      <div class="edit" data-edit="${a.id}">
+        <div class="field-label">To</div><input name="to" value="${esc(p.to)}">
+        <div class="field-label">Subject</div><input name="subject" value="${esc(p.subject)}">
+        <div class="field-label">Body</div><textarea name="body">${esc(p.body)}</textarea>
+      </div>`
+    return `
+      <dl class="kv"><dt>To</dt><dd>${markPlaceholders(p.to)}</dd>${p.cc ? `<dt>Cc</dt><dd>${markPlaceholders(p.cc)}</dd>` : ''}<dt>Subject</dt><dd>${markPlaceholders(p.subject)}</dd></dl>
+      <div class="transcript-box" style="margin-top:8px">${markPlaceholders(p.body)}</div>`
+  }
+  if (a.tool === 'send_sms') {
+    if (isEditing) return `<div class="edit" data-edit="${a.id}"><div class="field-label">To</div><input name="to" value="${esc(p.to)}"><div class="field-label">Message</div><textarea name="body" style="min-height:90px">${esc(p.body)}</textarea></div>`
+    return `<dl class="kv"><dt>To</dt><dd>${markPlaceholders(p.to)}</dd></dl><div class="transcript-box" style="margin-top:8px">${markPlaceholders(p.body)}</div>`
+  }
+  if (a.tool === 'place_call') {
+    const list = (title, items) => items?.length ? `<div class="field-label">${title}</div><ul class="small" style="margin:0;padding-left:18px">${items.map(i => `<li>${markPlaceholders(i)}</li>`).join('')}</ul>` : ''
+    if (isEditing) return `<div class="edit" data-edit="${a.id}"><div class="field-label">Number</div><input name="to" value="${esc(p.to)}"><div class="field-label">Goal</div><textarea name="goal" style="min-height:90px">${esc(p.goal)}</textarea></div>`
+    return `
+      <dl class="kv"><dt>Calling</dt><dd>${markPlaceholders(p.contact_name)} &middot; ${markPlaceholders(p.to)}</dd></dl>
+      <div class="field-label">It will open with</div>
+      <div class="transcript-box">"Hi, this is an AI assistant calling on behalf of ${esc(state.profile.name)}. ${markPlaceholders(p.opener)}"</div>
+      <div class="field-label">Goal</div><div class="small">${markPlaceholders(p.goal)}</div>
+      ${list('Facts it may share', p.facts)}
+      ${list('It will never agree to', p.must_not)}
+      ${list('It will ask', p.ask)}`
+  }
+  if (a.tool === 'prepare_form') {
+    const fields = Object.entries(p.fields ?? {})
+    return `
+      <div class="small"><strong>${markPlaceholders(p.form_name)}</strong></div>
+      <dl class="kv" style="margin-top:8px">${fields.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${markPlaceholders(typeof v === 'object' ? JSON.stringify(v) : v)} <button class="copy" data-copy="${esc(typeof v === 'object' ? JSON.stringify(v) : v)}">copy</button></dd>`).join('')}</dl>
+      ${p.instructions ? `<p class="small muted">${markPlaceholders(p.instructions)}</p>` : ''}
+      ${p.official_url ? `<p class="small">Official site: <a href="${esc(p.official_url)}" target="_blank" rel="noopener">${esc(p.official_url)}</a></p>` : ''}`
+  }
+  if (a.tool === 'open_url_prefilled') return `<p class="small"><a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.url)}</a>${p.search_for ? `<br>Search for: ${markPlaceholders(p.search_for)}` : ''}${p.bring ? `<br>Bring: ${esc(p.bring)}` : ''}</p>`
+  if (a.tool === 'create_calendar_event') return `<p class="small">${markPlaceholders(p.title)} on ${esc(p.date ? prettyDate(p.date) : '')}</p>`
+  if (a.tool === 'schedule_followup') return `<p class="small">In ${esc(p.wait)}: ${markPlaceholders(p.check)}</p>`
+  return `<pre class="small">${esc(JSON.stringify(p, null, 2))}</pre>`
+}
+
+function callResult(a, events) {
+  const r = a.result ?? {}
+  if (a.status === 'in_progress') {
+    const statuses = events.filter(e => e.kind === 'call' && e.detail?.call_id === r.call_id).map(e => e.title.replace('Call ', ''))
+    return `<div class="card calling working" style="margin-top:8px"><span class="pulse"></span><div><strong>Call in progress</strong><div class="small">${esc(statuses.at(-1) ?? 'dialing')}</div></div></div>`
+  }
+  if (!r.outcome) return ''
+  const o = r.outcome
+  return `
+    <div style="margin-top:10px">
+      <div class="row"><span class="chip ${o.resolved ? 'verified' : 'unverified'}">${o.resolved ? 'Goal reached' : 'Not resolved'}</span>${r.duration_s ? `<span class="chip">${r.duration_s}s</span>` : ''}</div>
+      <p><strong>${esc(o.summary)}</strong></p>
+      <dl class="kv">
+        ${o.appointment_date ? `<dt>Booked</dt><dd>${esc(prettyDate(o.appointment_date))} ${esc(o.appointment_time ?? '')}</dd>` : ''}
+        ${o.price !== null && o.price !== undefined ? `<dt>Price</dt><dd>${usd2(o.price)}</dd>` : ''}
+        <dt>Next</dt><dd>${esc(o.next_step)}</dd>
+        ${(o.fields ?? []).map(f => `<dt>${esc(f.key)}</dt><dd>${esc(f.value)}</dd>`).join('')}
+      </dl>
+      ${r.recording_url ? `<p class="small"><a href="${esc(r.recording_url)}" target="_blank" rel="noopener">Recording</a></p>` : ''}
+      <details><summary class="small">Transcript</summary><div class="transcript-box">${esc(r.transcript)}</div></details>
+    </div>`
+}
+
+function actionCard(a, events) {
+  const isEditing = editing.has(a.id)
+  const blocked = hasPlaceholder(a.payload)
+  const proposed = a.status === 'proposed'
+  return `
+    <div class="card action ${esc(a.status)}" id="action-${a.id}">
+      <div class="spread">
+        <div>
+          <div class="tool">${esc(TOOL[a.tool] ?? a.tool)}${a.due_at ? ` &middot; ${esc(relDay(a.due_at))}` : ''}</div>
+          <div class="case-title">${esc(a.title)}</div>
+        </div>
+        ${!proposed ? `<span class="chip ${a.status === 'done' ? 'verified' : a.status === 'failed' ? 'alert' : ''}">${esc(a.status.replace('_', ' '))}</span>` : ''}
+      </div>
+      <div style="margin-top:8px">${actionBody(a, isEditing)}</div>
+      ${a.status === 'failed' && a.result?.error ? `<p class="small" style="color:var(--danger)">${esc(a.result.error)}</p>` : ''}
+      ${a.tool === 'place_call' ? callResult(a, events) : ''}
+      ${a.tool === 'open_url_prefilled' && a.status === 'done' ? `<p class="small"><a href="${esc(a.result.url)}" target="_blank" rel="noopener">Open</a></p>` : ''}
+      ${proposed ? `
+        ${blocked && !isEditing ? `<p class="small" style="color:var(--warn)">Fill in the highlighted parts before approving.</p>` : ''}
+        <div class="row" style="margin-top:10px">
+          <button class="primary" data-approve="${a.id}" ${blocked && !isEditing ? 'disabled' : ''}>${a.tool === 'place_call' ? 'Approve and call' : a.tool === 'send_email' || a.tool === 'send_sms' ? 'Approve and send' : 'Approve'}</button>
+          ${['send_email', 'send_sms', 'place_call'].includes(a.tool) ? `<button class="ghost" data-edit-btn="${a.id}">${isEditing ? 'Cancel edit' : 'Edit'}</button>` : ''}
+          <button class="ghost" data-reject="${a.id}">Skip</button>
+        </div>` : ''}
+    </div>`
+}
+
+function eventLine(e) {
+  const d = new Date(e.at)
+  const extra = e.kind === 'data' && e.detail?.sources ? ` <a class="small" href="${esc(e.detail.sources.at(-1))}" target="_blank" rel="noopener">data</a>` : ''
+  return `<li class="${esc(e.kind)}"><div class="small">${esc(e.title)}${extra}</div><div class="tiny muted">${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} ${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</div></li>`
+}
+
+function computedHeadline(c) {
+  const i = c.computed?.interest
+  if (i) return `
+    <div class="card" style="margin-top:10px">
+      <div class="muted small">Your landlord owes you</div>
+      <div class="headline-money">${usd2(i.total_owed)}</div>
+      <ul class="small" style="padding-left:18px;margin:6px 0">${i.years.map(y => `<li>${esc(y.math)}</li>`).join('')}</ul>
+      <div class="small muted">Next payment: ${usd2(i.next_payment.interest)} due ${esc(prettyDate(i.next_payment.due_date))}. Rates: <a href="${esc(i.source_url)}" target="_blank" rel="noopener">SF Rent Board</a>, checked ${esc(i.last_verified)}.</div>
+      ${i.years_needing_confirmation.length ? `<div class="small" style="color:var(--warn)">Not counted (rate not verified): ${esc(i.years_needing_confirmation.join('; '))}. Ask the Rent Board.</div>` : ''}
+    </div>`
+  const chk = c.computed?.check
+  if (chk) return `
+    <div class="card" style="margin-top:10px">
+      <div class="muted small">Increase asked vs allowed</div>
+      <div class="headline-money" style="color:${chk.overcharge_per_month ? 'var(--danger)' : 'var(--money)'}">${chk.increase_percent}% vs ${chk.max_percent_with_banking ?? '?'}%</div>
+      <div class="small">${esc(chk.math ?? '')}</div>
+      <div class="small muted">${esc(chk.coverage_basis)}</div>
+    </div>`
+  const v = c.computed?.verdict
+  if (v) return `
+    <div class="card" style="margin-top:10px">
+      <div class="muted small">Verdict</div>
+      <div class="headline-money" style="color:${v.verdict === 'likely scam' ? 'var(--danger)' : v.verdict === 'likely real' ? 'var(--money)' : 'var(--warn)'}">${esc(v.verdict)}</div>
+      <div class="small">${v.links.map(l => `${esc(l.host)}: ${l.official ? 'official domain' : 'not an official domain'}`).join('<br>')}</div>
+      <div class="small muted">${esc(v.advice)}</div>
+    </div>`
+  const b = c.computed?.compare
+  if (b) return `
+    <div class="card" style="margin-top:10px">
+      <div class="muted small">Possible overbilling</div>
+      <div class="headline-money">${usd2(b.disputed_amount)}</div>
+      <div class="small">${esc(b.math ?? '')}${b.duplicate_lines.length ? `<br>Duplicate: ${b.duplicate_lines.map(l => `${esc(l.description)} ${usd2(l.amount)}`).join(', ')}` : ''}</div>
+    </div>`
+  return ''
+}
+
+async function renderCase(id, auto = false) {
+  let c
+  try {
+    c = await api(`/api/cases/${id}`)
+  } catch {
+    view.innerHTML = `<p>Case not found. <button class="link" onclick="location.hash='/'">Back</button></p>`
+    return
+  }
+  if (route !== `/case/${id}`) return
+  const typing = document.activeElement?.closest?.('.edit, .questions, #caseReply')
+  if (typing || (editing.size && auto)) {
+    caseTimer = setTimeout(() => renderCase(id, true), 2000)
+    return
+  }
+  const proposed = c.actions.filter(a => a.status === 'proposed')
+  const other = c.actions.filter(a => a.status !== 'proposed')
+  const upcoming = c.deadlines.filter(d => !d.done)
+  view.innerHTML = `
+    <button class="back" onclick="location.hash='/'">&larr; Cases</button>
+    <div class="spread">
+      <h1>${esc(c.title)}</h1>
+      <span class="status ${esc(c.status)}">${esc(STATUS[c.status])}</span>
+    </div>
+    <div class="row small muted" style="margin-top:6px">
+      ${c.playbook_title ? `<span class="chip">${esc(c.playbook_title)}</span>` : ''}
+      ${c.money_at_stake > 0 ? `<span class="chip money">${usd2(c.money_at_stake)} at stake</span>` : ''}
+      ${c.money_recovered > 0 ? `<span class="chip money">${usd2(c.money_recovered)} recovered</span>` : ''}
+    </div>
+    ${c.busy ? `<div class="card working" style="margin-top:12px"><span class="spinner"></span><span>${esc(c.events.at(-1)?.title ?? 'Reading')}...</span></div>` : ''}
+    ${computedHeadline(c)}
+    ${c.summary ? `<div class="card summary" style="margin-top:10px">${esc(c.summary)}</div>` : ''}
+    ${c.questions?.length && !c.busy ? `
+      <div class="card questions" style="margin-top:10px">
+        <strong>A few things Handled needs</strong>
+        ${c.questions.map((q, i) => `<div class="field-label">${esc(q.question)}</div><input data-q="${i}" data-field="${esc(q.field)}">`).join('')}
+        <div class="row" style="margin-top:10px"><button class="primary" id="answer">Send answers</button></div>
+      </div>` : ''}
+    ${proposed.length ? `<h2>Ready for your approval <span class="muted small">${proposed.length}</span></h2><div class="stack">${proposed.map(a => actionCard(a, c.events)).join('')}</div>` : ''}
+    ${upcoming.length ? `
+      <h2>Deadlines and check-ins</h2>
+      <div class="card">${upcoming.map(d => `
+        <div class="deadline">${dateBox(d.due_at)}
+          <div>
+            <div class="small"><strong>${esc(d.title)}</strong> <span class="muted">${esc(relDay(d.due_at))}</span></div>
+            ${d.rule_id ? `<span class="chip ${c.rules.find(r => r.id === d.rule_id)?.status ?? ''}">${esc(c.rules.find(r => r.id === d.rule_id)?.status ?? '')}</span>` : d.kind === 'checkin' ? '<span class="chip">automatic check-in</span>' : d.kind === 'event' ? '<span class="chip">calendar</span>' : ''}
+            ${d.note ? `<div class="tiny muted" style="margin-top:3px">${esc(d.note)}</div>` : ''}
+          </div>
+        </div>`).join('')}
+        <p class="small"><a href="/api/cases/${esc(c.id)}/calendar.ics">Add to calendar</a></p>
+      </div>` : ''}
+    ${other.length ? `<h2>Done and in progress</h2><div class="stack">${other.slice().reverse().map(a => actionCard(a, c.events)).join('')}</div>` : ''}
+    ${c.rules.length ? `
+      <h2>Rules and sources</h2>
+      <div class="stack">${c.rules.map(r => `
+        <details class="card"><summary class="small"><strong>${esc(r.title)}</strong> <span class="chip ${esc(r.status)}">${esc(r.status)}${r.last_verified ? ` ${esc(r.last_verified)}` : ''}</span></summary>
+          <p class="small">${esc(r.rule)}</p>
+          <p class="small muted">Source: <a href="${esc(r.source_url)}" target="_blank" rel="noopener">${esc(r.source_url)}</a><br>Confirm with: ${esc(r.confirm_with)}${r.notes ? `<br>${esc(r.notes)}` : ''}</p>
+          <p class="tiny muted">Information with sources, not legal, tax, immigration or medical advice.</p>
+        </details>`).join('')}</div>` : ''}
+    <h2>Timeline</h2>
+    <div class="card"><ul class="timeline">${c.events.map(eventLine).join('')}</ul>
+      ${c.jobs.length ? `<p class="small muted">Scheduled: ${c.jobs.map(j => `${esc(j.kind)} ${esc(relDay(j.run_at))}`).join(', ')}</p>` : ''}
+    </div>
+    <h2>Add to this case</h2>
+    <div class="card">
+      <textarea id="caseReply" rows="2" placeholder="Reply, correct a detail, or say what happened (e.g. they paid)" style="width:100%;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:10px"></textarea>
+      <div class="row" style="margin-top:8px;justify-content:space-between">
+        <button class="ghost" id="resolve">${c.status === 'resolved' ? 'Resolved' : 'Mark resolved'}</button>
+        <button class="primary" id="sendReply">Send</button>
+      </div>
+    </div>`
+
+  view.querySelectorAll('[data-approve]').forEach(b => b.addEventListener('click', async () => {
+    const aid = Number(b.dataset.approve)
+    const editEl = view.querySelector(`[data-edit="${aid}"]`)
+    const payload = editEl ? Object.fromEntries([...editEl.querySelectorAll('[name]')].map(i => [i.name, i.value])) : undefined
+    if (payload && hasPlaceholder(payload)) return toast('Fill in the highlighted parts first.')
+    b.disabled = true
+    b.textContent = 'Working...'
+    const r = await api(`/api/actions/${aid}/approve`, { payload })
+    editing.delete(aid)
+    toast(r.ok ? 'Done.' : `Failed: ${r.error}`)
+    renderCase(id)
+  }))
+  view.querySelectorAll('[data-reject]').forEach(b => b.addEventListener('click', async () => {
+    await api(`/api/actions/${b.dataset.reject}/reject`, {})
+    renderCase(id)
+  }))
+  view.querySelectorAll('[data-edit-btn]').forEach(b => b.addEventListener('click', () => {
+    const aid = Number(b.dataset.editBtn)
+    if (editing.has(aid)) editing.delete(aid)
+    else editing.add(aid)
+    renderCase(id)
+  }))
+  view.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => {
+    navigator.clipboard.writeText(b.dataset.copy)
+    toast('Copied')
+  }))
+  view.querySelector('#answer')?.addEventListener('click', async () => {
+    const answers = [...view.querySelectorAll('[data-q]')].map(i => `${c.questions[Number(i.dataset.q)].question} ${i.value}`).join('\n')
+    await api(`/api/cases/${id}/reply`, { text: answers })
+    renderCase(id)
+  })
+  view.querySelector('#sendReply').addEventListener('click', async () => {
+    const text = view.querySelector('#caseReply').value.trim()
+    if (!text) return
+    await api(`/api/cases/${id}/reply`, { text })
+    renderCase(id)
+  })
+  view.querySelector('#resolve').addEventListener('click', async () => {
+    const amount = c.money_at_stake > 0 ? prompt(`How much did you recover? (at stake: ${usd2(c.money_at_stake)})`, String(c.money_at_stake)) : '0'
+    if (amount === null) return
+    await api(`/api/cases/${id}/resolve`, { recovered: Number(amount) })
+    await refreshState()
+    renderCase(id)
+  })
+
+  const live = c.busy || c.actions.some(a => a.status === 'in_progress' || a.status === 'running')
+  caseTimer = setTimeout(() => renderCase(id, true), live ? 1500 : 5000)
+}
+
+let galleryPack = sessionStorage.getItem('galleryPack') ?? 'all'
+
+async function renderGallery() {
+  const { packs, playbooks } = await api('/api/playbooks')
+  const shown = playbooks.filter(p => galleryPack === 'all' || p.pack === galleryPack)
+  const order = Object.keys(packs)
+  shown.sort((a, b) => order.indexOf(a.pack) - order.indexOf(b.pack) || (a.depth === 'deep' ? -1 : 1))
+  view.innerHTML = `
+    <h1>${playbooks.length} playbooks</h1>
+    <p class="muted small">Each one is a declarative file: triggers, required fields, rules with sources, actions with deadlines, and follow-ups. One engine runs them all.</p>
+    <div class="gallery-scroll" role="tablist">
+      <button class="chip ${galleryPack === 'all' ? 'on' : ''}" data-pack="all">All</button>
+      ${order.map(k => `<button class="chip ${galleryPack === k ? 'on' : ''}" data-pack="${esc(k)}">${esc(packs[k])} ${playbooks.filter(p => p.pack === k).length}</button>`).join('')}
+    </div>
+    <div class="pack-grid" style="margin-top:12px">
+      ${shown.map(p => `
+        <div class="card pb-card">
+          <div class="row"><span class="chip">${esc(packs[p.pack])}</span>${p.depth === 'deep' ? '<span class="chip verified">deep</span>' : ''}</div>
+          <strong>${esc(p.title)}</strong>
+          <p>${esc(p.pitch)}</p>
+          <div class="tiny muted">${[...new Set(p.actions)].map(t => TOOL[t] ?? t).join(' &middot; ')}</div>
+          <button class="ghost" data-try="${esc(p.id)}">Try with a sample</button>
+        </div>`).join('')}
+    </div>`
+  view.querySelectorAll('[data-pack]').forEach(b => b.addEventListener('click', () => {
+    galleryPack = b.dataset.pack
+    sessionStorage.setItem('galleryPack', galleryPack)
+    renderGallery()
+  }))
+  view.querySelectorAll('[data-try]').forEach(b => b.addEventListener('click', async () => {
+    b.disabled = true
+    const { case_id } = await api(`/api/playbooks/${b.dataset.try}/try`, {})
+    await refreshState()
+    go(`/case/${case_id}`)
+  }))
+}
+
+async function renderSettings() {
+  const profile = await api('/api/profile')
+  const i = state.integrations
+  const cal = `${location.origin}/calendar.ics`
+  view.innerHTML = `
+    <h1>Settings</h1>
+    <h2>Time</h2>
+    <div class="card stack">
+      <div class="spread"><span>Handled's clock</span><strong class="clock-pill">${esc(prettyDate(state.clock.today))}${state.clock.offset_days ? ` (+${state.clock.offset_days} days)` : ''}</strong></div>
+      <div class="ff">
+        <button class="ghost" data-ff="1">+1 day</button>
+        <button class="ghost" data-ff="3">+3 days</button>
+        <button class="ghost" data-ff="7">+7 days</button>
+        <button class="ghost" data-ff="15">+15 days</button>
+      </div>
+      <p class="small muted">Fast-forward moves the clock and runs any reminders and check-ins that come due, so escalations fire right now.</p>
+      <button class="ghost" id="resetClock">Back to real time</button>
+    </div>
+    <h2>Calendar</h2>
+    <div class="card small">Subscribe your phone calendar to <a href="${esc(cal)}">${esc(cal)}</a>. Every deadline, check-in and booking shows up there.</div>
+    <h2>Connections</h2>
+    <div class="card small">
+      Claude: ${i.claude ? 'connected' : 'not set'}<br>
+      Email (Resend): ${i.email ? 'connected' : 'not set'}<br>
+      Texts (Twilio): ${i.sms ? 'connected' : 'not set'}<br>
+      Calls (Vapi): ${i.calls ? 'connected' : 'not set'}<br>
+      Forward email or webhook notes to <code>POST ${esc(location.origin)}/api/inbound</code>
+    </div>
+    <h2>Your profile</h2>
+    <div class="card settings">
+      <p class="small muted">Handled fills forms from this. Never put SSNs, card numbers or full ID numbers here.</p>
+      <textarea id="profile" rows="16" spellcheck="false" style="font-family:ui-monospace,monospace;font-size:.8rem">${esc(JSON.stringify(profile, null, 2))}</textarea>
+      <div class="row" style="margin-top:8px;justify-content:flex-end"><button class="primary" id="saveProfile">Save</button></div>
+    </div>`
+  view.querySelectorAll('[data-ff]').forEach(b => b.addEventListener('click', async () => {
+    const r = await api('/api/clock/advance', { days: Number(b.dataset.ff) })
+    await refreshState()
+    toast(r.fired ? `${r.fired} scheduled ${r.fired === 1 ? 'item' : 'items'} fired` : 'Nothing due yet')
+    renderSettings()
+  }))
+  view.querySelector('#resetClock').addEventListener('click', async () => {
+    await api('/api/clock/reset', {})
+    await refreshState()
+    renderSettings()
+  })
+  view.querySelector('#saveProfile').addEventListener('click', async () => {
+    try {
+      await api('/api/profile', JSON.parse(view.querySelector('#profile').value))
+      toast('Profile saved')
+    } catch (e) {
+      toast(`Could not save: ${e.message}`)
+    }
+  })
+}
+
+const composer = document.getElementById('composer')
+const listening = document.getElementById('listening')
+const textEl = document.getElementById('text')
+let files = []
+
+function shrink(file) {
+  return new Promise(resolve => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (!file.type.startsWith('image/')) return resolve(reader.result)
+      const img = new Image()
+      img.onload = () => {
+        const scale = Math.min(1, 1600 / Math.max(img.width, img.height))
+        const canvas = document.createElement('canvas')
+        canvas.width = Math.round(img.width * scale)
+        canvas.height = Math.round(img.height * scale)
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
+        resolve(canvas.toDataURL('image/jpeg', 0.85))
+      }
+      img.src = reader.result
+    }
+    reader.readAsDataURL(file)
+  })
+}
+
+function showAttachments() {
+  document.getElementById('attachments').innerHTML = files.map(f => f.startsWith('data:image') ? `<img src="${f}" alt="attached photo">` : '<span class="chip">PDF</span>').join('')
+}
+
+async function submit(payload) {
+  const { case_id } = await api('/api/intake', payload)
+  composer.hidden = true
+  listening.hidden = true
+  textEl.value = ''
+  files = []
+  showAttachments()
+  await refreshState()
+  go(`/case/${case_id}`)
+}
+
+document.getElementById('photo').addEventListener('change', async e => {
+  files = await Promise.all([...e.target.files].map(shrink))
+  e.target.value = ''
+  showAttachments()
+  composer.hidden = false
+  textEl.placeholder = 'Anything to add? (optional)'
+  textEl.focus()
+})
+
+document.getElementById('type').addEventListener('click', () => {
+  composer.hidden = !composer.hidden
+  listening.hidden = true
+  if (!composer.hidden) textEl.focus()
+})
+
+document.getElementById('closeComposer').addEventListener('click', () => {
+  composer.hidden = true
+  files = []
+  showAttachments()
+})
+
+document.getElementById('sendText').addEventListener('click', () => {
+  const text = textEl.value.trim()
+  if (!text && !files.length) return
+  submit({ text, files, source: files.length ? 'photo' : 'typed or pasted text' })
+})
+
+const Speech = window.SpeechRecognition ?? window.webkitSpeechRecognition
+let recognizer = null
+let heard = ''
+
+document.getElementById('voice').addEventListener('click', () => {
+  if (!Speech) {
+    toast('Voice needs Chrome or Safari. Type instead.')
+    composer.hidden = false
+    textEl.focus()
+    return
+  }
+  composer.hidden = true
+  listening.hidden = false
+  heard = ''
+  document.getElementById('transcript').textContent = 'Listening...'
+  recognizer = new Speech()
+  recognizer.lang = 'en-US'
+  recognizer.continuous = true
+  recognizer.interimResults = true
+  recognizer.onresult = e => {
+    let final = ''
+    let interim = ''
+    for (const r of e.results) {
+      if (r.isFinal) final += r[0].transcript
+      else interim += r[0].transcript
+    }
+    heard = final + interim
+    document.getElementById('transcript').textContent = heard || 'Listening...'
+  }
+  recognizer.start()
+})
+
+document.getElementById('cancelVoice').addEventListener('click', () => {
+  recognizer?.abort()
+  listening.hidden = true
+})
+
+document.getElementById('sendVoice').addEventListener('click', () => {
+  recognizer?.stop()
+  const text = heard.trim()
+  if (!text) {
+    listening.hidden = true
+    return
+  }
+  submit({ text: `Voice note: "${text}"`, source: 'voice note' })
+})
+
+setInterval(async () => {
+  await refreshState()
+  if (route === '/') renderHome()
+}, 4000)
+
+render()

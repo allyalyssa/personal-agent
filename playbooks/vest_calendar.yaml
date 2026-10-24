@@ -1,0 +1,45 @@
+id: vest_calendar
+pack: work
+title: Vesting calendar
+pitch: Turns a grant summary into vest dates on your calendar, plus tax reminders.
+depth: standard
+triggers:
+  documents: [grant summary, RSU grant, option grant, Carta screenshot]
+  phrases: [vesting schedule, RSUs, vest, cliff, grant]
+required_fields:
+  grant_date: { type: date, label: Grant date, get: extract or ask }
+  vesting_start: { type: date, label: Vesting start date, get: extract, optional: true }
+  total_shares: { type: number, label: Total shares, get: extract or ask }
+  cliff_months: { type: number, label: Cliff (months), get: extract or ask, default: 12 }
+  vest_months: { type: number, label: Total vesting period (months), get: extract or ask, default: 48 }
+  frequency_months: { type: number, label: Vest every N months after cliff, get: extract or ask, default: 1 }
+  equity_type: { type: string, label: RSU or options, get: extract or ask }
+rules: [rsu_vest_tax]
+compute:
+  schedule:
+    fn: vest_schedule
+    args: { grant_date: grant_date, vesting_start: vesting_start, total_shares: total_shares, cliff_months: cliff_months, vest_months: vest_months, frequency_months: frequency_months }
+actions:
+  - id: first_vest
+    tool: create_calendar_event
+    title: "Cliff vest: {{schedule.first_vest.shares}} shares"
+    needs_approval: false
+    payload:
+      title: "Cliff vest: {{schedule.first_vest.shares}} {{equity_type}}"
+      date: "{{schedule.first_vest.date}}"
+      note: RSUs are taxed as wages at vest; withholding may be lower than your bracket.
+  - id: next_vest
+    tool: create_calendar_event
+    title: "Next vest: {{schedule.next_vest.shares}} shares on {{date schedule.next_vest.date}}"
+    needs_approval: false
+    when: schedule.next_vest
+    payload:
+      title: "Vest: {{schedule.next_vest.shares}} {{equity_type}}"
+      date: "{{schedule.next_vest.date}}"
+deadlines:
+  - title: "Cliff vest ({{schedule.first_vest.shares}} shares): check tax withholding"
+    due: schedule.first_vest.date
+    rule: rsu_vest_tax
+    remind_days_before: [7]
+sample: |
+  Grant summary: 4,800 RSUs granted 2026-02-01, 4 year vest, 1 year cliff, quarterly after that.

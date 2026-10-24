@@ -1,0 +1,15 @@
+{
+  "id": "sf_business_compliance",
+  "title": "SF small business yearly deadlines",
+  "jurisdiction": "San Francisco",
+  "rule": "SF businesses renew business registration each year (due May 31) and file the annual gross receipts tax return if required (due the last day of February). Food businesses renew health permits; some businesses need fire permits.",
+  "params": {
+    "registration_due": "05-31",
+    "gross_receipts_due": "02-28"
+  },
+  "source_url": "https://sftreasurer.org/business",
+  "verify_phrase": "registration",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "SF Office of the Treasurer and Tax Collector"
+}

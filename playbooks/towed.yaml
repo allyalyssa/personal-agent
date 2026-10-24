@@ -1,0 +1,53 @@
+id: towed
+pack: car
+title: Car towed
+pitch: Explains why from City sweeping and no-parking data for that block, links AutoReturn by plate, and starts the hearing clock.
+depth: standard
+triggers:
+  documents: [tow notice, AutoReturn notice, citation]
+  phrases: [towed, my car is gone, car got towed, AutoReturn]
+required_fields:
+  parked_address: { type: string, label: Where the car was parked (street address), get: extract or ask }
+  tow_date: { type: date, label: Date of tow, get: extract or ask }
+  plate: { type: string, label: License plate, get: profile, profile: car.plate }
+  sweeping: { type: string, label: Street sweeping on that block, get: "lookup: query_datasf street_sweeping", optional: true }
+  no_parking: { type: string, label: Temporary no-parking permits that day, get: "lookup: query_datasf temporary_no_parking", optional: true }
+rules: [ca_tow_hearing, sf_street_sweeping_data]
+datasf: [street_sweeping, temporary_no_parking]
+guidance: >
+  Query both street_sweeping and temporary_no_parking for parked_address (use tow_date for no-parking).
+  Explain the likely reason from the data in two sentences and cite the datasets. If neither explains it,
+  say so; the reason will be on the tow record.
+actions:
+  - id: autoreturn
+    tool: open_url_prefilled
+    title: Find your car on AutoReturn (plate {{plate}})
+    needs_approval: true
+    due: today
+    payload:
+      url: https://www.autoreturn.com/
+      params: {}
+      search_for: "Plate {{plate}}, San Francisco"
+      bring: Photo ID, registration or title, payment for tow and storage fees (fees rise daily)
+  - id: hearing_prep
+    tool: prepare_form
+    title: Prepare a tow hearing request if the tow looks wrong
+    needs_approval: true
+    due: tow_date + 10 days
+    payload:
+      form_name: SFMTA tow hearing request
+      official_url: https://www.sfmta.com/
+      fields:
+        Plate: "{{plate}}"
+        Tow date: "{{tow_date}}"
+        Location: "{{parked_address}}"
+        Sweeping schedule found: "{{sweeping}}"
+        No-parking permits found: "{{no_parking}}"
+      instructions: Request the hearing within the window. Photos of posted signs (or missing signs) help.
+deadlines:
+  - title: Last day to request a tow hearing
+    due: tow_date + 10 days
+    rule: ca_tow_hearing
+    remind_days_before: [3]
+sample: |
+  My car got towed from outside 1000 Guerrero St this morning. Blue Civic.

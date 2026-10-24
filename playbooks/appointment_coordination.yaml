@@ -1,0 +1,45 @@
+id: appointment_coordination
+pack: care
+title: Parent's appointment, start to finish
+pitch: Reminders, the ride, what to bring, and a follow-up note after the visit.
+depth: standard
+triggers:
+  documents: [appointment letter, after-visit summary, referral]
+  phrases: [mom's appointment, dad's appointment, doctor appointment for my, specialist referral]
+required_fields:
+  person: { type: string, label: Who the appointment is for, get: extract or profile, profile: family.0.name }
+  person_phone: { type: phone, label: Their phone, get: profile, profile: family.0.phone }
+  provider: { type: string, label: Doctor or clinic, get: extract or ask }
+  appointment_date: { type: date, label: Date, get: extract or ask }
+  appointment_time: { type: string, label: Time, get: extract or ask }
+  bring: { type: string, label: What to bring, get: extract, default: "Photo ID, insurance card, medication list, questions for the doctor" }
+  needs_ride: { type: boolean, label: Do they need a ride?, get: ask }
+rules: [sf_paratransit]
+guidance: If needs_ride is true, tell the user you can book it with the paratransit playbook and propose a place_call only if they want it now.
+actions:
+  - id: reminder_text
+    tool: send_sms
+    title: Text {{person}} a reminder with what to bring
+    needs_approval: true
+    due: appointment_date - 1 days
+    payload:
+      to: "{{person_phone}}"
+      body: "Reminder: {{provider}} on {{appointment_date}} at {{appointment_time}}. Bring: {{bring}}. - {{profile.name}}"
+  - id: post_visit
+    tool: schedule_followup
+    title: Check in after the visit for notes and next steps
+    needs_approval: false
+    payload:
+      wait: 1 days
+      check: How did {{person}}'s visit with {{provider}} go? Any follow-up appointments, prescriptions, or tests?
+deadlines:
+  - title: "{{person}}: {{provider}} at {{appointment_time}}"
+    due: appointment_date
+    remind_days_before: [2, 0]
+followups:
+  - after_action: reminder_text
+    wait: 2 days
+    check: Add notes from {{person}}'s visit (next appointment, new prescriptions, tests)
+    resolved_when: Visit notes saved
+sample: |
+  My dad has a cardiology appointment at Kaiser on Geary, November 3rd at 2pm. He'll need a ride.

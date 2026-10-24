@@ -1,0 +1,15 @@
+{
+  "id": "sf_rent_control_coverage",
+  "title": "Does SF rent control apply?",
+  "jurisdiction": "San Francisco",
+  "rule": "SF rent increase limits generally cover units in buildings with a first certificate of occupancy before June 13, 1979. Single-family homes and condos are generally exempt from the increase limits under state law (Costa-Hawkins), with exceptions. Eviction protections can apply even where increase limits do not.",
+  "params": {
+    "built_before": "1979-06-13"
+  },
+  "source_url": "https://www.sf.gov/departments--rent-board",
+  "verify_phrase": "1979",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "SF Rent Board counseling",
+  "notes": "Year built from DataSF Assessor data is a proxy for certificate of occupancy date."
+}

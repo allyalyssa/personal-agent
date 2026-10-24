@@ -1,0 +1,112 @@
+id: medical_bill_check
+pack: everyday
+title: Medical bill check
+pitch: Compares the bill with your insurer's statement, flags duplicates, calls the billing office, and checks financial assistance.
+depth: deep
+triggers:
+  documents: [medical bill, hospital statement, explanation of benefits, EOB]
+  phrases: [medical bill, hospital bill, EOB, billed twice, surprise bill]
+required_fields:
+  provider_name: { type: string, label: Provider or hospital, get: extract or ask }
+  billing_email: { type: email, label: Billing office email, get: extract or ask, optional: true }
+  billing_phone: { type: phone, label: Billing office phone, get: extract or profile, profile: contacts.2.phone }
+  date_of_service: { type: date, label: Date of service, get: extract or ask }
+  amount_billed: { type: number, label: Amount the bill says you owe, get: extract or ask }
+  eob_patient_responsibility: { type: number, label: What your insurer says you owe (EOB), get: extract or ask }
+  bill_lines: { type: list, label: "Line items [{description, code, date, amount}]", get: extract, optional: true }
+  account_last4: { type: string, label: Account number (last 4), get: extract, optional: true }
+  statement_due: { type: date, label: Bill due date, get: extract, optional: true }
+rules: [ca_hospital_fair_billing]
+guidance: >
+  Put bill line items into bill_lines when visible. Use compare_bill output for every number.
+  Ask for the EOB if the user only sent the bill. The call script asks for an itemized bill, a hold on
+  collections, and a financial assistance application; it never agrees to pay or gives card details.
+compute:
+  compare:
+    fn: compare_bill
+    args: { bill_lines: bill_lines, eob_patient_responsibility: eob_patient_responsibility, amount_billed: amount_billed }
+money_at_stake: compare.disputed_amount
+actions:
+  - id: billing_call
+    tool: place_call
+    title: Call {{provider_name}} billing about the ${{$ compare.disputed_amount}} difference
+    needs_approval: true
+    due: today
+    waits_on_other_party: true
+    payload:
+      to: "{{billing_phone}}"
+      contact_name: "{{provider_name}} billing office"
+      opener: "I'm calling about a bill for a visit on {{date_of_service}}. The amount billed doesn't match the insurance statement. Can you help me with that?"
+      goal: "Get the bill corrected to match the insurer's EOB (${{$ eob_patient_responsibility}}), request an itemized bill, ask for collections to be paused while it is reviewed, and ask how to apply for financial assistance."
+      facts:
+        - "Patient: {{profile.name}}, date of service {{date_of_service}}"
+        - "Account ending {{account_last4}}"
+        - "Bill says ${{$ amount_billed}}; the insurer EOB says patient responsibility is ${{$ eob_patient_responsibility}}"
+        - "Possible duplicate charges: {{compare.duplicate_total}}"
+      must_not:
+        - Agree to pay any amount
+        - Give payment card or bank details
+        - Agree to a payment plan
+      ask:
+        - Will they correct the balance to the EOB amount, and by when?
+        - Can they mail or email an itemized bill?
+        - Will they put the account on hold so it does not go to collections?
+        - How to apply for financial assistance or charity care?
+        - Reference number for this call
+    outcome:
+      corrected_balance: number
+      reference_number: string
+      itemized_bill_sent: yes or no
+      account_on_hold: yes or no
+  - id: itemized_request
+    tool: send_email
+    title: Request an itemized bill and financial assistance application in writing
+    needs_approval: true
+    due: today
+    payload:
+      to: "{{billing_email}}"
+      subject: "Itemized bill request: {{provider_name}}, {{date_of_service}}"
+      body: |
+        To the {{provider_name}} billing office:
+
+        Please send an itemized bill for services on {{date date_of_service}} (account ending {{account_last4}}), and a financial assistance application under your charity care and discount payment policy.
+
+        The statement shows ${{$ amount_billed}} owed, but my insurer's explanation of benefits lists my responsibility as ${{$ eob_patient_responsibility}}. Please correct the balance and hold the account from collections while it is reviewed.
+
+        {{profile.name}}
+  - id: fap
+    tool: prepare_form
+    title: Prepare a California hospital financial assistance application
+    needs_approval: true
+    due: today + 7 days
+    payload:
+      form_name: Hospital financial assistance (charity care / discount payment)
+      official_url: https://hcai.ca.gov/affordability/hospital-fair-billing-program/
+      fields:
+        Provider: "{{provider_name}}"
+        Date of service: "{{date_of_service}}"
+        Amount billed: "{{amount_billed}}"
+      instructions: Eligibility depends on household income compared with the federal poverty level. Ask the hospital for its application; HCAI has the program rules.
+deadlines:
+  - title: Bill due date (ask for a hold before then)
+    due: statement_due
+    rule: ca_hospital_fair_billing
+    remind_days_before: [5]
+followups:
+  - after_action: billing_call
+    wait: 10 days
+    check: Did {{provider_name}} send a corrected bill?
+    resolved_when: Corrected bill matching the EOB
+    escalate:
+      tool: send_email
+      title: Send a written dispute to {{provider_name}} billing
+      needs_approval: true
+      payload:
+        to: "{{billing_email}}"
+        subject: "Billing dispute: {{provider_name}}, {{date_of_service}}"
+        body: |
+          I called your billing office about this bill. My insurer's EOB lists my responsibility as ${{$ eob_patient_responsibility}}, but I was billed ${{$ amount_billed}}. Please correct the balance and confirm in writing.
+
+          {{profile.name}}
+sample: |
+  Bill from the hospital for my ER visit on 2026-09-12 says I owe $1,840. My insurance EOB says patient responsibility is $350. Line items: ER visit level 4 $1,200; CT scan $490; CT scan $490 same day; lab panel $150. Due 2026-11-15.

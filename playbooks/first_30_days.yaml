@@ -1,0 +1,72 @@
+id: first_30_days
+pack: newcomer
+title: Your first 30 days in SF
+pitch: A checklist with real deadlines (DMV license and registration, voter registration, City ID, library card, Clipper discounts, parking permit) and each one prepared.
+depth: standard
+triggers:
+  documents: [new lease, moving confirmation]
+  phrases: [just moved to SF, new to San Francisco, moved here, newcomer, relocating]
+required_fields:
+  move_in_date: { type: date, label: Date you became an SF resident, get: extract or ask, profile: moved_to_sf }
+  has_car: { type: boolean, label: Did you bring a car?, get: ask }
+  out_of_state_license: { type: boolean, label: Out-of-state driver license?, get: ask }
+  address: { type: string, label: SF address, get: profile, profile: address }
+  clipper_discount: { type: string, label: Youth, senior, disability, or low income (any apply?), get: ask, optional: true }
+rules: [ca_dmv_new_resident, ca_voter_registration, sf_newcomer_services]
+actions:
+  - id: dmv_license
+    tool: open_url_prefilled
+    title: Start your California driver license application
+    needs_approval: true
+    when: out_of_state_license
+    due: move_in_date + 10 days
+    payload:
+      url: https://www.dmv.ca.gov/portal/
+  - id: dmv_registration
+    tool: open_url_prefilled
+    title: Register your car in California
+    needs_approval: true
+    when: has_car
+    due: move_in_date + 20 days
+    payload:
+      url: https://www.dmv.ca.gov/portal/
+  - id: voter
+    tool: prepare_form
+    title: Register to vote at your SF address
+    needs_approval: true
+    due: today
+    payload:
+      form_name: California voter registration
+      official_url: https://registertovote.ca.gov/
+      fields:
+        Name: "{{profile.name}}"
+        Address: "{{address}}"
+      instructions: Takes a few minutes. You will need your driver license or last 4 of your SSN (Handled does not store these).
+  - id: library
+    tool: open_url_prefilled
+    title: Get a free SF Public Library card (also unlocks museum passes)
+    needs_approval: true
+    due: today + 7 days
+    payload:
+      url: https://sfpl.org/
+  - id: rpp
+    tool: open_url_prefilled
+    title: Check Residential Parking Permit eligibility for your block
+    needs_approval: true
+    when: has_car
+    due: today + 14 days
+    payload:
+      url: https://www.sfmta.com/
+deadlines:
+  - title: Get a California driver license (10 days after residency)
+    due: move_in_date + 10 days
+    rule: ca_dmv_new_resident
+    when: out_of_state_license
+    remind_days_before: [3]
+  - title: Register your out-of-state car in California (20 days)
+    due: move_in_date + 20 days
+    rule: ca_dmv_new_resident
+    when: has_car
+    remind_days_before: [5]
+sample: |
+  I just moved to SF from Austin, signed my lease starting October 20. I brought my car and still have a Texas license.

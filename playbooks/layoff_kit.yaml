@@ -1,0 +1,181 @@
+id: layoff_kit
+pack: work
+title: Layoff kit
+pitch: One voice note becomes every deadline that starts the day you are laid off, plus the email to HR.
+depth: deep
+triggers:
+  documents: [termination letter, separation agreement, severance agreement, layoff notice]
+  phrases: [laid off, let go, terminated, last day, severance, RIF, my job was eliminated]
+required_fields:
+  employer_name: { type: string, label: Employer, get: extract or ask, profile: work.employer }
+  hr_email: { type: email, label: HR email, get: extract or ask, profile: work.hr_email }
+  termination_date: { type: date, label: Last day of employment, get: extract or ask }
+  coverage_end_date: { type: date, label: Date employer health coverage ends, get: extract or ask }
+  final_pay_received: { type: boolean, label: Final paycheck and PTO already received?, get: extract or ask, default: false }
+  has_equity: { type: boolean, label: Do you have stock options or RSUs?, get: extract or ask }
+  equity_window_days: { type: number, label: Days to exercise options after leaving (from your equity docs), get: extract or ask, optional: true }
+  on_work_visa: { type: boolean, label: Are you on a work visa?, get: ask, profile: work.visa, default: false }
+  visa_type: { type: string, label: Visa type, get: ask, optional: true }
+  i94_end_date: { type: date, label: I-94 end date, get: ask, optional: true }
+  warn_possible: { type: boolean, label: Was this part of a layoff of 50+ people at a company with 75+ employees?, get: extract or ask, optional: true }
+rules: [ca_final_pay, ca_edd_ui, cobra_election, covered_ca_sep, iso_post_termination, h1b_grace_period, warn_notice]
+guidance: >
+  Users often send this as a rushed voice note. Extract what you can, and ask only for what is missing
+  in one batch: usually coverage end date and whether they have equity. If they mention a visa, set
+  on_work_visa true and strongly recommend an immigration attorney right away. If coverage_end_date is
+  unknown and they cannot say, ask; many plans end coverage on the last day of the month, but do not assume it.
+  Every deadline you mention must come from plan_actions output.
+compute:
+  equity_deadline:
+    fn: add_days
+    args: { date: termination_date, days: equity_window_days }
+  visa:
+    fn: visa_grace
+    args: { termination_date: termination_date, i94_end_date: i94_end_date }
+actions:
+  - id: hr_email
+    tool: send_email
+    title: Email {{employer_name}} HR for final pay, PTO payout, separation papers and equity summary
+    needs_approval: true
+    due: today
+    waits_on_other_party: true
+    payload:
+      to: "{{hr_email}}"
+      cc: "{{profile.email}}"
+      subject: "Separation follow-up: {{profile.name}}"
+      body: |
+        Hi,
+
+        Following my separation from {{employer_name}} effective {{date termination_date}}, please send me the following:
+
+        1. My final paycheck, including all earned and unused vacation/PTO, with an itemized wage statement. California requires final wages at the time of discharge.
+        2. Written confirmation of my separation date and reason (layoff), and the EDD "For Your Benefit" pamphlet, for my unemployment claim.
+        3. My COBRA election notice and the exact date my health coverage ends.
+        4. An equity summary: vested and unvested shares, option type (ISO or NSO), strike price, and my post-termination exercise deadline.
+        5. Any severance agreement, with the deadline to sign it.
+        6. Whether this was part of a larger layoff, and if so a copy of any WARN notice.
+
+        Please also confirm the mailing address you have for my W-2.
+
+        Thank you,
+        {{profile.name}}
+  - id: edd_claim
+    tool: prepare_form
+    title: Prepare your EDD unemployment claim (you submit)
+    needs_approval: true
+    due: termination_date + 7 days
+    payload:
+      form_name: California EDD unemployment insurance claim
+      official_url: https://edd.ca.gov/en/unemployment/
+      fields:
+        Employer: "{{employer_name}}"
+        Last day worked: "{{termination_date}}"
+        Reason for separation: Laid off (lack of work)
+        Final pay received: "{{final_pay_received}}"
+      instructions: File online with a myEDD account. Benefits start the week you file and are not backdated, so file this week. Have your Social Security number and last 18 months of employer names and dates ready (Handled does not store these).
+  - id: health_compare
+    tool: prepare_form
+    title: Compare COBRA with a Covered California plan
+    needs_approval: true
+    due: coverage_end_date + 30 days
+    payload:
+      form_name: Covered California special enrollment (loss of coverage)
+      official_url: https://www.coveredca.com/
+      fields:
+        Qualifying event: Loss of job-based coverage
+        Coverage end date: "{{coverage_end_date}}"
+      instructions: COBRA keeps your exact plan but you pay the full premium. A Covered California plan may cost less, especially with income-based help after a layoff. You have 60 days after coverage ends for either.
+  - id: equity_review
+    tool: create_calendar_event
+    title: Decide whether to exercise options before the window closes
+    needs_approval: false
+    when: has_equity
+    due: termination_date + 1 months
+    payload:
+      title: "Equity decision: exercise window from {{employer_name}}"
+      date: "{{equity_deadline.date}}"
+      note: ISO treatment needs exercise within 3 months of leaving. Confirm with your equity administrator and a tax professional.
+  - id: visa_attorney
+    tool: prepare_form
+    title: Prepare a summary for an immigration attorney (today)
+    needs_approval: true
+    when: on_work_visa
+    due: today
+    payload:
+      form_name: Immigration attorney consult summary
+      official_url: https://www.uscis.gov/working-in-the-united-states
+      fields:
+        Visa type: "{{visa_type}}"
+        Employment ended: "{{termination_date}}"
+        Grace period may end: "{{visa.end_date}} ({{visa.basis}})"
+      instructions: This is information, not legal advice. Talk to an immigration attorney now; options like a new employer petition or change of status have to start inside the grace period.
+deadlines:
+  - title: Final paycheck with all unused PTO due
+    due: termination_date
+    rule: ca_final_pay
+    unless: final_pay_received
+  - title: Waiting-time penalty clock reaches its 30-day max
+    due: termination_date + 30 days
+    rule: ca_final_pay
+    unless: final_pay_received
+    note: If final pay is late, each day late can add a day of wages, up to 30 days.
+  - title: File your EDD unemployment claim (benefits are not backdated)
+    due: termination_date + 7 days
+    rule: ca_edd_ui
+    note: Handled's target date. EDD says to file as soon as you stop working.
+    remind_days_before: [2, 0]
+  - title: COBRA notice should have arrived (30 + 14 days)
+    due: termination_date + 44 days
+    rule: cobra_election
+    note: If no notice by now, contact the plan administrator.
+  - title: COBRA election window closes (earliest possible date)
+    due: coverage_end_date + 60 days
+    rule: cobra_election
+    note: Counted from coverage end; if your notice arrives later, the window runs 60 days from the notice.
+    remind_days_before: [14, 3]
+  - title: Covered California special enrollment closes
+    due: coverage_end_date + 60 days
+    rule: covered_ca_sep
+    remind_days_before: [14, 3]
+  - title: ISO tax treatment ends (3 months after leaving)
+    due: termination_date + 3 months
+    rule: iso_post_termination
+    when: has_equity
+    remind_days_before: [21, 7]
+  - title: Option exercise window closes (from your equity docs)
+    due: equity_deadline.date
+    rule: iso_post_termination
+    when: equity_window_days
+    remind_days_before: [21, 7, 2]
+  - title: Work visa grace period may end
+    due: visa.end_date
+    rule: h1b_grace_period
+    when: on_work_visa
+    note: "Talk to an immigration attorney now. Basis: {{visa.basis}}."
+    remind_days_before: [30, 14, 7]
+  - title: WARN notice period (60 days) check
+    due: termination_date
+    rule: warn_notice
+    when: warn_possible
+    note: If you got less than 60 days notice of a mass layoff, ask an employment attorney about back pay.
+followups:
+  - after_action: hr_email
+    wait: 3 days
+    check: Has {{employer_name}} sent final pay, PTO payout and your separation papers?
+    resolved_when: Final pay with PTO and separation documents received
+    escalate:
+      id: wage_claim
+      tool: prepare_form
+      title: Prepare a Labor Commissioner wage claim for unpaid final wages
+      needs_approval: true
+      due: today
+      payload:
+        form_name: California Labor Commissioner wage claim
+        official_url: https://www.dir.ca.gov/dlse/
+        fields:
+          Employer: "{{employer_name}}"
+          Separation date: "{{termination_date}}"
+          Claim: Unpaid final wages and vacation/PTO; waiting time penalties
+        instructions: Information, not legal advice. Confirm with the Labor Commissioner (DLSE) or an employment attorney.
+sample: |
+  Voice note: "I just got laid off from Northwind AI. Today was my last day. HR said my health insurance runs through the end of the month. I have stock options, the letter says I have 90 days to exercise. I'm on an H-1B."

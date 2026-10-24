@@ -1,0 +1,34 @@
+id: toll_text_check
+pack: car
+title: Is this toll text a scam?
+pitch: Compares the text with how Bay Area bridge tolls are billed and the official domain. Verdict in seconds.
+depth: standard
+triggers:
+  documents: [screenshot of a text message about tolls, FasTrak notice]
+  phrases: [toll, FasTrak, unpaid toll, toll violation, bridge toll text]
+required_fields:
+  message_text: { type: string, label: The text message, get: extract or ask }
+  links: { type: list, label: Links in the message, get: extract, optional: true }
+  due_date: { type: date, label: Due date if the notice is real, get: extract, optional: true }
+rules: [fastrak_billing]
+compute:
+  verdict:
+    fn: toll_text_check
+    args: { message_text: message_text, links: links }
+guidance: >
+  Lead with the verdict word. Never tell the user to tap the link. If likely real, plan a deadline from due_date.
+actions:
+  - id: official_site
+    tool: open_url_prefilled
+    title: Check your balance on the official FasTrak site instead of the link
+    needs_approval: true
+    due: today
+    payload:
+      url: https://www.bayareafastrak.org/
+deadlines:
+  - title: Toll invoice due (if real)
+    due: due_date
+    rule: fastrak_billing
+    when: verdict.likely_real
+sample: |
+  Got this text: "FasTrak: You have an unpaid toll of $6.99. Pay now to avoid a $50 late fee and DMV hold: https://bayareafastrak-tolls.com/pay"

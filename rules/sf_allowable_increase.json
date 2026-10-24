@@ -1,0 +1,46 @@
+{
+  "id": "sf_allowable_increase",
+  "title": "SF allowable annual rent increase",
+  "jurisdiction": "San Francisco",
+  "rule": "For rent-controlled units, the Rent Board sets the allowable annual increase for each March 1 to February 28 period, based on Bay Area CPI. Landlords may also impose increases they banked from earlier years when they did not raise the rent. Example from the Rent Board: $2,000.00 base rent at 1.6% becomes $2,032.00.",
+  "params": {
+    "rates": [
+      {
+        "start": "2022-03-01",
+        "end": "2023-02-28",
+        "rate": 2.3,
+        "status": "unverified"
+      },
+      {
+        "start": "2023-03-01",
+        "end": "2024-02-29",
+        "rate": 3.6,
+        "status": "unverified"
+      },
+      {
+        "start": "2024-03-01",
+        "end": "2025-02-28",
+        "rate": 1.7,
+        "status": "verified"
+      },
+      {
+        "start": "2025-03-01",
+        "end": "2026-02-28",
+        "rate": 1.4,
+        "status": "verified"
+      },
+      {
+        "start": "2026-03-01",
+        "end": "2027-02-28",
+        "rate": 1.6,
+        "status": "verified"
+      }
+    ]
+  },
+  "source_url": "https://www.sf.gov/reports--current-rates-including-rent-increase-relocation-sec-deposit",
+  "verify_phrase": "1.6%",
+  "status": "verified",
+  "last_verified": "2026-10-24",
+  "confirm_with": "SF Rent Board counseling (sf.gov/departments--rent-board)",
+  "notes": "2022-23 and 2023-24 rates come from a secondary source and are unverified. Banking rules were not verified today."
+}

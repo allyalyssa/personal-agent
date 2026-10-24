@@ -1,0 +1,88 @@
+id: rent_increase_check
+pack: renter
+title: Rent increase check
+pitch: Checks your building's year built in City data, the Rent Board's allowable rate and banked increases, and drafts your response.
+depth: standard
+triggers:
+  documents: [rent increase notice, notice of change in terms of tenancy]
+  phrases: [rent increase, raising my rent, new rent, rent going up]
+required_fields:
+  rental_address: { type: string, label: Rental address, get: extract or profile, profile: address }
+  current_rent: { type: number, label: Current monthly rent, get: extract or ask, profile: renter.monthly_rent }
+  new_rent: { type: number, label: New monthly rent, get: extract or ask }
+  effective_date: { type: date, label: Date the increase takes effect, get: extract or ask }
+  notice_date: { type: date, label: Date you received the notice, get: extract or ask }
+  landlord_name: { type: string, label: Landlord, get: extract or profile, profile: renter.landlord_name }
+  landlord_email: { type: email, label: Landlord email, get: extract or profile, profile: renter.landlord_email }
+  year_built: { type: number, label: Year the building was built, get: "lookup: query_datasf assessor" }
+  unit_type: { type: string, label: Building use (from Assessor), get: "lookup: query_datasf assessor", optional: true }
+  last_increase_date: { type: date, label: Date of your last rent increase (or move-in), get: ask, profile: renter.move_in_date }
+rules: [sf_allowable_increase, sf_rent_control_coverage]
+datasf: [assessor]
+guidance: >
+  Always call query_datasf assessor for the rental address and set year_built and unit_type from it, citing the dataset.
+  Rent control coverage is a likelihood, not a ruling. If the increase is within the limit, say so plainly and do not draft a dispute.
+compute:
+  check:
+    fn: rent_increase_check
+    args: { current_rent: current_rent, new_rent: new_rent, effective_date: effective_date, year_built: year_built, unit_type: unit_type, last_increase_date: last_increase_date }
+money_at_stake: check.overcharge_per_month
+actions:
+  - id: response
+    tool: send_email
+    title: Ask {{landlord_name}} to correct the increase to the allowable amount
+    needs_approval: true
+    when: check.overcharge_per_month
+    due: today
+    waits_on_other_party: true
+    payload:
+      to: "{{landlord_email}}"
+      subject: "Rent increase notice for {{rental_address}}"
+      body: |
+        Hello {{landlord_name}},
+
+        I received your notice dated {{date notice_date}} raising my rent from ${{$ current_rent}} to ${{$ new_rent}} ({{check.increase_percent}}%) effective {{date effective_date}}.
+
+        City Assessor records list this building as built in {{year_built}}, so the unit appears to be covered by San Francisco's rent increase limits. The Rent Board's allowable increase for this period is {{check.allowable_percent}}%{{check.banked_note}}. By my math:
+
+        {{check.math}}
+
+        Please send a corrected notice for no more than ${{$ check.max_allowed_rent}}, or explain the basis for the higher amount (for example, an approved capital improvement passthrough).
+
+        Thank you,
+        {{profile.name}}
+  - id: petition_prep
+    tool: prepare_form
+    title: Prepare Rent Board tenant petition information
+    needs_approval: true
+    when: check.overcharge_per_month
+    due: effective_date
+    payload:
+      form_name: SF Rent Board tenant petition (unlawful rent increase)
+      official_url: https://www.sf.gov/departments--rent-board
+      fields:
+        Address: "{{rental_address}}"
+        Current rent: "{{current_rent}}"
+        Noticed rent: "{{new_rent}}"
+        Effective date: "{{effective_date}}"
+        Year built (Assessor): "{{year_built}}"
+        Allowable increase: "{{check.allowable_percent}}%"
+      instructions: Talk to Rent Board counseling before filing. They can confirm coverage and banking.
+deadlines:
+  - title: Rent increase takes effect
+    due: effective_date
+    rule: sf_allowable_increase
+    remind_days_before: [7]
+followups:
+  - after_action: response
+    wait: 10 days
+    check: Did {{landlord_name}} send a corrected notice?
+    resolved_when: Corrected notice received or increase withdrawn
+    escalate:
+      tool: open_url_prefilled
+      title: Book Rent Board counseling before the increase takes effect
+      needs_approval: true
+      payload:
+        url: https://www.sf.gov/departments--rent-board
+sample: |
+  My landlord gave me a notice today raising my rent at 1000 Guerrero St from $3,400 to $3,600 starting January 1, 2027. My last increase was when I moved in, November 2023.

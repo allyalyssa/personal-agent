@@ -1,0 +1,39 @@
+{
+  "id": "sf_deposit_interest",
+  "title": "SF security deposit interest",
+  "jurisdiction": "San Francisco",
+  "rule": "San Francisco landlords must pay tenants simple (not compounded) interest on security deposits each year, at the rate the Rent Board sets for each March 1 to February 28 period. The rate is based on the prior calendar year average of the 90-day AA financial commercial paper rate. Example from the Rent Board: a $1,000 deposit at 5.0% earns $50.00.",
+  "params": {
+    "compounding": "simple",
+    "rates": [
+      {
+        "start": "2024-03-01",
+        "end": "2025-02-28",
+        "rate": 5.2,
+        "status": "verified"
+      },
+      {
+        "start": "2025-03-01",
+        "end": "2026-02-28",
+        "rate": 5,
+        "status": "verified"
+      },
+      {
+        "start": "2026-03-01",
+        "end": "2027-02-28",
+        "rate": 4.2,
+        "status": "verified"
+      }
+    ],
+    "rate_applied": "rate in effect on the date each annual payment came due (tenancy anniversary)",
+    "rate_applied_status": "unverified",
+    "citation": "SF Administrative Code Chapter 49",
+    "citation_status": "unverified"
+  },
+  "source_url": "https://www.sf.gov/reports--current-rates-including-rent-increase-relocation-sec-deposit",
+  "verify_phrase": "4.2%",
+  "status": "verified",
+  "last_verified": "2026-10-24",
+  "confirm_with": "SF Rent Board counseling (sf.gov/departments--rent-board)",
+  "notes": "Rates before March 2024 were not verified today and are left out; the engine reports those years as needing confirmation instead of guessing. Which period rate applies to a payment, and the exemption list, are not verified."
+}

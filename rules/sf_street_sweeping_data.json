@@ -1,0 +1,14 @@
+{
+  "id": "sf_street_sweeping_data",
+  "title": "SF street sweeping schedule data",
+  "jurisdiction": "San Francisco",
+  "rule": "Street sweeping schedules for each block side are published by the City on DataSF. Parking during posted sweeping hours can lead to a citation; repeated or long-term violations can lead to a tow.",
+  "params": {
+    "dataset": "yhqp-riqs"
+  },
+  "source_url": "https://data.sfgov.org/d/yhqp-riqs",
+  "verify_phrase": "Street Sweeping",
+  "status": "unverified",
+  "last_verified": null,
+  "confirm_with": "SFMTA"
+}
