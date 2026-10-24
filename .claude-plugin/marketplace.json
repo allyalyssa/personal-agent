@@ -1,0 +1,14 @@
+{
+  "name": "claude-workbench",
+  "description": "Personal Claude Code workbench: agent team, dashboard, second brain, natural writing.",
+  "owner": {
+    "name": "Amalfi"
+  },
+  "plugins": [
+    {
+      "name": "workbench",
+      "source": "./plugins/workbench",
+      "description": "Agent team, task-aware dashboard, local second brain and natural-writing skill for Claude Code."
+    }
+  ]
+}

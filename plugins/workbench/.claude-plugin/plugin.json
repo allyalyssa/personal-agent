@@ -1,0 +1,131 @@
+{
+  "name": "workbench",
+  "version": "0.2.0",
+  "description": "Agent team, task-aware dashboard pane, local Markdown second brain and natural-writing skill for Claude Code.",
+  "author": {
+    "name": "Amalfi"
+  },
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "brainPath": {
+      "type": "string",
+      "title": "Second brain folder",
+      "description": "Absolute path of the Markdown knowledge base. Empty means <home>/repos/second-brain.",
+      "required": false,
+      "default": ""
+    },
+    "injectMemories": {
+      "type": "boolean",
+      "title": "Attach relevant notes to prompts",
+      "description": "Search the second brain on each prompt and attach the few best matches as hidden context.",
+      "required": false,
+      "default": true
+    },
+    "maxMemoriesPerPrompt": {
+      "type": "number",
+      "title": "Notes attached per prompt",
+      "description": "Upper bound on second-brain notes attached to one prompt.",
+      "required": false,
+      "default": 3
+    },
+    "teamPolicy": {
+      "type": "boolean",
+      "title": "Team routing policy",
+      "description": "Add the agent-team routing and coordination rules to the system prompt.",
+      "required": false,
+      "default": true
+    },
+    "autoOpenDashboard": {
+      "type": "boolean",
+      "title": "Open dashboard at start",
+      "description": "Open the dashboard pane when a session starts (it stays closed on narrow terminals).",
+      "required": false,
+      "default": true
+    },
+    "maxParallelAgents": {
+      "type": "number",
+      "title": "Parallel agent limit",
+      "description": "Agent calls are refused while this many subagents are already running.",
+      "required": false,
+      "default": 3
+    },
+    "maxReviewRounds": {
+      "type": "number",
+      "title": "Review rounds per request",
+      "description": "How many critic or QA reviews one request may start.",
+      "required": false,
+      "default": 2
+    },
+    "taskBudgetUsd": {
+      "type": "number",
+      "title": "Budget per request (USD)",
+      "description": "Spend for one request before the plugin stops new subagents and research and asks Claude to wrap up. 0 turns it off.",
+      "required": false,
+      "default": 5
+    },
+    "sessionBudgetUsd": {
+      "type": "number",
+      "title": "Budget per session (USD)",
+      "description": "Warnings from usageWarnPercent of this; no new subagents past it. 0 turns it off.",
+      "required": false,
+      "default": 20
+    },
+    "reservePercent": {
+      "type": "number",
+      "title": "Reserve for the answer (%)",
+      "description": "The last part of a request's budget kept for verification and the final answer.",
+      "required": false,
+      "default": 15
+    },
+    "usageWarnPercent": {
+      "type": "number",
+      "title": "Warn at (%)",
+      "description": "Warn when the session budget or the account's five-hour or seven-day usage window reaches this.",
+      "required": false,
+      "default": 80
+    },
+    "maxSearchesPerRequest": {
+      "type": "number",
+      "title": "Web lookups per request",
+      "description": "WebSearch and WebFetch calls allowed in the main conversation per request.",
+      "required": false,
+      "default": 12
+    },
+    "compactAtPercent": {
+      "type": "number",
+      "title": "Compact at context (%)",
+      "description": "Compact the conversation after a turn once the context window is this full. 0 leaves it to Claude Code's own auto-compact.",
+      "required": false,
+      "default": 80
+    },
+    "downgradeUnderPressure": {
+      "type": "boolean",
+      "title": "Downgrade opus agents under pressure",
+      "description": "Run opus subagents on sonnet while account usage is past the warning level.",
+      "required": false,
+      "default": true
+    },
+    "ledger": {
+      "type": "boolean",
+      "title": "Task ledger",
+      "description": "Keep a resumable ledger per project in the second brain's _ledgers folder.",
+      "required": false,
+      "default": true
+    },
+    "requireReview": {
+      "type": "boolean",
+      "title": "Require review of larger code changes",
+      "description": "When a request edits reviewMinFiles or more code files and no critic or QA review ran, ask Claude to get one before finishing (once per request). Say 'no review' or 'quick' in a request to skip it.",
+      "required": false,
+      "default": true
+    },
+    "reviewMinFiles": {
+      "type": "number",
+      "title": "Files that trigger a review",
+      "description": "Code files edited in one request before a review is required.",
+      "required": false,
+      "default": 3
+    }
+  }
+}
