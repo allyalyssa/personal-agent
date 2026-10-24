@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { db, json } from './db.ts'
-import { now, today, evalFormula, addDays } from './clock.ts'
+import { now, today, evalFormula, addDays, at9 } from './clock.ts'
 import { playbook, type ActionSpec } from './playbooks.ts'
 import { rule, allRules } from './rules.ts'
 import { computeFns } from './compute.ts'
@@ -209,7 +209,8 @@ export function plan(caseId: string) {
   const money = p.money_at_stake ? Number(get(ctx, p.money_at_stake) ?? 0) : 0
   updateCase(caseId, { money_at_stake: money })
 
-  db.prepare(`delete from actions where case_id = ? and status = 'proposed'`).run(caseId)
+  // Keep drafts the agent tailored, extra actions it proposed, and escalations; replace only untouched playbook drafts.
+  db.prepare(`delete from actions where case_id = ? and status = 'proposed' and source = 'playbook' and coalesce(json_extract(payload, '$.revised'), 0) = 0`).run(caseId)
   db.prepare(`delete from deadlines where case_id = ? and kind = 'deadline' and done = 0`).run(caseId)
   db.prepare(`delete from jobs where case_id = ? and kind = 'reminder' and status = 'pending'`).run(caseId)
 
@@ -223,11 +224,11 @@ export function plan(caseId: string) {
     const info = db.prepare('insert into deadlines (case_id, title, due_at, rule_id, note) values (?, ?, ?, ?, ?)').run(caseId, render(d.title, ctx), due, d.rule ?? null, note)
     for (const n of d.remind_days_before ?? []) {
       const at = addDays(due, -n)
-      if (at >= today()) db.prepare(`insert into jobs (case_id, kind, run_at, payload) values (?, 'reminder', ?, ?)`).run(caseId, `${at}T09:00:00-07:00`, JSON.stringify({ deadline_id: Number(info.lastInsertRowid), days_before: n }))
+      if (at >= today()) db.prepare(`insert into jobs (case_id, kind, run_at, payload) values (?, 'reminder', ?, ?)`).run(caseId, at9(at), JSON.stringify({ deadline_id: Number(info.lastInsertRowid), days_before: n }))
     }
   }
 
-  const done = new Set((db.prepare(`select step from actions where case_id = ? and status != 'proposed'`).all(caseId) as any[]).map(a => a.step))
+  const done = new Set((db.prepare(`select step from actions where case_id = ? and step is not null`).all(caseId) as any[]).map(a => a.step))
   for (const a of p.actions) {
     if (done.has(a.id) || !applies(a, ctx)) continue
     insertAction(caseId, a, ctx)
@@ -254,7 +255,7 @@ export function scheduleFollowups(caseId: string, step: string) {
   for (const f of p.followups ?? []) {
     if (f.after_action !== step) continue
     const runAt = evalFormula(`today + ${f.wait}`, () => null)!
-    db.prepare(`insert into jobs (case_id, kind, run_at, payload) values (?, 'followup', ?, ?)`).run(caseId, `${runAt}T09:00:00-07:00`, JSON.stringify({ step, check: render(f.check, ctx), resolved_when: f.resolved_when }))
+    db.prepare(`insert into jobs (case_id, kind, run_at, payload) values (?, 'followup', ?, ?)`).run(caseId, at9(runAt), JSON.stringify({ step, check: render(f.check, ctx), resolved_when: f.resolved_when }))
     db.prepare(`insert into deadlines (case_id, title, due_at, kind, note) values (?, ?, ?, 'checkin', ?)`).run(caseId, `Check-in: ${render(f.check, ctx)}`, runAt, `Handled checks in automatically. Resolved when: ${f.resolved_when}`)
   }
 }

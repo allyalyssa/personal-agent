@@ -91,3 +91,33 @@ test('civic report has counts and no personal details', () => {
   assert.ok(!text.includes('Guerrero'))
   assert.ok(r.steps_with_no_online_path.some((s: any) => s.host === 'www.uscis.gov'))
 })
+
+test('review fixes: 311 ids and phones survive redaction, SSN labels do not', async () => {
+  const { redactDeep, redact } = await import('../server/redact.ts')
+  const out = redactDeep({ service_request_id: '202000208425', to: '14155551234', notes: 'my SSN: 123456789' })
+  assert.equal(out.service_request_id, '202000208425')
+  assert.equal(out.to, '14155551234')
+  assert.ok(!out.notes.includes('123456789'))
+  assert.ok(!redact('social security number 123 45 6789').includes('123 45 6789'))
+})
+
+test('review fixes: 9am Pacific follows daylight time', async () => {
+  const { at9 } = await import('../server/clock.ts')
+  assert.equal(at9('2026-10-30'), '2026-10-30T16:00:00.000Z')
+  assert.equal(at9('2026-11-10'), '2026-11-10T17:00:00.000Z')
+})
+
+test('review fixes: re-planning keeps tailored drafts, completing twice is refused', async () => {
+  const id = createCase('replan')
+  updateCase(id, { playbook: 'repair_request', pack: 'renter' })
+  prefillFromProfile(id)
+  setFields(id, { problem: 'leak', first_noticed: '2026-10-01' })
+  const first = plan(id).actions.find((a: any) => a.step === 'written_request')
+  db.prepare('update actions set payload = ? where id = ?').run(JSON.stringify({ ...first.payload, for_you: 'Pide la reparación', revised: true }), first.id)
+  const again = plan(id).actions.filter((a: any) => a.step === 'written_request')
+  assert.equal(again.length, 1)
+  assert.equal(again[0].payload.for_you, 'Pide la reparación')
+  await executeAction(again[0].id)
+  await completeAction(again[0].id)
+  await assert.rejects(completeAction(again[0].id))
+})

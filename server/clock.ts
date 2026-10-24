@@ -24,6 +24,14 @@ export function isoDate(d: Date) {
   return d.toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' })
 }
 
+// 9am Pacific on a date, with the right offset for daylight time.
+export function at9(date: string) {
+  const probe = new Date(`${date}T17:00:00Z`)
+  const name = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', timeZoneName: 'shortOffset' }).formatToParts(probe).find(p => p.type === 'timeZoneName')!.value
+  const hours = Number(name.replace('GMT', '') || 0)
+  return new Date(`${date}T09:00:00${hours < 0 ? '-' : '+'}${String(Math.abs(hours)).padStart(2, '0')}:00`).toISOString()
+}
+
 export function today() {
   return isoDate(now())
 }

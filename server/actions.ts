@@ -1,7 +1,8 @@
 import { db, json } from './db.ts'
-import { now, evalFormula } from './clock.ts'
+import { now, evalFormula, at9 } from './clock.ts'
 import { updateCase, logEvent, scheduleFollowups, getProfile } from './engine.ts'
 import { placeCall, finishCall } from './calls.ts'
+import { redact, redactDeep } from './redact.ts'
 
 export async function sendEmail(p: { to: string, subject: string, body: string, cc?: string }) {
   if (!process.env.RESEND_API_KEY) throw new Error('Email is not configured: set RESEND_API_KEY and EMAIL_FROM in .env')
@@ -54,6 +55,7 @@ export async function notifyUser(caseId: string, text: string) {
 
 function prefillUrl(p: { url: string, params?: Record<string, string> }) {
   const u = new URL(p.url)
+  if (u.protocol !== 'https:' && u.protocol !== 'http:') throw new Error(`Refusing a non-web link: ${u.protocol}`)
   for (const [k, v] of Object.entries(p.params ?? {})) u.searchParams.set(k, v)
   return u.toString()
 }
@@ -66,15 +68,15 @@ function handoff(tool: string, p: Record<string, any>) {
     if (p.cc) q.set('cc', p.cc)
     return { handoff: 'email', url: `mailto:${encodeURIComponent(p.to)}?${q.toString().replace(/\+/g, '%20')}` }
   }
-  if (tool === 'send_sms' && !process.env.TWILIO_ACCOUNT_SID) return { handoff: 'sms', url: `sms:${p.to}?&body=${encodeURIComponent(p.body ?? '')}` }
-  if (tool === 'place_call' && !process.env.VAPI_API_KEY) return { handoff: 'call', url: `tel:${p.to}` }
+  if (tool === 'send_sms' && !process.env.TWILIO_ACCOUNT_SID) return { handoff: 'sms', url: `sms:${encodeURIComponent(p.to)}?&body=${encodeURIComponent(p.body ?? '')}` }
+  if (tool === 'place_call' && !process.env.VAPI_API_KEY) return { handoff: 'call', url: `tel:${encodeURIComponent(p.to)}` }
   return null
 }
 
 export async function executeAction(id: number, edited?: Record<string, any>) {
   const a = db.prepare('select * from actions where id = ?').get(id) as any
   if (a.status !== 'proposed') throw new Error(`Action ${id} is ${a.status}`)
-  const payload = { ...json(a.payload, {} as Record<string, any>), ...(edited ?? {}) }
+  const payload = { ...json(a.payload, {} as Record<string, any>), ...redactDeep(edited ?? {}) }
   const manual = handoff(a.tool, payload)
   if (manual) {
     db.prepare(`update actions set status = 'handoff', payload = ?, result = ? where id = ?`).run(JSON.stringify(payload), JSON.stringify(manual), id)
@@ -96,7 +98,7 @@ export async function executeAction(id: number, edited?: Record<string, any>) {
     else if (a.tool === 'open_url_prefilled') result = { url: prefillUrl(payload as any) }
     else if (a.tool === 'schedule_followup') {
       const runAt = evalFormula(`today + ${payload.wait}`, () => null)
-      db.prepare(`insert into jobs (case_id, kind, run_at, payload) values (?, 'followup', ?, ?)`).run(a.case_id, `${runAt}T09:00:00-07:00`, JSON.stringify(payload))
+      db.prepare(`insert into jobs (case_id, kind, run_at, payload) values (?, 'followup', ?, ?)`).run(a.case_id, at9(runAt!), JSON.stringify(payload))
       result = { scheduled_for: runAt }
     }
     else throw new Error(`Unknown tool ${a.tool}`)
@@ -116,8 +118,10 @@ export async function executeAction(id: number, edited?: Record<string, any>) {
 
 // The user did the last step themself (sent the email, made the call). For a call, what they
 // heard becomes the outcome, exactly as an automated call's transcript would.
-export async function completeAction(id: number, notes?: string) {
+export async function completeAction(id: number, rawNotes?: string) {
   const a = db.prepare('select * from actions where id = ?').get(id) as any
+  if (a.status !== 'handoff') throw new Error(`Action ${id} is ${a.status}, not waiting on you`)
+  const notes = rawNotes ? redact(rawNotes) : undefined
   const payload = json(a.payload, {} as Record<string, any>)
   const result = { ...json(a.result, {}), completed_by: 'you', notes: notes ?? null }
   db.prepare(`update actions set status = 'done', result = ?, done_at = ? where id = ?`).run(JSON.stringify(result), now().toISOString(), id)

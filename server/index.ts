@@ -69,6 +69,7 @@ const routes: [string, RegExp, (m: RegExpMatchArray, req: IncomingMessage, res: 
   ['GET', /^\/api\/cases\/(\w+)$/, async (m, __, res) => send(res, 200, caseView(m[1]))],
   ['POST', /^\/api\/cases\/(\w+)\/reply$/, async (m, req, res) => {
     const b = await body(req)
+    if (getCase(m[1]).busy) return send(res, 409, { error: 'Handled is still working on this case' })
     reply(m[1], b).catch(e => console.error('reply', e))
     send(res, 200, { ok: true })
   }],
@@ -119,6 +120,7 @@ const routes: [string, RegExp, (m: RegExpMatchArray, req: IncomingMessage, res: 
   ['POST', /^\/api\/personas\/(\w+)$/, async (m, req, res) => {
     const b = await body(req)
     if (b.fresh) {
+      if (db.prepare('select 1 from cases where busy = 1').get()) return send(res, 409, { error: 'Wait for running cases to finish' })
       db.exec('delete from cases; delete from events; delete from actions; delete from deadlines; delete from jobs;')
       resetClock()
     }

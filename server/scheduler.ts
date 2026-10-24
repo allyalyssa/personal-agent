@@ -11,23 +11,36 @@ export async function runDueJobs() {
   const due = db.prepare(`select * from jobs where status = 'pending' and run_at <= ? order by run_at`).all(now().toISOString()) as any[]
   for (const job of due) {
     db.prepare(`update jobs set status = 'done' where id = ?`).run(job.id)
+    try {
+      await runJob(job)
+    } catch (e: any) {
+      // A failed check (network down on stage, say) is retried in an hour instead of being lost.
+      logEvent(job.case_id, 'error', `Scheduled ${job.kind} failed, retrying in an hour: ${e.message}`)
+      db.prepare(`insert into jobs (case_id, kind, run_at, payload) values (?, ?, ?, ?)`).run(job.case_id, job.kind, new Date(now().getTime() + 3600000).toISOString(), job.payload)
+    }
+  }
+  return due.length
+}
+
+async function runJob(job: any) {
+  {
     const c = getCase(job.case_id)
-    if (c.status === 'resolved') continue
+    if (c.status === 'resolved') return
     const payload = json(job.payload, {} as any)
 
     if (job.kind === 'reminder') {
       const d = db.prepare('select * from deadlines where id = ?').get(payload.deadline_id) as any
-      if (!d || d.done) continue
+      if (!d || d.done) return
       const when = payload.days_before === 0 ? 'today' : `in ${payload.days_before} day${payload.days_before === 1 ? '' : 's'}`
       await notifyUser(c.id, `Reminder: ${d.title} is due ${when} (${d.due_at}).`)
-      continue
+      return
     }
 
     if (job.kind === 'followup') {
       logEvent(c.id, 'checkin', `Check-in: ${payload.check}`, payload)
       if (!c.playbook) {
         await notifyUser(c.id, payload.check)
-        continue
+        return
       }
       const spec = playbook(c.playbook).followups?.find(f => f.after_action === payload.step)
       const requestId = spec?.check_311 ? c.fields[spec.check_311] : null
@@ -37,21 +50,21 @@ export async function runDueJobs() {
         if (s.found && s.status_description === 'Closed') {
           resolveCase(c.id, 0)
           await notifyUser(c.id, `The City closed your 311 report ${requestId}${s.status_notes ? `: ${s.status_notes}` : ''}. Thanks for fixing your block.`)
-          continue
+          return
         }
         db.prepare(`insert into jobs (case_id, kind, run_at, payload) values (?, 'followup', ?, ?)`).run(c.id, new Date(now().getTime() + 3 * 86400000).toISOString(), job.payload)
         await notifyUser(c.id, `311 request ${requestId} is still ${s.found ? s.status_description : 'not in City data yet'}. Handled checks again in 3 days.`)
-        continue
+        return
       }
       updateCase(c.id, { status: 'escalated' })
       if (spec?.escalate) {
         const id = insertAction(c.id, { ...spec.escalate, id: spec.escalate.id ?? `${payload.step}_escalation` }, context(c))
+        db.prepare(`update actions set source = 'escalation' where id = ?`).run(id)
         logEvent(c.id, 'escalate', `Escalated. Proposed next step: ${spec.escalate.title}`, { action_id: id })
       }
       await notifyUser(c.id, `No resolution yet on "${c.title}". ${spec?.escalate ? `Next step ready for your approval: ${spec.escalate.title}.` : payload.check}`)
     }
   }
-  return due.length
 }
 
 export function startScheduler() {

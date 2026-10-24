@@ -203,7 +203,7 @@ async function runTool(caseId: string, name: string, input: any): Promise<{ resu
   }
   if (name === 'compute') {
     const result = computeFns[input.fn](input.args)
-    logEvent(caseId, 'compute', `Computed ${input.fn}`, { args: input.args, result })
+    logEvent(caseId, 'compute', `Computed ${input.fn}`, redactDeep({ args: input.args, result }))
     return { result }
   }
   if (name === 'ask_user') {
@@ -228,7 +228,7 @@ async function runTool(caseId: string, name: string, input: any): Promise<{ resu
   if (name === 'revise_action') {
     const a = db.prepare('select * from actions where id = ? and case_id = ?').get(input.action_id, caseId) as any
     if (!a || a.status !== 'proposed') return { result: { error: 'No proposed action with that id' } }
-    const payload = { ...JSON.parse(a.payload), ...redactDeep(input.changes) }
+    const payload = { ...JSON.parse(a.payload), ...redactDeep(input.changes), revised: true }
     db.prepare('update actions set payload = ? where id = ?').run(JSON.stringify(payload), input.action_id)
     return { result: { ok: true, payload } }
   }
@@ -238,6 +238,8 @@ async function runTool(caseId: string, name: string, input: any): Promise<{ resu
     return { result: { ok: true } }
   }
   if (name === 'open_case') {
+    const child = db.prepare(`select 1 from events where case_id = ? and kind = 'route' and title like 'Opened from %'`).get(caseId)
+    if (child) return { result: { error: 'This case was itself opened by Handled; mention the obligation instead of opening another case.' } }
     const opened = db.prepare(`select count(*) n from events where case_id = ? and kind = 'opened_case'`).get(caseId) as any
     if (opened.n >= 6) return { result: { error: 'Already opened 6 cases from this capture' } }
     playbook(input.playbook_id)
@@ -260,7 +262,11 @@ async function runTool(caseId: string, name: string, input: any): Promise<{ resu
 export async function runAgent(caseId: string, userContent: Anthropic.Beta.BetaContentBlockParam[]) {
   updateCase(caseId, { busy: 1, questions: null })
   const c = getCase(caseId)
-  const messages: Anthropic.Beta.BetaMessageParam[] = [...c.messages, { role: 'user', content: userContent }]
+  // A restart mid-tool can leave the last assistant turn with unanswered tool calls; answer them so the history stays valid.
+  const last = c.messages.at(-1)
+  const pending = last?.role === 'assistant' && Array.isArray(last.content) ? last.content.filter((b: any) => b.type === 'tool_use') : []
+  const interrupted = pending.map((b: any) => ({ type: 'tool_result' as const, tool_use_id: b.id, content: 'Interrupted before this tool finished.', is_error: true }))
+  const messages: Anthropic.Beta.BetaMessageParam[] = [...c.messages, { role: 'user', content: [...interrupted, ...userContent] }]
   try {
     for (let turn = 0; turn < 16; turn++) {
       const res = await client.beta.messages.create({
@@ -316,6 +322,11 @@ export async function runAgent(caseId: string, userContent: Anthropic.Beta.BetaC
         })
         messages.push({ role: 'assistant', content: r.content as any })
         updateCase(caseId, { messages })
+        const text = r.content.filter(b => b.type === 'text').map(b => (b as any).text).join('\n').trim()
+        if (text) {
+          updateCase(caseId, { summary: redact(text) })
+          logEvent(caseId, 'agent', redact(text))
+        }
         break
       }
     }

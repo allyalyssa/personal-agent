@@ -5,6 +5,7 @@ let lastNotification = Number(sessionStorage.getItem('lastNotification') ?? 0)
 let caseTimer = null
 let editing = new Set()
 
+const safeUrl = u => /^(https?:|mailto:|sms:|tel:)/i.test(String(u ?? '')) ? u : '#'
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
 const usd = n => `$${Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`
 const usd2 = n => `$${Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -239,9 +240,9 @@ function actionBody(a, isEditing) {
       <div class="small"><strong>${markPlaceholders(p.form_name)}</strong></div>
       <dl class="kv" style="margin-top:8px">${fields.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${markPlaceholders(typeof v === 'object' ? JSON.stringify(v) : v)} <button class="copy" data-copy="${esc(typeof v === 'object' ? JSON.stringify(v) : v)}">copy</button></dd>`).join('')}</dl>
       ${p.instructions ? `<p class="small muted">${markPlaceholders(p.instructions)}</p>` : ''}
-      ${p.official_url ? `<p class="small">Official site: <a href="${esc(p.official_url)}" target="_blank" rel="noopener">${esc(p.official_url)}</a></p>` : ''}`
+      ${p.official_url ? `<p class="small">Official site: <a href="${esc(safeUrl(p.official_url))}" target="_blank" rel="noopener">${esc(p.official_url)}</a></p>` : ''}`
   }
-  if (a.tool === 'open_url_prefilled') return `<p class="small"><a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.url)}</a>${p.search_for ? `<br>Search for: ${markPlaceholders(p.search_for)}` : ''}${p.bring ? `<br>Bring: ${esc(p.bring)}` : ''}</p>`
+  if (a.tool === 'open_url_prefilled') return `<p class="small"><a href="${esc(safeUrl(p.url))}" target="_blank" rel="noopener">${esc(p.url)}</a>${p.search_for ? `<br>Search for: ${markPlaceholders(p.search_for)}` : ''}${p.bring ? `<br>Bring: ${esc(p.bring)}` : ''}</p>`
   if (a.tool === 'create_calendar_event') return `<p class="small">${markPlaceholders(p.title)} on ${esc(p.date ? prettyDate(p.date) : '')}</p>`
   if (a.tool === 'schedule_followup') return `<p class="small">In ${esc(p.wait)}: ${markPlaceholders(p.check)}</p>`
   return `<pre class="small">${esc(JSON.stringify(p, null, 2))}</pre>`
@@ -265,7 +266,7 @@ function callResult(a, events) {
         <dt>Next</dt><dd>${esc(o.next_step)}</dd>
         ${(o.fields ?? []).map(f => `<dt>${esc(f.key)}</dt><dd>${esc(f.value)}</dd>`).join('')}
       </dl>
-      ${r.recording_url ? `<p class="small"><a href="${esc(r.recording_url)}" target="_blank" rel="noopener">Recording</a></p>` : ''}
+      ${r.recording_url ? `<p class="small"><a href="${esc(safeUrl(r.recording_url))}" target="_blank" rel="noopener">Recording</a></p>` : ''}
       <details><summary class="small">Transcript</summary><div class="transcript-box">${esc(r.transcript)}</div></details>
     </div>`
 }
@@ -288,12 +289,12 @@ function actionCard(a, events) {
       ${a.status === 'failed' && a.result?.error ? `<p class="small" style="color:var(--danger)">${esc(a.result.error)}</p>` : ''}
       ${a.status === 'handoff' ? `
         <div class="stack" style="margin-top:10px">
-          <a class="primary" style="display:block;text-align:center;text-decoration:none" href="${esc(a.result.url)}">${esc(t('open_phone'))}</a>
+          <a class="primary" style="display:block;text-align:center;text-decoration:none" href="${esc(safeUrl(a.result.url))}">${esc(t('open_phone'))}</a>
           ${a.tool === 'place_call' ? `<textarea data-notes="${a.id}" rows="3" placeholder="${esc(t('what_they_said'))}" style="width:100%;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:10px"></textarea>` : ''}
           <button class="ghost" data-complete="${a.id}">${esc(t('i_did_it'))}</button>
         </div>` : ''}
       ${a.tool === 'place_call' ? callResult(a, events) : ''}
-      ${a.tool === 'open_url_prefilled' && a.status === 'done' ? `<p class="small"><a href="${esc(a.result.url)}" target="_blank" rel="noopener">Open</a></p>` : ''}
+      ${a.tool === 'open_url_prefilled' && a.status === 'done' ? `<p class="small"><a href="${esc(safeUrl(a.result.url))}" target="_blank" rel="noopener">Open</a></p>` : ''}
       ${proposed ? `
         ${blocked && !isEditing ? `<p class="small" style="color:var(--warn)">Fill in the highlighted parts before approving.</p>` : ''}
         <div class="row" style="margin-top:10px">
@@ -306,7 +307,7 @@ function actionCard(a, events) {
 
 function eventLine(e) {
   const d = new Date(e.at)
-  const extra = e.kind === 'data' && e.detail?.sources ? ` <a class="small" href="${esc(e.detail.sources.at(-1))}" target="_blank" rel="noopener">data</a>` : ''
+  const extra = e.kind === 'data' && e.detail?.sources ? ` <a class="small" href="${esc(safeUrl(e.detail.sources.at(-1)))}" target="_blank" rel="noopener">data</a>` : ''
   return `<li class="${esc(e.kind)}"><div class="small">${esc(e.title)}${extra}</div><div class="tiny muted">${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} ${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</div></li>`
 }
 
@@ -317,7 +318,7 @@ function computedHeadline(c) {
       <div class="muted small">Your landlord owes you</div>
       <div class="headline-money">${usd2(i.total_owed)}</div>
       <ul class="small" style="padding-left:18px;margin:6px 0">${i.years.map(y => `<li>${esc(y.math)}</li>`).join('')}</ul>
-      <div class="small muted">Next payment: ${usd2(i.next_payment.interest)} due ${esc(prettyDate(i.next_payment.due_date))}. Rates: <a href="${esc(i.source_url)}" target="_blank" rel="noopener">SF Rent Board</a>, checked ${esc(i.last_verified)}.</div>
+      <div class="small muted">Next payment: ${usd2(i.next_payment.interest)} due ${esc(prettyDate(i.next_payment.due_date))}. Rates: <a href="${esc(safeUrl(i.source_url))}" target="_blank" rel="noopener">SF Rent Board</a>, checked ${esc(i.last_verified)}.</div>
       ${i.years_needing_confirmation.length ? `<div class="small" style="color:var(--warn)">Not counted (rate not verified): ${esc(i.years_needing_confirmation.join('; '))}. Ask the Rent Board.</div>` : ''}
     </div>`
   const chk = c.computed?.check
@@ -402,7 +403,7 @@ async function renderCase(id, auto = false) {
       <div class="stack">${c.rules.map(r => `
         <details class="card"><summary class="small"><strong>${esc(r.title)}</strong> <span class="chip ${esc(r.status)}">${esc(r.status)}${r.last_verified ? ` ${esc(r.last_verified)}` : ''}</span></summary>
           <p class="small">${esc(r.rule)}</p>
-          <p class="small muted">Source: <a href="${esc(r.source_url)}" target="_blank" rel="noopener">${esc(r.source_url)}</a><br>Confirm with: ${esc(r.confirm_with)}${r.notes ? `<br>${esc(r.notes)}` : ''}</p>
+          <p class="small muted">Source: <a href="${esc(safeUrl(r.source_url))}" target="_blank" rel="noopener">${esc(r.source_url)}</a><br>Confirm with: ${esc(r.confirm_with)}${r.notes ? `<br>${esc(r.notes)}` : ''}</p>
           <p class="tiny muted">Information with sources, not legal, tax, immigration or medical advice.</p>
         </details>`).join('')}</div>` : ''}
     <h2>${esc(t('timeline'))}</h2>
