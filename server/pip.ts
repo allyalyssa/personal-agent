@@ -132,6 +132,7 @@ export async function nudges(force = false) {
       },
       recipe: m.recipe ? { name: m.recipe.name, url: m.recipe.url, minutes: m.recipe.minutes, servings: m.recipe.servings, kcal: m.recipe.kcal, ingredients: m.recipe.ingredients } : null,
       plate: m.recipe ? null : m.items.map((i: any) => `${i.servings} x ${i.name} (${i.serving})`),
+      sides: m.recipe && m.items.length ? m.items.map((i: any) => `${i.servings} x ${i.name.toLowerCase()}`) : [],
       store,
       kcal_target: m.kcal_target,
       eat_out: out ? { ...out, time_text: out.time ? clock(toMin(out.time)) : null, leave_text: out.leave != null ? clock(out.leave) : null, back_text: out.back != null ? clock(out.back) : null } : null

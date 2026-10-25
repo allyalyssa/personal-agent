@@ -505,7 +505,16 @@ export function allowedFoods(args: Limits) {
   })
 }
 
-const MEAL_SHARE: Record<string, number> = { breakfast: 0.25, lunch: 0.35, dinner: 0.30, snack: 0.10 }
+const IRON_SIDES = ['lentils', 'black_beans', 'spinach', 'sardines', 'tofu', 'ground_beef']
+const MAX_SHOPPING = 25
+const PANTRY = /\b(salt|water|oil|spray|vinegar|sugar|spices?|seasoning|flakes|cumin|paprika|cayenne|oregano|thyme|cinnamon|extract|powder)\b|(?<!bell |green |red |yellow )\bpepper/
+
+function foodFor(text: string) {
+  if (PANTRY.test(text)) return undefined
+  return FOODS.foods.find(f => f.match.some(m => text.includes(m)) && !f.exclude.some(x => text.includes(x)))
+}
+
+const MEAL_SHARE:Record<string, number> = { breakfast: 0.25, lunch: 0.35, dinner: 0.30, snack: 0.10 }
 const RECIPE_MEAL: Record<string, string> = { breakfast: 'breakfast', lunch: 'main', dinner: 'main', snack: 'snack' }
 
 type Budget = { kcal: number, protein: number | null, fiber: number | null, sodium: number, carbs: number | null, satFat: number | null }
@@ -676,15 +685,29 @@ export function mealPlan(args: { targets: any, nearby?: any, diet?: any, allergi
   let after = 0
   const usedPlaces = new Set<string>()
   const places = (args.nearby?.restaurants ?? []).map((p: any) => ({ ...p, cuisines: placeCuisines(p) }))
-  const planned = day.map(m => {
+  const sideItems: typeof day[number]['items'] = []
+  if (tg.priority.includes('iron') && pool.length) {
+    const ironFood = foods.filter(f => IRON_SIDES.includes(f.id)).sort((a, b) => score(b, 'side') - score(a, 'side') || a.id.localeCompare(b.id))[0]
+    const cFood = foods.filter(f => f.n.vitamin_c >= 50 && (f.roles.includes('veg') || f.roles.includes('fruit'))).sort((a, b) => score(b, 'side') - score(a, 'side') || b.n.vitamin_c - a.n.vitamin_c)[0]
+    if (ironFood && cFood) {
+      const ironServings = Math.max(0.5, Math.min(1, round(120 / ironFood.n.kcal, 0.5)))
+      sideItems.push({ id: ironFood.id, name: ironFood.name, role: 'iron_side', servings: ironServings, serving: ironFood.serving })
+      sideItems.push({ id: cFood.id, name: cFood.name, role: 'vitamin_c_side', servings: 1, serving: cFood.serving })
+    }
+  }
+  const sideKcal = sideItems.reduce((s, i) => s + byId[i.id].n.kcal * i.servings, 0)
+  const sideSodium = sideItems.reduce((s, i) => s + (byId[i.id].n.sodium ?? 0) * i.servings, 0)
+  const hostIndex = Math.max(0, meals.findIndex(m => m.meal === 'lunch'))
+
+  const picked = day.map((m, n) => {
     const before = after
     const share = MEAL_SHARE[m.meal] / shareTotal
     const kcal = target * share
     const budget: Budget = {
-      kcal,
+      kcal: kcal - (n === hostIndex && !tg.no_calorie_target ? sideKcal : 0),
       protein: tg.protein ? tg.protein.target * share : null,
       fiber: tg.needs.fiber ? tg.needs.fiber * share : null,
-      sodium: tg.sodium_limit_mg * share,
+      sodium: tg.sodium_limit_mg * share - (n === hostIndex ? sideSodium : 0),
       carbs: tg.carbs_limited ? tg.carbs_g * share : null,
       satFat: tg.sat_fat_limit_g != null ? tg.sat_fat_limit_g * share : null
     }
@@ -738,7 +761,7 @@ export function mealPlan(args: { targets: any, nearby?: any, diet?: any, allergi
       ...m,
       ...timing,
       kcal_target,
-      items: [],
+      items: [] as typeof sideItems,
       recipe: {
         id: r.id, name: r.name, url: r.url, cuisines: r.cuisines, main: r.main, minutes: r.minutes, rating: r.rating, reviews: r.reviews,
         servings,
@@ -752,9 +775,18 @@ export function mealPlan(args: { targets: any, nearby?: any, diet?: any, allergi
       }
     }
   })
-  const plates = planned.filter(m => !m.recipe)
+  if (picked[hostIndex].recipe) picked[hostIndex].items = sideItems
+
+  const foodIds = (m: typeof picked[number]) => [...new Set<string>([...m.items.map(i => i.id), ...(m.recipe?.ingredients ?? []).map(i => foodFor(i.item.toLowerCase())?.id).filter(Boolean) as string[]])]
+  const planned = picked.map(m => ({
+    ...m,
+    deals: foodIds(m).filter(id => deals[id]?.length).map(id => {
+      const d = deals[id][0]
+      return { food: byId[id].name, price_text: d.price_text, store: d.store ?? d.merchant, walk_minutes: d.walk_minutes }
+    })
+  }))
   const recipes = planned.flatMap(m => m.recipe ? [m.recipe] : [])
-  const plateTotal = (key: string) => plates.reduce((s, m) => s + m.items.reduce((t, i) => t + (byId[i.id].n[key] ?? 0) * i.servings, 0), 0)
+  const plateTotal = (key: string) => planned.reduce((s, m) => s + m.items.reduce((t, i) => t + (byId[i.id].n[key] ?? 0) * i.servings, 0), 0)
   const recipeTotal: Record<string, (r: any) => number> = { kcal: r => r.kcal ?? 0, protein: r => r.protein_g, fiber: r => r.fiber_g, sodium: r => r.sodium_mg }
 
   const keys = recipes.length ? ['kcal', 'protein', 'fiber'] : ['kcal', 'protein', 'fiber', 'iron', 'calcium', 'vitamin_c', 'potassium', 'magnesium', 'folate', 'b12', 'vitamin_d']
@@ -771,23 +803,32 @@ export function mealPlan(args: { targets: any, nearby?: any, diet?: any, allergi
   }))
 
   const pairs: string[] = []
-  for (const m of plates) {
-    const iron = m.items.find(i => byId[i.id].n.iron >= 3)
+  for (const m of planned) {
+    const iron = m.items.find(i => byId[i.id].n.iron >= 2.5)
     const c = m.items.find(i => byId[i.id].n.vitamin_c >= 50)
     if (iron && c) pairs.push(`${m.meal}: ${byId[iron.id].name.toLowerCase()} with ${byId[c.id].name.toLowerCase()}, so the vitamin C helps you absorb the iron`)
   }
 
-  const chosen = [...new Set(plates.flatMap(m => m.items.map(i => i.id)))]
+  const toBuy = new Map<string, { name: string, search: string }>()
+  for (const id of new Set(planned.flatMap(m => m.items.map(i => i.id)))) toBuy.set(id, { name: byId[id].name, search: byId[id].search })
+  for (const r of recipes) for (const i of r.ingredients) {
+    const text = i.item.toLowerCase()
+    if (PANTRY.test(text)) continue
+    const food = foodFor(text)
+    const name = text.split(/,| or /)[0].trim()
+    const key = food?.id ?? name
+    if (name && !toBuy.has(key)) toBuy.set(key, { name: food?.name ?? name, search: food?.search ?? name })
+  }
   const delivery = args.delivery === true || /^(y|yes|sí|si|sim|true)/i.test(String(args.delivery ?? ''))
-  const shopping = chosen.map(id => {
+  const shopping = [...toBuy].map(([id, b]) => {
     const best = (deals[id] ?? [])[0] ?? null
     return {
       id,
-      name: byId[id].name,
+      name: b.name,
       deal: best ? { item: best.item, price: best.price, price_text: best.price_text, store: best.store ?? best.merchant, walk_minutes: best.walk_minutes, valid_to: best.valid_to, image: best.image } : null,
-      order_url: delivery ? `https://www.instacart.com/store/s?k=${encodeURIComponent(byId[id].search)}` : null
+      order_url: delivery ? `https://www.instacart.com/store/s?k=${encodeURIComponent(b.search)}` : null
     }
-  })
+  }).sort((a, b) => Number(!!b.deal) - Number(!!a.deal)).slice(0, MAX_SHOPPING)
   const onSale = shopping.filter(s => s.deal)
   const expiring = onSale.filter(s => s.deal!.valid_to).sort((a, b) => a.deal!.valid_to.localeCompare(b.deal!.valid_to))[0] ?? null
   const shoppingText = [

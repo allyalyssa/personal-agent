@@ -251,7 +251,7 @@ export function plan(caseId: string) {
     const due = evalFormula(d.due, lookup)
     if (!due) continue
     const r = d.rule ? rule(d.rule) : null
-    const note = [d.note ? render(d.note, ctx) : null, r ? `${r.status === 'verified' ? 'Verified' : 'Unverified'}: ${r.source_url}. Confirm with ${r.confirm_with}.` : null].filter(Boolean).join(' ')
+    const note = [d.note ? render(d.note, ctx) : null, r ? `Confirm with ${r.confirm_with}.` : null].filter(Boolean).join(' ')
     const info = db.prepare('insert into deadlines (case_id, title, due_at, rule_id, note) values (?, ?, ?, ?, ?)').run(caseId, render(d.title, ctx), due, d.rule ?? null, note)
     for (const n of d.remind_days_before ?? []) {
       const at = addDays(due, -n)

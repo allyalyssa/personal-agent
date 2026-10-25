@@ -11,7 +11,13 @@ import { db } from './db.ts'
 import { bodyFacts } from './nutrition.ts'
 
 // Without Claude, a few playbooks can still read plain facts (numbers, units, keywords) out of what the person said.
-const offlineExtractors: Record<string, (text: string) => Record<string, any>> = { body_facts: bodyFacts }
+const offlineExtractors: Record<string, (text: string) => Record<string, any>> = {
+  body_facts: bodyFacts,
+  citation: text => {
+    const n = text.match(/\b(?:citation|ticket|multa|citación)\s*(?:number|no\.?|#|número)?\s*:?\s*(\d{9,11})\b/i) ?? text.match(/\b(\d{10})\b/)
+    return n ? { citation_number: n[1] } : {}
+  }
+}
 
 type Tool = Anthropic.Beta.BetaTool
 
@@ -435,9 +441,9 @@ async function askMissing(caseId: string) {
   }
   updateCase(caseId, { questions: null })
   await runLookups(caseId)
-  const v = plan(caseId)
-  const lines = v.deadlines.slice(0, 6).map((d: any) => `${d.due_at}: ${d.title}`)
-  updateCase(caseId, { summary: `Planned ${v.actions.filter((x: any) => x.status === 'proposed').length} actions.${lines.length ? '\n' + lines.join('\n') : ''}` })
+  plan(caseId)
+  // Without Claude there is no written summary; the case page shows the steps and dates itself.
+  updateCase(caseId, { summary: null })
 }
 
 export async function intakeOffline(caseId: string, text: string) {

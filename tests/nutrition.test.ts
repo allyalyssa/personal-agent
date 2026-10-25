@@ -5,7 +5,7 @@ process.env.HANDLED_DB = ':memory:'
 delete process.env.ANTHROPIC_API_KEY
 const { loadRules } = await import('../server/rules.ts')
 const { loadPlaybooks } = await import('../server/playbooks.ts')
-const { nutritionTargets, mealPlan, parseHeight, parseWeight, parseTimes, allowedFoods, allowedRecipes, amount } = await import('../server/nutrition.ts')
+const { nutritionTargets, mealPlan, parseHeight, parseWeight, parseTimes, allowedFoods, allowedRecipes, amount, FOODS } = await import('../server/nutrition.ts')
 const { routeByTriggers } = await import('../server/agent.ts')
 const { createCase, updateCase, setFields, plan, setProfile, prefillFromProfile } = await import('../server/engine.ts')
 const { readFileSync } = await import('node:fs')
@@ -110,11 +110,13 @@ test('each meal gets a recipe sized to its share of the day', () => {
   const ids = p.meals.map((m: any) => m.recipe?.id)
   assert.ok(ids.every(Boolean), JSON.stringify(p.meals.map((m: any) => [m.meal, m.recipe?.name])))
   assert.equal(new Set(ids).size, ids.length)
-  for (const m of p.meals) assert.ok(Math.abs(m.recipe.kcal - m.kcal_target) <= m.kcal_target * 0.25, `${m.meal} ${m.recipe.kcal} vs ${m.kcal_target}`)
+  const sides = (m: any, key: string) => m.items.reduce((s: number, i: any) => s + FOODS.foods.find((f: any) => f.id === i.id)!.n[key] * i.servings, 0)
+  for (const m of p.meals) assert.ok(Math.abs(m.recipe.kcal + sides(m, 'kcal') - m.kcal_target) <= m.kcal_target * 0.25, `${m.meal} ${m.recipe.kcal} + sides vs ${m.kcal_target}`)
+  assert.ok(p.meals.find((m: any) => m.meal === 'lunch').items.length === 2, 'anemia: lunch carries the iron and vitamin C sides')
   assert.deepEqual(p.meals.map((m: any) => m.kcal_target), [400, 560, 480, 160])
   assert.ok(p.meals.every((m: any) => m.recipe.minutes <= 45 && m.recipe.url.startsWith('https://www.food.com/recipe/')))
   assert.deepEqual(p.coverage.map((c: any) => c.key), ['kcal', 'protein', 'fiber', 'sodium'])
-  for (const m of p.meals) assert.ok(m.recipe.sodium_mg <= t.sodium_limit_mg * ({ breakfast: 0.25, lunch: 0.35, dinner: 0.30, snack: 0.10 } as any)[m.meal] + 10, `${m.meal} sodium ${m.recipe.sodium_mg}`)
+  for (const m of p.meals) assert.ok(m.recipe.sodium_mg + sides(m, 'sodium') <= t.sodium_limit_mg * ({ breakfast: 0.25, lunch: 0.35, dinner: 0.30, snack: 0.10 } as any)[m.meal] + 10, `${m.meal} sodium ${m.recipe.sodium_mg} + sides`)
 })
 
 test('high blood pressure, diabetes and high cholesterol keep each recipe under its share of the limit', () => {
@@ -130,6 +132,39 @@ test('high blood pressure, diabetes and high cholesterol keep each recipe under 
     assert.ok(m.recipe.carbs_g <= t.carbs_g * share[m.meal] + 1, `${m.meal} carbs ${m.recipe.carbs_g}`)
     assert.ok(m.recipe.sat_fat_g <= t.sat_fat_limit_g * share[m.meal] + 0.5, `${m.meal} sat fat ${m.recipe.sat_fat_g}`)
   }
+})
+
+test('a deal on a recipe ingredient shows on the shopping list and on that meal', () => {
+  const t: any = nutritionTargets({ age: 35, sex: 'male', height: '178 cm', weight: '80 kg', goal: 'maintain' })
+  const args = { targets: t, meal_times: '8am, 1pm, 7pm', max_cook_minutes: 45 }
+  const base: any = mealPlan({ ...args, nearby: {} })
+  const meal = base.meals.find((m: any) => m.recipe.ingredients.some((i: any) => FOODS.foods.some(f => f.match.some(w => i.item.toLowerCase().includes(w)) && !f.exclude.some(w => i.item.toLowerCase().includes(w)))))
+  const text = meal.recipe.ingredients.map((i: any) => i.item.toLowerCase()).join(' | ')
+  const food = FOODS.foods.find(f => f.match.some(w => text.includes(w)) && !f.exclude.some(w => text.includes(w)))!
+  const nearby = { deals: { [food.id]: [{ item: food.name, price: 1.5, price_text: '$1.50 lb', store: 'Safeway', walk_minutes: 4, valid_to: '2026-10-28T06:59:59+00:00' }] }, stores: [], markets: [] }
+  const p: any = mealPlan({ ...args, nearby })
+  const line = p.shopping.find((s: any) => s.id === food.id)
+  assert.equal(line.deal.store, 'Safeway')
+  assert.ok(p.on_sale_count >= 1)
+  assert.ok(p.shopping_text.includes('Safeway $1.50 lb (4 min walk)'))
+  assert.ok(p.meals.some((m: any) => m.deals.some((d: any) => d.food === food.name && d.store === 'Safeway' && d.walk_minutes === 4 && d.price_text === '$1.50 lb')))
+  assert.ok(p.shopping.some((s: any) => !s.deal), 'ingredients without a food still listed')
+  assert.ok(!p.shopping.some((s: any) => /^(salt|water|pepper)$/.test(s.name)))
+  assert.ok(p.shopping.length <= 25)
+})
+
+test('an anemic profile with recipes gets one iron side with vitamin C and a pairs line', () => {
+  const t: any = nutritionTargets({ age: 29, sex: 'female', height: '165 cm', weight: '62 kg', exercise: 'lift 3x a week', goal: 'lose', conditions: 'anemia' })
+  const p: any = mealPlan({ targets: t, nearby: {}, meal_times: '8am, 1pm, 8pm', max_cook_minutes: 45 })
+  const sides = p.meals.flatMap((m: any) => m.items)
+  assert.equal(sides.length, 2)
+  assert.ok(p.meals.every((m: any) => m.recipe))
+  assert.equal(p.pairs.length, 1)
+  assert.match(p.pairs[0], /^lunch: .+ with .+, so the vitamin C helps you absorb the iron$/)
+  const kcal = p.coverage.find((c: any) => c.key === 'kcal')
+  assert.ok(Math.abs(kcal.have - t.calories) / t.calories < 0.15, `${kcal.have} vs ${t.calories}`)
+  const plain: any = mealPlan({ targets: nutritionTargets({ age: 35, sex: 'male', height: '178 cm', weight: '80 kg' }), nearby: {}, meal_times: '8am, 1pm, 8pm', max_cook_minutes: 45 })
+  assert.deepEqual(plain.pairs, [])
 })
 
 test('recipes respect diet, allergies and celiac line by line', () => {

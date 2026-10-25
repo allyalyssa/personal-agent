@@ -41,6 +41,7 @@ async function load() {
         ${m.quicker_because ? `<div class="note">Picked a quicker recipe to fit around ${esc(m.quicker_because.join(', '))}.</div>` : ''}
         ${m.no_time_because ? `<div class="note warn">No time to shop and cook around ${esc(m.no_time_because.join(', '))}.</div>` : ''}
         ${m.recipe ? recipe(m.recipe) : `<ul>${m.items.map(i => `<li>${esc(i.servings)} x ${esc(i.name)} (${esc(i.serving)})</li>`).join('')}</ul>`}
+        ${m.recipe && m.items.length ? `<div class="note">On the side: ${m.items.map(i => `${esc(i.servings)} x ${esc(i.name.toLowerCase())}`).join(' and ')}${m.items.some(i => i.role === 'iron_side') ? ' (iron with vitamin C, so you absorb more of it)' : ''}.</div>` : ''}
       </div>`).join('')}
     <div class="meal bars"><strong>How today covers you</strong>
       ${plan.coverage.filter(c => c.need).map(c => `<div><span>${esc(c.name)}</span><span class="bar"><span style="width:${Math.min(100, c.percent)}%${c.key === 'sodium' && c.percent > 100 ? ';background:#c0392b' : ''}"></span></span><span>${esc(c.have)}/${esc(c.need)} ${esc(c.unit)}</span></div>`).join('')}

@@ -23,6 +23,7 @@ function recipeTab(n) {
   return `<a href="${esc(r.url)}" target="_blank"><strong>${esc(r.name)}</strong></a>
     <div class="muted">${esc(r.servings)} serving${r.servings === 1 ? '' : 's'} · ${esc(r.minutes)} min${r.kcal != null ? ` · ${esc(r.kcal)} kcal` : ''}</div>
     <ul>${lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul>
+    ${n.sides?.length ? `<p class="muted">On the side: ${n.sides.map(esc).join(' and ')}.</p>` : ''}
     <button data-copy>Copy ingredients and link</button>`
 }
 
