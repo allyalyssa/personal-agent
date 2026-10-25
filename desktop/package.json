@@ -1,0 +1,11 @@
+{
+  "name": "handled-pip",
+  "private": true,
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^45.0.0"
+  }
+}

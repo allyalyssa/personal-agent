@@ -7,6 +7,7 @@ import { loadPlaybooks, allPlaybooks, playbook, PACKS } from './playbooks.ts'
 import { createCase, caseView, listCases, resolveCase, getProfile, setProfile, getCase, setFields, plan, remember } from './engine.ts'
 import { FOODS, RECIPES } from './nutrition.ts'
 import { rate } from './taste.ts'
+import { pipLook, setPipLook, details, saveDetails, nudges, meals } from './pip.ts'
 import { intake, reply } from './agent.ts'
 import { executeAction, rejectAction, completeAction } from './actions.ts'
 import { civicReport } from './civic.ts'
@@ -95,13 +96,14 @@ const routes: [string, RegExp, (m: RegExpMatchArray, req: IncomingMessage, res: 
     remember(b.like ? 'foods_you_like' : 'foods_you_skip', (b.like ? likes : dislikes).join(', '), 'meal plan feedback')
     send(res, 200, plan(m[1]))
   }],
-  // Star a recipe. Handled learns which cuisines and main ingredients you like and still tries new ones.
+  // Star a recipe or a restaurant. Handled learns which cuisines (and, for recipes, main ingredients) you like and still tries new ones.
   ['POST', /^\/api\/cases\/(\w+)\/rate$/, async (m, req, res) => {
     const b = await body(req)
-    const recipe = RECIPES.recipes.find(r => r.id === Number(b.recipe))
-    if (!recipe) return send(res, 400, { error: 'Unknown recipe' })
+    const recipe = b.recipe != null ? RECIPES.recipes.find(r => r.id === Number(b.recipe)) : null
+    const place = Array.isArray(b.cuisines) && b.cuisines.length ? { id: 0, cuisines: b.cuisines.map(String), main: null } : null
+    if (!recipe && !place) return send(res, 400, { error: 'Unknown recipe or restaurant' })
     if (!db.prepare('select 1 from cases where id = ?').get(m[1])) return send(res, 404, { error: 'Case not found' })
-    rate(m[1], recipe, Number(b.stars))
+    rate(m[1], recipe ?? place!, Number(b.stars))
     send(res, 200, plan(m[1]))
   }],
   ['POST', /^\/api\/cases\/(\w+)\/resolve$/, async (m, req, res) => {
@@ -161,6 +163,16 @@ const routes: [string, RegExp, (m: RegExpMatchArray, req: IncomingMessage, res: 
   ['GET', /^\/api\/civic$/, async (_, __, res) => send(res, 200, civicReport())],
   ['GET', /^\/api\/eval$/, async (_, __, res) => send(res, 200, existsSync('data/eval.json') ? JSON.parse(readFileSync('data/eval.json', 'utf8')) : existsSync('eval/latest.json') ? JSON.parse(readFileSync('eval/latest.json', 'utf8')) : { note: 'Run npm run eval' })],
   ['GET', /^\/api\/rules$/, async (_, __, res) => send(res, 200, allRules())],
+  ['GET', /^\/api\/pip$/, async (_, __, res) => send(res, 200, pipLook())],
+  ['POST', /^\/api\/pip$/, async (_, req, res) => send(res, 200, setPipLook(await body(req)))],
+  ['GET', /^\/api\/details$/, async (_, __, res) => send(res, 200, details())],
+  ['POST', /^\/api\/details$/, async (_, req, res) => {
+    const v: any = await saveDetails(await body(req))
+    send(res, 200, { case_id: v.id, ready: Boolean(v.computed?.plan?.ready), missing: v.computed?.targets?.missing ?? [], reason: v.computed?.targets?.reason ?? null })
+  }],
+  ['GET', /^\/api\/meals$/, async (_, __, res) => send(res, 200, meals())],
+  ['GET', /^\/api\/nudges$/, async (_, __, res) => send(res, 200, await nudges())],
+  ['POST', /^\/api\/calendar\/check$/, async (_, __, res) => send(res, 200, await nudges(true))],
   ['GET', /^\/api\/profile$/, async (_, __, res) => send(res, 200, getProfile())],
   ['POST', /^\/api\/profile$/, async (_, req, res) => {
     setProfile(await body(req))

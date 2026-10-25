@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pip settings</title>
+<style>
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: #f6f7f5; color: #111; font-size: 14px; }
+  nav { display: flex; gap: 4px; padding: 10px 14px 0; border-bottom: 1px solid #ddd; background: #fff; position: sticky; top: 0; }
+  nav a { padding: 8px 12px; color: #444; text-decoration: none; border-bottom: 2px solid transparent; }
+  nav a.on { color: #111; border-color: #2bb673; font-weight: 600; }
+  main { padding: 14px 16px 80px; max-width: 520px; }
+  section[hidden] { display: none; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: #666; margin: 18px 0 8px; }
+  label { display: grid; grid-template-columns: 11em 1fr; gap: 8px; align-items: center; margin: 7px 0; }
+  label.check { grid-template-columns: auto 1fr; }
+  input, select { font: inherit; padding: 6px 8px; border: 1px solid #ccc; border-radius: 6px; background: #fff; min-width: 0; }
+  .preview { display: flex; align-items: center; gap: 12px; margin: 8px 0 4px; }
+  .preview img, .preview svg { width: 72px; height: 72px; object-fit: contain; }
+  .hint { color: #666; font-size: 12px; margin: 2px 0 0; }
+  footer { position: fixed; bottom: 0; left: 0; right: 0; padding: 10px 16px; background: #fff; border-top: 1px solid #ddd; display: flex; gap: 12px; align-items: center; }
+  button { font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px solid #ccc; background: #fff; cursor: pointer; }
+  button.primary { background: #2bb673; border-color: #2bb673; color: #fff; font-weight: 600; }
+  #status { color: #444; }
+</style>
+</head>
+<body>
+<nav><a href="#look" data-tab="look">Pip's look</a><a href="#details" data-tab="details">My details</a></nav>
+<main>
+  <section id="look">
+    <div class="preview"><span id="preview"></span><span class="hint">Changes show on your desktop within a few seconds.</span></div>
+    <label>Name <input id="name" maxlength="20"></label>
+    <label>Colour <input id="color" type="color"></label>
+    <label>Hat <select id="hat"></select></label>
+    <label>Your own picture <input id="image" type="file" accept="image/png,image/*"></label>
+    <button id="drawing">Back to the drawing</button>
+  </section>
+  <section id="details" hidden>
+    <p class="hint">Everything here can be changed any time. Saving re-plans today's meals.</p>
+    <form id="form"></form>
+  </section>
+</main>
+<footer hidden id="footer"><button class="primary" id="save">Save and plan my meals</button><span id="status"></span></footer>
+<script type="module" src="/pip-settings.js"></script>
+</body>
+</html>

@@ -113,7 +113,23 @@ test('each meal gets a recipe sized to its share of the day', () => {
   for (const m of p.meals) assert.ok(Math.abs(m.recipe.kcal - m.kcal_target) <= m.kcal_target * 0.25, `${m.meal} ${m.recipe.kcal} vs ${m.kcal_target}`)
   assert.deepEqual(p.meals.map((m: any) => m.kcal_target), [400, 560, 480, 160])
   assert.ok(p.meals.every((m: any) => m.recipe.minutes <= 45 && m.recipe.url.startsWith('https://www.food.com/recipe/')))
-  assert.deepEqual(p.coverage.map((c: any) => c.key), ['kcal', 'protein', 'fiber'])
+  assert.deepEqual(p.coverage.map((c: any) => c.key), ['kcal', 'protein', 'fiber', 'sodium'])
+  for (const m of p.meals) assert.ok(m.recipe.sodium_mg <= t.sodium_limit_mg * ({ breakfast: 0.25, lunch: 0.35, dinner: 0.30, snack: 0.10 } as any)[m.meal] + 10, `${m.meal} sodium ${m.recipe.sodium_mg}`)
+})
+
+test('high blood pressure, diabetes and high cholesterol keep each recipe under its share of the limit', () => {
+  const t: any = nutritionTargets({ age: 55, sex: 'male', height: '178 cm', weight: '85 kg', goal: 'maintain', conditions: 'hypertension, diabetes, high cholesterol' })
+  assert.equal(t.sodium_limit_mg, 1500)
+  assert.equal(t.sat_fat_limit_g, Math.round(t.calories * 0.06 / 9))
+  const p: any = mealPlan({ targets: t, nearby: {}, meal_times: '8am, 12:30pm, 7pm', max_cook_minutes: 60, conditions: 'hypertension, diabetes, high cholesterol' })
+  const share: any = { breakfast: 0.25, lunch: 0.35, dinner: 0.30, snack: 0.10 }
+  const recipes = p.meals.filter((m: any) => m.recipe)
+  assert.ok(recipes.length >= 2)
+  for (const m of recipes) {
+    assert.ok(m.recipe.sodium_mg <= 1500 * share[m.meal] + 10, `${m.meal} sodium ${m.recipe.sodium_mg}`)
+    assert.ok(m.recipe.carbs_g <= t.carbs_g * share[m.meal] + 1, `${m.meal} carbs ${m.recipe.carbs_g}`)
+    assert.ok(m.recipe.sat_fat_g <= t.sat_fat_limit_g * share[m.meal] + 0.5, `${m.meal} sat fat ${m.recipe.sat_fat_g}`)
+  }
 })
 
 test('recipes respect diet, allergies and celiac line by line', () => {

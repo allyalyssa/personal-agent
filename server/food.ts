@@ -1,4 +1,5 @@
-﻿import { lookupAddress } from './datasf.ts'
+﻿import { readFileSync } from 'node:fs'
+import { lookupAddress } from './datasf.ts'
 import { allowedFoods } from './nutrition.ts'
 import { db } from './db.ts'
 
@@ -7,6 +8,8 @@ const FLIPP = 'https://backflipp.wishabi.com/flipp/items/search'
 const METERS_PER_MINUTE = 80
 const PLACES_TTL_DAYS = 7
 const GENERIC = new Set(['foods', 'fresh', 'grocery', 'valencia', 'mission', 'super', 'save'])
+const SAVED = JSON.parse(readFileSync('nutrition/sf_stores.json', 'utf8')) as { checked: string, places: { name: string, kind: string, lat: number, lon: number }[] }
+const RESTAURANTS = JSON.parse(readFileSync('nutrition/sf_restaurants.json', 'utf8')) as { checked: string, places: { name: string, kind: string, cuisine: string, website: string | null, lat: number, lon: number }[] }
 
 function meters(a: { lat: number, lon: number }, b: { lat: number, lon: number }) {
   const rad = Math.PI / 180
@@ -46,6 +49,14 @@ export async function storesAround(lat: number, lon: number, radius: number) {
   return places
 }
 
+// The same stores from the snapshot in nutrition/sf_stores.json, for when the live map servers are busy.
+function savedAround(lat: number, lon: number, radius: number) {
+  return SAVED.places.map(p => {
+    const d = meters({ lat, lon }, p)
+    return { ...p, brand: null, meters: Math.round(d), walk_minutes: Math.max(1, Math.round(d / METERS_PER_MINUTE)) }
+  }).filter(p => p.meters <= Math.max(radius, 2000)).sort((a, b) => a.meters - b.meters)
+}
+
 async function flyerItems(zip: string, term: string) {
   const url = `${FLIPP}?locale=en-us&postal_code=${encodeURIComponent(zip)}&q=${encodeURIComponent(term)}`
   const res = await fetch(url, { signal: AbortSignal.timeout(8000) })
@@ -64,9 +75,12 @@ export async function foodNearby(args: { address: string, walk_minutes?: any, di
   const walk = Number(args.walk_minutes) || 15
   const radius = Math.min(3000, walk * METERS_PER_MINUTE)
   let mapError: string | null = null
-  const placesPending = storesAround(lat, lon, radius).catch(e => {
-    mapError = `OpenStreetMap unavailable: ${e.errors?.[0]?.message ?? e.message}`
-    return [] as any[]
+  let storesFrom = 'live map'
+  const placesPending = storesAround(lat, lon, radius).catch(() => {
+    storesFrom = `saved map of San Francisco stores (${SAVED.checked})`
+    const saved = savedAround(lat, lon, radius)
+    if (!saved.length) mapError = 'OpenStreetMap unavailable and no saved stores nearby'
+    return saved
   })
   const foods = allowedFoods(args)
   const flyers: any[][] = []
@@ -83,6 +97,7 @@ export async function foodNearby(args: { address: string, walk_minutes?: any, di
     const found = flyers[j]
       .filter(it => typeof it.current_price === 'number' && it.current_price > 0)
       .filter(it => /food|beverage/i.test(it._L1 ?? 'food'))
+      .filter(it => !/restaurant depot/i.test(it.merchant_name ?? ''))
       .filter(it => (!it.valid_to || it.valid_to > nowIso) && (!it.valid_from || it.valid_from <= nowIso))
       .filter(it => {
         const name = String(it.name ?? '').toLowerCase()
@@ -92,7 +107,7 @@ export async function foodNearby(args: { address: string, walk_minutes?: any, di
         const key = norm(it.merchant_name ?? '')
         const first = key.split(' ')[0]
         // Match the chain by its brand or the start of the store name, so "Valencia Whole Foods" is not Whole Foods.
-        const store = key ? stores.find(s => [s.brand, s.name].filter(Boolean).map(norm).some(n => n === key || n.startsWith(`${key} `) || key.startsWith(`${n} `) || (first.length > 4 && !GENERIC.has(first) && n.split(' ')[0] === first))) : undefined
+        const store = key ? stores.find(s => [s.brand, s.name].filter(Boolean).map(norm).some(n => n === key || (s.kind === 'supermarket' && (n.startsWith(`${key} `) || key.startsWith(`${n} `) || (first.length > 4 && !GENERIC.has(first) && n.split(' ')[0] === first))))) : undefined
         return {
           item: it.name,
           price: it.current_price,
@@ -117,12 +132,14 @@ export async function foodNearby(args: { address: string, walk_minutes?: any, di
     zip,
     walk_minutes: walk,
     radius_m: radius,
-    stores: stores.slice(0, 12).map(s => ({ name: s.name, kind: s.kind, walk_minutes: s.walk_minutes })),
+    stores: stores.slice(0, 12).map(s => ({ name: s.name, kind: s.kind, walk_minutes: s.walk_minutes, lat: s.lat, lon: s.lon })),
+    restaurants: RESTAURANTS.places.map(r => ({ ...r, walk_minutes: Math.max(1, Math.round(meters({ lat, lon }, r) / METERS_PER_MINUTE)) })).filter(r => r.walk_minutes <= walk).sort((a, b) => a.walk_minutes - b.walk_minutes),
     markets: markets.slice(0, 5).map(m => ({ name: m.name, walk_minutes: m.walk_minutes })),
     deals,
     deal_count: Object.values(deals).reduce((n, d) => n + d.length, 0),
     checked_at: nowIso,
     map_error: mapError,
+    stores_from: storesFrom,
     note: 'Walk times are straight-line estimates at about 80 m a minute. Deals are from this week\'s store flyers (Flipp) for your ZIP code.',
     sources: [addr.query_url, 'https://www.openstreetmap.org/', `https://flipp.com/en-us/search?postal_code=${zip}`]
   }

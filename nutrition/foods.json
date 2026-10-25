@@ -70,7 +70,7 @@
       "n": { "kcal": 102, "protein": 8.2, "carbs": 12.2, "fat": 2.4, "fiber": 0, "iron": 0.1, "calcium": 305, "vitamin_c": 0, "potassium": 366, "magnesium": 27, "folate": 12, "b12": 1.1, "vitamin_d": 2.9, "sodium": 107 } },
     { "id": "soy_milk", "name": "Fortified soy milk", "serving": "1 cup", "search": "soy milk", "match": ["soy"], "exclude": ["sauce", "bean", "nuggets"], "roles": ["drink"], "diet": ["vegan", "vegetarian"], "allergens": ["soy"], "cook_minutes": 0,
       "n": { "kcal": 100, "protein": 7, "carbs": 8, "fat": 4, "fiber": 1, "iron": 1.1, "calcium": 300, "vitamin_c": 0, "potassium": 300, "magnesium": 40, "folate": 24, "b12": 2.7, "vitamin_d": 2.9, "sodium": 90 } },
-    { "id": "cheese", "name": "Cheddar cheese", "serving": "1 oz", "search": "cheddar cheese", "match": ["cheddar", "cheese"], "exclude": ["cracker", "puff", "dip", "sauce", "pizza", "macaroni", "cake"], "roles": ["snack"], "diet": ["vegetarian"], "allergens": ["dairy"], "cook_minutes": 0,
+    { "id": "cheese", "name": "Cheddar cheese", "serving": "1 oz", "search": "cheddar cheese", "match": ["cheddar", "cheese"], "exclude": ["cracker", "puff", "dip", "sauce", "pizza", "macaroni", "cake", "fries", "chips", "tots", "snack", "popcorn", "booty"], "roles": ["snack"], "diet": ["vegetarian"], "allergens": ["dairy"], "cook_minutes": 0,
       "n": { "kcal": 114, "protein": 7, "carbs": 0.4, "fat": 9.4, "fiber": 0, "iron": 0.2, "calcium": 200, "vitamin_c": 0, "potassium": 21, "magnesium": 8, "folate": 5, "b12": 0.3, "vitamin_d": 0.1, "sodium": 180 } }
   ]
 }

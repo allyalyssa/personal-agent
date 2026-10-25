@@ -57,6 +57,9 @@ MAIN_WORDS = [
     ('fruit', r'apple|banana|berr|peach|pear\b|mango|pineapple|orange|lemon|lime\b|cherr|grape|melon'),
 ]
 MEATS = {'beef', 'pork', 'lamb', 'chicken', 'seafood'}
+NOT_A_MEAL = re.compile(r'\b(batter|dough|crusts?|marinade|rub|seasoning|dressing|vinaigrette|sauce|gravy|frosting|icing|glaze|syrup|stock|broth|jam|jelly|butter|mayonnaise|aioli|salsa|dip|spread|croutons|mix|pickles?|brine)\s*$', re.I)
+TOPPING_FOR = re.compile(r'\b(glaze|rub|marinade|sauce|seasoning|dressing|batter|brine) for\b', re.I)
+JOINED = re.compile(r'\b(with|in|and|w)\b|&|/', re.I)
 UNITS = {
     'cup': 'cup', 'cups': 'cup', 'c': 'cup', 'tablespoon': 'tbsp', 'tablespoons': 'tbsp', 'tbsp': 'tbsp', 'tbs': 'tbsp', 'tb': 'tbsp',
     'teaspoon': 'tsp', 'teaspoons': 'tsp', 'tsp': 'tsp', 'lb': 'lb', 'lbs': 'lb', 'pound': 'lb', 'pounds': 'lb',
@@ -103,7 +106,10 @@ def parse_line(line, servings):
     return out
 
 
-def meal_type(category, keywords):
+def meal_type(category, keywords, name):
+    core = re.sub(r'\b(copycat|clone|recipe|of)\b', '', re.sub(r'\(.*?\)', '', name)).strip(' !.-')
+    if (NOT_A_MEAL.search(core) and not JOINED.search(core)) or TOPPING_FOR.search(name):
+        return 'condiment'
     tags = {category, *keywords}
     if tags & DRINK:
         return 'drink'
@@ -151,7 +157,7 @@ def main(parquet, csv, out):
     mean = rec.AggregatedRating.mean()
     rec['score'] = (rec.ReviewCount * rec.AggregatedRating + PRIOR_REVIEWS * mean) / (rec.ReviewCount + PRIOR_REVIEWS)
     rec['dish'] = rec.Name.map(dish_key)
-    rec['meal'] = [meal_type(c, k) for c, k in zip(rec.RecipeCategory, rec.Keywords)]
+    rec['meal'] = [meal_type(c, k, html.unescape(n)) for c, k, n in zip(rec.RecipeCategory, rec.Keywords, rec.Name)]
     rec = rec[rec.meal.isin(['breakfast', 'main', 'side', 'snack']) & (rec.dish != '')]
     dish_reviews = rec.groupby('dish').ReviewCount.sum()
     rec = rec[rec.dish.map(dish_reviews) >= MIN_DISH_REVIEWS]

@@ -22,6 +22,8 @@ See [DEMO.md](DEMO.md) for the stage script and [COMPETITION.md](COMPETITION.md)
 
 ## Run
 
+Each person runs their own copy; everything it learns about you stays in `data/` on your machine. Double-click `start.cmd` (Windows) or run `./start.sh` (Mac, Linux). It installs what it needs the first time, starts the server and puts Pip in the bottom-right corner of your screen. Right-click Pip for today's meals, your details and Pip's look. To run only the server:
+
 ```
 npm install
 cp .env.example .env        # add keys

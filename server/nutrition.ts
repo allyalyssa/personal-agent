@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { rule } from './rules.ts'
 import { today } from './clock.ts'
 import { tasteSampler, rng, ratingCount } from './taste.ts'
+import type { Busy } from './calendar.ts'
 
 export type Food = { id: string, name: string, serving: string, search: string, match: string[], exclude: string[], roles: string[], diet: string[], allergens: string[], cook_minutes: number, n: Record<string, number> }
 
@@ -326,6 +327,8 @@ export function nutritionTargets(args: { age: any, sex: any, height: any, weight
     calories: noCalories ? null : calories,
     calorie_floor_applied: atFloor,
     sodium_limit_mg: conditions.includes('hypertension') ? cond.hypertension.sodium_limit_mg : dri.sodium_limit_mg,
+    sat_fat_limit_g: conditions.includes('cholesterol') && !noCalories ? round(calories * cond.cholesterol.sat_fat_percent_max / 100 / 9) : null,
+    carbs_limited: conditions.includes('diabetes') && !noCalories,
     protein,
     carbs_g: noCalories ? null : carbs_g,
     fat_g: noCalories ? null : fat_g,
@@ -505,21 +508,91 @@ export function allowedFoods(args: Limits) {
 const MEAL_SHARE: Record<string, number> = { breakfast: 0.25, lunch: 0.35, dinner: 0.30, snack: 0.10 }
 const RECIPE_MEAL: Record<string, string> = { breakfast: 'breakfast', lunch: 'main', dinner: 'main', snack: 'snack' }
 
-function pickRecipe(pool: Recipe[], meal: string, kcal: number, protein: number | null, taken: Set<number>, mains: Set<string>, taste: (r: Recipe) => number) {
+type Budget = { kcal: number, protein: number | null, fiber: number | null, sodium: number, carbs: number | null, satFat: number | null }
+
+// Calories within 25%; sodium, and carbs or saturated fat when a condition limits them, at or under the meal's share.
+function pickRecipe(pool: Recipe[], meal: string, b: Budget, taken: Set<number>, mains: Set<string>, taste: (r: Recipe) => number, maxMinutes = Infinity) {
   let best: { recipe: Recipe, servings: number } | null = null
   let bestScore = -1
   for (const r of pool) {
-    if (r.meal !== RECIPE_MEAL[meal] || taken.has(r.id) || !(r.per_serving.kcal > 0)) continue
-    const servings = Math.min(2, Math.max(0.5, round(kcal / r.per_serving.kcal, 0.5)))
-    if (Math.abs(servings * r.per_serving.kcal - kcal) > kcal * 0.25) continue
-    const proteinFit = protein ? 0.5 + 0.5 * Math.min(1, servings * r.per_serving.protein_g / protein) : 1
-    const s = taste(r) * (r.score / 5) * proteinFit * (mains.has(r.main) ? 0.1 : 1)
+    if (r.meal !== RECIPE_MEAL[meal] || taken.has(r.id) || !(r.per_serving.kcal > 0) || (r.minutes ?? 0) > maxMinutes) continue
+    const n = r.per_serving
+    const servings = Math.min(2, Math.max(0.5, round(b.kcal / n.kcal, 0.5)))
+    if (Math.abs(servings * n.kcal - b.kcal) > b.kcal * 0.25) continue
+    if (servings * n.sodium_mg > b.sodium || (b.carbs != null && servings * n.carbs_g > b.carbs) || (b.satFat != null && servings * n.sat_fat_g > b.satFat)) continue
+    const fit = (have: number, want: number | null) => want ? 0.5 + 0.5 * Math.min(1, have / want) : 1
+    const s = taste(r) * (r.score / 5) * fit(servings * n.protein_g, b.protein) * fit(servings * n.fiber_g, b.fiber) * (mains.has(r.main) ? 0.1 : 1)
     if (s > bestScore) [best, bestScore] = [{ recipe: r, servings }, s]
   }
   return best
 }
 
-export function mealPlan(args: { targets: any, nearby?: any, diet?: any, allergies?: any, conditions?: any, likes?: any, dislikes?: any, max_cook_minutes?: any, meal_times?: any, delivery?: any, recipes?: Recipe[] }) {
+const EAT_MINUTES = 30
+const MAX_SHIFT = 120
+
+const toMinutes = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5))
+const toTime = (m: number) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`
+const overlapping = (busy: Busy[], from: number, to: number) => busy.filter(b => b.start < to && b.end > from)
+
+// Meal times to try, closest to the usual one first, in 5-minute steps up to MAX_SHIFT either way.
+function nearby(usual: number) {
+  const out = [usual]
+  for (let k = 5; k <= MAX_SHIFT; k += 5) out.push(usual - k, usual + k)
+  return out.filter(t => t >= 0 && t + EAT_MINUTES <= 1440)
+}
+
+// Store trip, cooking and eating all have to be free, and after the previous meal.
+function schedule(usual: number, prep: number, busy: Busy[], after: number) {
+  return nearby(usual).find(t => t - prep >= after && !overlapping(busy, t - prep, t + EAT_MINUTES).length) ?? null
+}
+
+// For each candidate time with a free meal, how many minutes are free before it for the trip and cooking.
+function room(usual: number, busy: Busy[], after: number) {
+  return nearby(usual).filter(t => !overlapping(busy, t, t + EAT_MINUTES).length).map(t => ({ t, free: t - Math.max(after, ...busy.filter(b => b.start < t).map(b => b.end)) }))
+}
+
+const EAT_OUT_MINUTES = 45
+const OSM_CUISINE: Record<string, string> = {
+  thai: 'thai', chinese: 'chinese', dim_sum: 'chinese', cantonese: 'chinese', szechuan: 'chinese', sichuan: 'chinese', noodle: 'chinese',
+  japanese: 'japanese', sushi: 'japanese', ramen: 'japanese', udon: 'japanese', korean: 'korean', vietnamese: 'vietnamese', pho: 'vietnamese',
+  indian: 'indian', nepalese: 'indian', pakistani: 'indian', mexican: 'mexican', burrito: 'mexican', taco: 'mexican', tacos: 'mexican', 'tex-mex': 'mexican',
+  italian: 'italian', pizza: 'italian', pasta: 'italian', greek: 'greek', mediterranean: 'greek', middle_eastern: 'middle_eastern', lebanese: 'middle_eastern',
+  turkish: 'middle_eastern', falafel: 'middle_eastern', kebab: 'middle_eastern', persian: 'middle_eastern', french: 'french', cajun: 'cajun', creole: 'cajun',
+  ethiopian: 'african', african: 'african', moroccan: 'african', caribbean: 'caribbean', jamaican: 'caribbean', cuban: 'caribbean', spanish: 'spanish', tapas: 'spanish',
+  german: 'german', filipino: 'filipino', hawaiian: 'hawaiian', poke: 'hawaiian', peruvian: 'latin_american', salvadoran: 'latin_american',
+  latin_american: 'latin_american', brazilian: 'latin_american', colombian: 'latin_american', american: 'american', burger: 'american', sandwich: 'american',
+  barbecue: 'american', bbq: 'american', chicken: 'american', wings: 'american', diner: 'american', breakfast: 'american', brunch: 'american', hot_dog: 'american',
+  steak_house: 'american', seafood: 'american', salad: 'american', bagel: 'american'
+}
+const NOT_A_MEAL_PLACE = /^(coffee_shop|bubble_tea|ice_cream|juice|donut|dessert|frozen_yogurt|tea|cake|cupcake)$/
+const BREAKFAST_PLACE = /breakfast|brunch|bagel|bakery|diner|coffee_shop/
+
+const placeCuisines = (p: { cuisine: string }) => [...new Set(p.cuisine.toLowerCase().split(';').map(c => OSM_CUISINE[c.trim()]).filter(Boolean))]
+
+// The most-reviewed main of each cuisine, with the median home serving's calories, as a rough guide for eating out.
+const TYPICAL: Record<string, { name: string, url: string, kcal: number }> = Object.fromEntries([...new Set(Object.values(OSM_CUISINE))].flatMap(c => {
+  const mains = RECIPES.recipes.filter(r => r.meal === 'main' && r.cuisines.includes(c))
+  if (!mains.length) return []
+  const kcal = mains.map(r => r.per_serving.kcal).sort((a, b) => a - b)[Math.floor(mains.length / 2)]
+  const top = mains.reduce((a, b) => b.reviews > a.reviews ? b : a)
+  return [[c, { name: top.name, url: top.url, kcal: round(kcal, 10) }]]
+}))
+
+function pickPlace(places: any[], meal: string, taste: (r: any) => number, used: Set<string>, maxWalk: number) {
+  let best: any = null
+  let bestScore = -1
+  for (const p of places) {
+    const kinds = p.cuisine.toLowerCase().split(';').map((c: string) => c.trim())
+    const breakfast = p.kind === 'cafe' || kinds.some((c: string) => BREAKFAST_PLACE.test(c))
+    if (used.has(p.name) || kinds.every((c: string) => NOT_A_MEAL_PLACE.test(c)) || (meal === 'breakfast' ? !breakfast : p.kind === 'cafe')) continue
+    const cuisines = p.cuisines.length ? p.cuisines : ['american']
+    const s = taste({ id: 0, cuisines, main: null }) * (0.5 + 0.5 * (1 - p.walk_minutes / (maxWalk + 1)))
+    if (s > bestScore) [best, bestScore] = [{ ...p, cuisines }, s]
+  }
+  return best
+}
+
+export function mealPlan(args: { targets: any, nearby?: any, diet?: any, allergies?: any, conditions?: any, likes?: any, dislikes?: any, max_cook_minutes?: any, meal_times?: any, delivery?: any, recipes?: Recipe[], busy?: Busy[], shop_minutes?: any }) {
   const tg = args.targets
   if (!tg?.ready) return { ready: false }
   const foods = allowedFoods(args)
@@ -587,32 +660,102 @@ export function mealPlan(args: { targets: any, nearby?: any, diet?: any, allergi
   const seed = `${today()}:${ratingCount()}`
   const taken = new Set<number>()
   const mains = new Set<string>()
+  const stores = args.nearby?.stores ?? []
+  const shop = stores.find((x: any) => x.kind === 'supermarket') ?? stores[0] ?? null
+  const shopAt = shop ? { name: shop.name, walk_minutes: shop.walk_minutes, map_url: shop.lat != null ? `https://www.google.com/maps/search/?api=1&query=${shop.lat}%2C${shop.lon}` : null } : null
+  const trip = (shop?.walk_minutes ?? 0) * 2 + (Number(args.shop_minutes) || 15)
+  const dealFor = (item: string) => {
+    const t = item.toLowerCase()
+    for (const f of FOODS.foods) {
+      const d = deals[f.id]?.[0]
+      if (d && f.match.some(m => new RegExp(`\\b${m}`).test(t)) && !f.exclude.some(x => t.includes(x))) return { item: d.item, price_text: d.price_text, store: d.store ?? d.merchant, walk_minutes: d.walk_minutes, valid_to: d.valid_to }
+    }
+    return null
+  }
+  const busy: Busy[] = Array.isArray(args.busy) ? args.busy : []
+  let after = 0
+  const usedPlaces = new Set<string>()
+  const places = (args.nearby?.restaurants ?? []).map((p: any) => ({ ...p, cuisines: placeCuisines(p) }))
   const planned = day.map(m => {
+    const before = after
     const share = MEAL_SHARE[m.meal] / shareTotal
-    const pick = pickRecipe(pool, m.meal, target * share, tg.protein ? tg.protein.target * share : null, taken, mains, tasteSampler(rng(`${seed}:${m.meal}:${m.time}`)))
-    if (!pick) return { ...m, kcal_target: tg.no_calorie_target ? null : round(target * share, 10), recipe: null }
+    const kcal = target * share
+    const budget: Budget = {
+      kcal,
+      protein: tg.protein ? tg.protein.target * share : null,
+      fiber: tg.needs.fiber ? tg.needs.fiber * share : null,
+      sodium: tg.sodium_limit_mg * share,
+      carbs: tg.carbs_limited ? tg.carbs_g * share : null,
+      satFat: tg.sat_fat_limit_g != null ? tg.sat_fat_limit_g * share : null
+    }
+    const taste = tasteSampler(rng(`${seed}:${m.meal}:${m.time}`))
+    let pick = pickRecipe(pool, m.meal, budget, taken, mains, taste)
+    const cook = () => pick ? pick.recipe.minutes ?? 0 : Math.max(0, ...m.items.map(i => byId[i.id].cook_minutes ?? 0))
+    const usual = m.time ? toMinutes(m.time) : null
+    let at = usual
+    let moved: string[] | null = null
+    let quicker: string[] | null = null
+    let noTime: string[] | null = null
+    if (usual != null && busy.length) {
+      const conflicts = overlapping(busy, usual - trip - cook(), usual + EAT_MINUTES).map(b => b.title)
+      at = schedule(usual, trip + cook(), busy, after)
+      if (at == null && pick) {
+        for (const r of room(usual, busy, after)) {
+          const quick = r.free - trip >= 5 ? pickRecipe(pool, m.meal, budget, taken, mains, taste, r.free - trip) : null
+          if (quick) {
+            [pick, at, quicker] = [quick, r.t, conflicts]
+            break
+          }
+        }
+      }
+      if (at == null) [at, noTime] = [usual, conflicts]
+      else if (at !== usual) moved = conflicts
+    }
+    if (at != null) after = at + EAT_MINUTES
+    const place = m.meal !== 'snack' && usual != null ? pickPlace(places, m.meal, taste, usedPlaces, Number(args.max_walk_minutes) || 15) : null
+    let eatOut = null
+    if (place) {
+      usedPlaces.add(place.name)
+      const walk = place.walk_minutes
+      const t = nearby(usual!).find(t => t - walk >= before && !overlapping(busy, t - walk, t + EAT_OUT_MINUTES + walk).length) ?? null
+      const conflicts = overlapping(busy, usual! - walk, usual! + EAT_OUT_MINUTES + walk).map(b => b.title)
+      eatOut = {
+        name: place.name, kind: place.kind, cuisine: place.cuisine.split(';')[0].replaceAll('_', ' '), cuisines: place.cuisines,
+        walk_minutes: walk, website: place.website, map_url: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name)}%20${place.lat}%2C${place.lon}`,
+        time: t != null ? toTime(t) : null, leave: t != null ? t - walk : null, back: t != null ? t + EAT_OUT_MINUTES + walk : null,
+        moved_because: t != null && t !== usual && conflicts.length ? conflicts : null, no_time_because: t == null ? conflicts : null,
+        typical: TYPICAL[place.cuisines[0]] ?? null
+      }
+    }
+    const timing = { time: at != null ? toTime(at) : m.time, usual_time: m.time, leave: at != null ? at - trip - cook() : null, trip_minutes: trip, moved_because: moved, quicker_because: quicker, no_time_because: noTime, eat_out: eatOut }
+    const kcal_target = tg.no_calorie_target ? null : round(kcal, 10)
+    if (!pick) return { ...m, ...timing, kcal_target, recipe: null }
     const r = pick.recipe
+    const servings = pick.servings
     taken.add(r.id)
     mains.add(r.main)
     return {
       ...m,
-      kcal_target: tg.no_calorie_target ? null : round(target * share, 10),
+      ...timing,
+      kcal_target,
       items: [],
       recipe: {
         id: r.id, name: r.name, url: r.url, cuisines: r.cuisines, main: r.main, minutes: r.minutes, rating: r.rating, reviews: r.reviews,
-        servings: pick.servings,
-        kcal: tg.no_calorie_target ? null : round(pick.servings * r.per_serving.kcal),
-        protein_g: round(pick.servings * r.per_serving.protein_g),
-        fiber_g: round(pick.servings * r.per_serving.fiber_g),
-        sodium_mg: round(pick.servings * r.per_serving.sodium_mg, 10),
-        ingredients: r.ingredients.map(i => ({ amount: amount(i, pick.servings), item: i.item }))
+        servings,
+        kcal: tg.no_calorie_target ? null : round(servings * r.per_serving.kcal),
+        protein_g: round(servings * r.per_serving.protein_g),
+        fiber_g: round(servings * r.per_serving.fiber_g),
+        sodium_mg: round(servings * r.per_serving.sodium_mg, 10),
+        carbs_g: round(servings * r.per_serving.carbs_g),
+        sat_fat_g: round(servings * r.per_serving.sat_fat_g, 0.5),
+        ingredients: r.ingredients.map(i => ({ amount: amount(i, servings), item: i.item, deal: i.qty == null ? null : dealFor(i.item) }))
       }
     }
   })
   const plates = planned.filter(m => !m.recipe)
   const recipes = planned.flatMap(m => m.recipe ? [m.recipe] : [])
   const plateTotal = (key: string) => plates.reduce((s, m) => s + m.items.reduce((t, i) => t + (byId[i.id].n[key] ?? 0) * i.servings, 0), 0)
-  const recipeTotal: Record<string, (r: any) => number> = { kcal: r => r.kcal ?? 0, protein: r => r.protein_g, fiber: r => r.fiber_g }
+  const recipeTotal: Record<string, (r: any) => number> = { kcal: r => r.kcal ?? 0, protein: r => r.protein_g, fiber: r => r.fiber_g, sodium: r => r.sodium_mg }
 
   const keys = recipes.length ? ['kcal', 'protein', 'fiber'] : ['kcal', 'protein', 'fiber', 'iron', 'calcium', 'vitamin_c', 'potassium', 'magnesium', 'folate', 'b12', 'vitamin_d']
   const coverage = keys.filter(k => k !== 'kcal' || !tg.no_calorie_target).map(k => {
@@ -620,7 +763,9 @@ export function mealPlan(args: { targets: any, nearby?: any, diet?: any, allergi
     const have = round(plateTotal(k) + recipes.reduce((s, r) => s + recipeTotal[k](r), 0), k === 'b12' || k === 'vitamin_d' || k === 'iron' ? 0.1 : 1)
     return { key: k, name: k === 'kcal' ? 'Calories' : NUTRIENTS[k].name, have, need, unit: k === 'kcal' ? 'kcal' : NUTRIENTS[k].unit, percent: need ? Math.round(have / need * 100) : null }
   })
-  const gaps = coverage.filter(c => c.key !== 'kcal' && c.percent != null && c.percent < 80).map(c => ({
+  const sodium = round(plateTotal('sodium') + recipes.reduce((t, r) => t + r.sodium_mg, 0), 10)
+  coverage.push({ key: 'sodium', name: 'Sodium (stay under)', have: sodium, need: tg.sodium_limit_mg, unit: 'mg', percent: Math.round(sodium / tg.sodium_limit_mg * 100) })
+  const gaps = coverage.filter(c => c.key !== 'kcal' && c.key !== 'sodium' && c.percent != null && c.percent < 80).map(c => ({
     ...c,
     tip: c.key === 'vitamin_d' || c.key === 'b12' ? `${NUTRIENTS[c.key].how}` : `Add more ${NUTRIENTS[c.key].foods}.`
   }))
@@ -655,6 +800,7 @@ export function mealPlan(args: { targets: any, nearby?: any, diet?: any, allergi
     date: today(),
     meal_times: times,
     meal_times_text: times.join('; '),
+    shop_at: shopAt,
     meals: planned,
     coverage,
     gaps,

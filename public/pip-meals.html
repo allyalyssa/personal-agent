@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Today's meals</title>
+<style>
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: #f6f7f5; color: #111; font-size: 14px; }
+  main { padding: 14px 16px 30px; max-width: 560px; }
+  h1 { font-size: 22px; margin: 4px 0 2px; }
+  .sub { color: #555; margin: 0 0 12px; }
+  .meal { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 12px; margin: 10px 0; }
+  .top { display: flex; justify-content: space-between; gap: 8px; color: #555; font-size: 13px; }
+  .top strong { color: #111; font-size: 15px; }
+  .name { display: block; margin: 6px 0 2px; font-weight: 600; color: #11603a; }
+  .facts { color: #555; font-size: 13px; }
+  .note { font-size: 13px; color: #11603a; margin-top: 4px; }
+  .note.warn { color: #a14b00; }
+  ul { margin: 6px 0; padding-left: 18px; }
+  .row { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+  button { font: inherit; border: 0; background: none; cursor: pointer; padding: 2px 4px; }
+  .copy { color: #11603a; text-decoration: underline; }
+  .stars button { font-size: 18px; color: #c58a00; }
+  .bars div { display: grid; grid-template-columns: 6em 1fr auto; gap: 8px; align-items: center; margin: 4px 0; font-size: 13px; }
+  .bar { height: 7px; background: #e3e3e3; border-radius: 4px; overflow: hidden; }
+  .bar span { display: block; height: 100%; background: #2bb673; }
+  #toast { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); background: #111; color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 13px; }
+  #toast[hidden] { display: none; }
+</style>
+</head>
+<body>
+<main id="view">Loading…</main>
+<div id="toast" hidden></div>
+<script type="module" src="/pip-meals.js"></script>
+</body>
+</html>

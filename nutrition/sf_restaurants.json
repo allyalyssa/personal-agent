@@ -1,0 +1,5200 @@
+{
+"source": "OpenStreetMap via Nominatim search",
+"source_url": "https://www.openstreetmap.org/",
+"license": "ODbL 1.0",
+"checked": "2026-10-24",
+"places": [
+{
+"name": "77 Chinese Cuisine & Hawaiian",
+"kind": "restaurant",
+"cuisine": "hawaiian",
+"website": null,
+"lat": 37.79197,
+"lon": -122.399871
+},
+{
+"name": "8 Immortals Seafood Restaurant",
+"kind": "restaurant",
+"cuisine": "asian",
+"website": null,
+"lat": 37.742571,
+"lon": -122.48166
+},
+{
+"name": "85°C",
+"kind": "cafe",
+"cuisine": "coffee_shop;chinese",
+"website": null,
+"lat": 37.728032,
+"lon": -122.476508
+},
+{
+"name": "A-1",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.794245,
+"lon": -122.40597
+},
+{
+"name": "Aaha Indian Cuisine",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": "https://www.aahasfo.com/",
+"lat": 37.763511,
+"lon": -122.419987
+},
+{
+"name": "Abu Salim Middle Eastern Grill",
+"kind": "restaurant",
+"cuisine": "middle_eastern",
+"website": "https://www.abusalimsf.com/home",
+"lat": 37.769711,
+"lon": -122.448412
+},
+{
+"name": "Aji Kiji",
+"kind": "fast_food",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.79157,
+"lon": -122.404368
+},
+{
+"name": "Akari Japanese Bistro",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": "https://www.akari-japanese.com/",
+"lat": 37.77564,
+"lon": -122.408847
+},
+{
+"name": "Akiko's Sushi Bar",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": "https://akikossushibar.com/",
+"lat": 37.788716,
+"lon": -122.410067
+},
+{
+"name": "Al Pastor Papi",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.78648,
+"lon": -122.408629
+},
+{
+"name": "Al-Masri",
+"kind": "restaurant",
+"cuisine": "egyptian",
+"website": null,
+"lat": 37.775373,
+"lon": -122.502122
+},
+{
+"name": "Allstars Donuts & Burgers",
+"kind": "fast_food",
+"cuisine": "donut;burger;sandwich",
+"website": null,
+"lat": 37.781786,
+"lon": -122.415417
+},
+{
+"name": "Amami Sushi",
+"kind": "restaurant",
+"cuisine": "japanese;sushi",
+"website": null,
+"lat": 37.780434,
+"lon": -122.481215
+},
+{
+"name": "An Sushi",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": "https://sushiansf.com/",
+"lat": 37.785105,
+"lon": -122.429098
+},
+{
+"name": "Antigua",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": null,
+"lat": 37.742808,
+"lon": -122.478404
+},
+{
+"name": "Anton's Falafel House",
+"kind": "restaurant",
+"cuisine": "lebanese",
+"website": "https://www.antonsfalafelhouse.com/",
+"lat": 37.775225,
+"lon": -122.410012
+},
+{
+"name": "Arabian Nights",
+"kind": "restaurant",
+"cuisine": "mediterranean",
+"website": null,
+"lat": 37.759495,
+"lon": -122.418983
+},
+{
+"name": "Aria Korean Tapas",
+"kind": "fast_food",
+"cuisine": "chicken;wings;korean",
+"website": "https://ariasf.com/",
+"lat": 37.78649,
+"lon": -122.418045
+},
+{
+"name": "Ariel’s Breakfast Mi Yucatan",
+"kind": "fast_food",
+"cuisine": "mexican;yucatanense",
+"website": null,
+"lat": 37.751518,
+"lon": -122.418227
+},
+{
+"name": "Aroi Thai",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "https://www.aroisf.com/",
+"lat": 37.754949,
+"lon": -122.423013
+},
+{
+"name": "Asa Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": "http://www.asasushisf.com/",
+"lat": 37.799938,
+"lon": -122.442275
+},
+{
+"name": "Ay Caray Taqueria",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://www.instagram.com/taqueriaaycaray/",
+"lat": 37.725789,
+"lon": -122.433814
+},
+{
+"name": "Ayola",
+"kind": "restaurant",
+"cuisine": "mediterranean;greek",
+"website": null,
+"lat": 37.791141,
+"lon": -122.404285
+},
+{
+"name": "BANGKOK STREET Thai Street Food",
+"kind": "restaurant",
+"cuisine": "thai;curry;asian",
+"website": "https://www.bangkokstreetsf.com/",
+"lat": 37.786931,
+"lon": -122.429946
+},
+{
+"name": "Baby Blues BBQ",
+"kind": "restaurant",
+"cuisine": "barbecue",
+"website": "https://babybluesbbq.com/",
+"lat": 37.746866,
+"lon": -122.418889
+},
+{
+"name": "Bandit",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://www.banditsf.com/",
+"lat": 37.786454,
+"lon": -122.414537
+},
+{
+"name": "Banh Mi House",
+"kind": "fast_food",
+"cuisine": "sandwich;vietnamese",
+"website": null,
+"lat": 37.727564,
+"lon": -122.403453
+},
+{
+"name": "Banh Mi Viet",
+"kind": "fast_food",
+"cuisine": "vietnamese",
+"website": null,
+"lat": 37.77441,
+"lon": -122.437533
+},
+{
+"name": "Bar Sprezzatura",
+"kind": "restaurant",
+"cuisine": "italian",
+"website": "https://www.barsprezzatura.com/",
+"lat": 37.795818,
+"lon": -122.399171
+},
+{
+"name": "Barista Coffee & Brunch",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": "https://baristasf.com",
+"lat": 37.775723,
+"lon": -122.446293
+},
+{
+"name": "Basa Seafood Express",
+"kind": "restaurant",
+"cuisine": "seafood;sushi",
+"website": null,
+"lat": 37.752659,
+"lon": -122.413363
+},
+{
+"name": "Base Camp",
+"kind": "restaurant",
+"cuisine": "asian",
+"website": "https://basecampsf.com/",
+"lat": 37.758802,
+"lon": -122.414848
+},
+{
+"name": "Basil Thai Resaurant & Bar",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "https://www.basilthai.com/",
+"lat": 37.775406,
+"lon": -122.409318
+},
+{
+"name": "Bayshore Taqueria",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://bayshoretaqueria.com/",
+"lat": 37.743144,
+"lon": -122.405468
+},
+{
+"name": "Beanstalk Cafe",
+"kind": "cafe",
+"cuisine": "coffee_shop;sandwich;bagel",
+"website": "https://m.facebook.com/Beanstalk-Cafe-722100901151670/",
+"lat": 37.790206,
+"lon": -122.409311
+},
+{
+"name": "Beep's Burgers",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://www.beepsburgers.com/",
+"lat": 37.723225,
+"lon": -122.453869
+},
+{
+"name": "Ben Thai Cafe",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "https://www.benthaicafe.com/",
+"lat": 37.789243,
+"lon": -122.420564
+},
+{
+"name": "Benu",
+"kind": "restaurant",
+"cuisine": "fine_dining;american;asian",
+"website": null,
+"lat": 37.785462,
+"lon": -122.39908
+},
+{
+"name": "Berlin Döner & Kebab House",
+"kind": "cafe",
+"cuisine": "turkish;kebab",
+"website": "https://www.berlindonerkebabhouse.com/",
+"lat": 37.788289,
+"lon": -122.415311
+},
+{
+"name": "Besharam",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": "https://besharamrestaurant.com/",
+"lat": 37.754281,
+"lon": -122.38972
+},
+{
+"name": "Big Bear Tea, Donut & Chinese Food",
+"kind": "fast_food",
+"cuisine": "chinese;donut;bubble_tea",
+"website": null,
+"lat": 37.752334,
+"lon": -122.41863
+},
+{
+"name": "Bini's Kitchen",
+"kind": "fast_food",
+"cuisine": "nepali",
+"website": null,
+"lat": 37.788564,
+"lon": -122.402703
+},
+{
+"name": "Bini’s Kitchen",
+"kind": "fast_food",
+"cuisine": "nepalese",
+"website": null,
+"lat": 37.779534,
+"lon": -122.407197
+},
+{
+"name": "Biscoff",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": null,
+"lat": 37.810018,
+"lon": -122.410388
+},
+{
+"name": "Bite Me Sandwiches",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": null,
+"lat": 37.769377,
+"lon": -122.450819
+},
+{
+"name": "Blue Bottle Coffee",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": null,
+"lat": 37.771107,
+"lon": -122.391072
+},
+{
+"name": "Blue Bottle Coffee",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": "https://bluebottlecoffee.com/cafes/sutter-street",
+"lat": 37.789741,
+"lon": -122.403702
+},
+{
+"name": "Blue Heron Boathouse",
+"kind": "fast_food",
+"cuisine": "burger;coffee_shop;sandwich",
+"website": null,
+"lat": 37.770589,
+"lon": -122.477262
+},
+{
+"name": "Bo & Beurre",
+"kind": "fast_food",
+"cuisine": "vietnamese;sandwich",
+"website": null,
+"lat": 37.783377,
+"lon": -122.417931
+},
+{
+"name": "Boba Guys",
+"kind": "cafe",
+"cuisine": "bubble_tea",
+"website": "https://www.bobaguys.com/",
+"lat": 37.783666,
+"lon": -122.432632
+},
+{
+"name": "Boichik",
+"kind": "fast_food",
+"cuisine": "bagel",
+"website": "https://boichikbagels.com",
+"lat": 37.791477,
+"lon": -122.39937
+},
+{
+"name": "Bonita Taqueria Y Rotisserie",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://sfbonita.com/",
+"lat": 37.800184,
+"lon": -122.440464
+},
+{
+"name": "Boudin",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": null,
+"lat": 37.728611,
+"lon": -122.476779
+},
+{
+"name": "Bow Hon Seafood Restaurant",
+"kind": "restaurant",
+"cuisine": "seafood",
+"website": null,
+"lat": 37.794964,
+"lon": -122.406351
+},
+{
+"name": "Bravado",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": "https://www.bravadolounge.com/",
+"lat": 37.77878,
+"lon": -122.391332
+},
+{
+"name": "Breakfast Little",
+"kind": "restaurant",
+"cuisine": "sandwich",
+"website": null,
+"lat": 37.755225,
+"lon": -122.420361
+},
+{
+"name": "Breakfast at Tiffany's",
+"kind": "restaurant",
+"cuisine": "breakfast;sandwich",
+"website": "https://www.breakfastattiffanyssf.com/",
+"lat": 37.730453,
+"lon": -122.404622
+},
+{
+"name": "Breakthrough Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": "https://www.breakthroughsushi.com/",
+"lat": 37.792813,
+"lon": -122.400967
+},
+{
+"name": "Brenda's French Soul Food",
+"kind": "restaurant",
+"cuisine": "southern;american",
+"website": "https://www.frenchsoulfood.com",
+"lat": 37.782906,
+"lon": -122.418897
+},
+{
+"name": "Brew Cha",
+"kind": "cafe",
+"cuisine": "bubble_tea",
+"website": "https://www.brewchasf.com/",
+"lat": 37.761911,
+"lon": -122.420029
+},
+{
+"name": "Burger King",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://www.bk.com/store-locator/store/restaurant_2683",
+"lat": 37.701798,
+"lon": -122.484785
+},
+{
+"name": "Burger King",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://www.bk.com/store-locator/store/restaurant_3278",
+"lat": 37.744158,
+"lon": -122.404032
+},
+{
+"name": "Burger King",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://www.bk.com/store-locator/store/restaurant_2611",
+"lat": 37.745595,
+"lon": -122.420218
+},
+{
+"name": "Burger King",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://www.bk.com/store-locator/store/restaurant_5271",
+"lat": 37.781369,
+"lon": -122.461263
+},
+{
+"name": "Burger King",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://www.bk.com/store-locator/store/restaurant_2055",
+"lat": 37.783152,
+"lon": -122.421122
+},
+{
+"name": "Burger King",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://www.bk.com/store-locator/store/restaurant_1266",
+"lat": 37.78504,
+"lon": -122.408121
+},
+{
+"name": "Burger Stack",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": null,
+"lat": 37.752784,
+"lon": -122.411264
+},
+{
+"name": "Burrito Loco",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.740878,
+"lon": -122.46553
+},
+{
+"name": "C. Q. Noodle",
+"kind": "restaurant",
+"cuisine": "chinese;noodle",
+"website": null,
+"lat": 37.782027,
+"lon": -122.482103
+},
+{
+"name": "Cafe Enchante",
+"kind": "cafe",
+"cuisine": "bakery",
+"website": "https://cafe-enchante.cafes-city.com/",
+"lat": 37.779875,
+"lon": -122.48567
+},
+{
+"name": "Cafe Europa",
+"kind": "restaurant",
+"cuisine": "polish;german",
+"website": null,
+"lat": 37.785233,
+"lon": -122.463893
+},
+{
+"name": "Cafe Mason",
+"kind": "restaurant",
+"cuisine": "international;mexican",
+"website": "https://www.masondiner.com/",
+"lat": 37.786607,
+"lon": -122.409593
+},
+{
+"name": "Cafe Okawari",
+"kind": "cafe",
+"cuisine": "japanese",
+"website": "https://www.cafeokawari.com/",
+"lat": 37.778198,
+"lon": -122.393853
+},
+{
+"name": "Café de la Presse",
+"kind": "restaurant",
+"cuisine": "french",
+"website": "https://www.cafedelapresse.com/",
+"lat": 37.790481,
+"lon": -122.405465
+},
+{
+"name": "Cali-Phô-nia",
+"kind": "restaurant",
+"cuisine": "asian",
+"website": null,
+"lat": 37.731689,
+"lon": -122.405494
+},
+{
+"name": "California Fish Market",
+"kind": "restaurant",
+"cuisine": "seafood",
+"website": null,
+"lat": 37.799725,
+"lon": -122.408279
+},
+{
+"name": "Capo's",
+"kind": "restaurant",
+"cuisine": "italian",
+"website": null,
+"lat": 37.798501,
+"lon": -122.408382
+},
+{
+"name": "Capurro's",
+"kind": "restaurant",
+"cuisine": "seafood;pasta",
+"website": "https://capurros.com/",
+"lat": 37.807812,
+"lon": -122.420242
+},
+{
+"name": "Carl's Jr.",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://locations.carlsjr.com/ca/san-francisco/1-hallidie-plaza",
+"lat": 37.784292,
+"lon": -122.408722
+},
+{
+"name": "Casa de la Condesa",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://www.casadelacondesa.com",
+"lat": 37.752904,
+"lon": -122.418369
+},
+{
+"name": "Cento",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": null,
+"lat": 37.77885,
+"lon": -122.393942
+},
+{
+"name": "Cha-Ya Vegetarian",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": "https://www.chayasf.com/",
+"lat": 37.760742,
+"lon": -122.421664
+},
+{
+"name": "Chacho Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": "https://www.chachosushi.com/",
+"lat": 37.720993,
+"lon": -122.437817
+},
+{
+"name": "Chalos",
+"kind": "fast_food",
+"cuisine": "empanada",
+"website": "https://chalossf.com",
+"lat": 37.789499,
+"lon": -122.39767
+},
+{
+"name": "Charleys Philly Steaks",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": "https://www.charleys.com/locations/sales-force-transit-center/",
+"lat": 37.788948,
+"lon": -122.397297
+},
+{
+"name": "Chavita's Mexican Restaurant",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://www.chavitasca.com/",
+"lat": 37.748851,
+"lon": -122.418295
+},
+{
+"name": "Cheezy's",
+"kind": "fast_food",
+"cuisine": "pizza",
+"website": null,
+"lat": 37.782617,
+"lon": -122.408978
+},
+{
+"name": "Cheezy's Artisan Pizza",
+"kind": "restaurant",
+"cuisine": "pizza",
+"website": null,
+"lat": 37.783047,
+"lon": -122.408672
+},
+{
+"name": "Chestnut Diner",
+"kind": "restaurant",
+"cuisine": "diner",
+"website": null,
+"lat": 37.80239,
+"lon": -122.425253
+},
+{
+"name": "China Live",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": "https://chinalivesf.com/",
+"lat": 37.797913,
+"lon": -122.407877
+},
+{
+"name": "Chipotle",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": "https://locations.chipotle.com/ca/daly-city/213-westlake-ctr",
+"lat": 37.701502,
+"lon": -122.482446
+},
+{
+"name": "Chipotle",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": "https://locations.chipotle.com/ca/san-francisco/3251-20th-ave",
+"lat": 37.727657,
+"lon": -122.47653
+},
+{
+"name": "Chipotle",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": "https://locations.chipotle.com/ca/san-francisco/1523-sloat-blvd",
+"lat": 37.73253,
+"lon": -122.489975
+},
+{
+"name": "Chipotle",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": "https://locations.chipotle.com/ca/san-francisco/2675-geary-boulevard",
+"lat": 37.781824,
+"lon": -122.445657
+},
+{
+"name": "Chipotle",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": "https://locations.chipotle.com/ca/san-francisco/121-4th-st",
+"lat": 37.784236,
+"lon": -122.403673
+},
+{
+"name": "Chipotle",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": "https://locations.chipotle.com/ca/san-francisco/400-howard-st",
+"lat": 37.788914,
+"lon": -122.396134
+},
+{
+"name": "Chipotle",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": "https://locations.chipotle.com/ca/san-francisco/211-sutter-st",
+"lat": 37.789703,
+"lon": -122.404007
+},
+{
+"name": "Chipotle",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": "https://locations.chipotle.com/ca/san-francisco/525-market-street",
+"lat": 37.790366,
+"lon": -122.399403
+},
+{
+"name": "Chipotle",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": "https://locations.chipotle.com/ca/san-francisco/50-california-st",
+"lat": 37.794311,
+"lon": -122.397567
+},
+{
+"name": "Cholita Linda",
+"kind": "restaurant",
+"cuisine": "latin_american",
+"website": "https://cholitalinda.com/",
+"lat": 37.795503,
+"lon": -122.393133
+},
+{
+"name": "Cholo Soy",
+"kind": "restaurant",
+"cuisine": "peruvian",
+"website": null,
+"lat": 37.752415,
+"lon": -122.413943
+},
+{
+"name": "Chubby Noodle",
+"kind": "restaurant",
+"cuisine": "noodle",
+"website": "https://www.chubbynoodle.com/north-beach",
+"lat": 37.799688,
+"lon": -122.408539
+},
+{
+"name": "Chuy's Fiestas Taqueria II",
+"kind": "fast_food",
+"cuisine": "mexican;burrito;tacos",
+"website": null,
+"lat": 37.787743,
+"lon": -122.413677
+},
+{
+"name": "Chīsai Sushi Club",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": "https://chisaisushiclub.com/",
+"lat": 37.742719,
+"lon": -122.421578
+},
+{
+"name": "Cilantro SF Taqueria",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://cilantrosftaqueria.com/",
+"lat": 37.804566,
+"lon": -122.413549
+},
+{
+"name": "Cinco de Mayo Taquería",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.731759,
+"lon": -122.405535
+},
+{
+"name": "Clay Oven",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": "https://clayovensf.com/",
+"lat": 37.736672,
+"lon": -122.470293
+},
+{
+"name": "Coco's Ramen",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": "https://www.cocoramen.com/",
+"lat": 37.743779,
+"lon": -122.420899
+},
+{
+"name": "Coffee Cantata",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": null,
+"lat": 37.769674,
+"lon": -122.450611
+},
+{
+"name": "Coffee Roastery",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": null,
+"lat": 37.796997,
+"lon": -122.435219
+},
+{
+"name": "Coffee Tuk Tuk",
+"kind": "fast_food",
+"cuisine": "coffee_shop",
+"website": null,
+"lat": 37.761672,
+"lon": -122.410549
+},
+{
+"name": "CoffeeShop",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": null,
+"lat": 37.747053,
+"lon": -122.418779
+},
+{
+"name": "Colibri Mexican Bistro",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://www.colibrimexicanbistro.com/",
+"lat": 37.797625,
+"lon": -122.459184
+},
+{
+"name": "Columbus Burger",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://www.columbusburger.com/",
+"lat": 37.796109,
+"lon": -122.404381
+},
+{
+"name": "Copper Chimney Indian Restaurant",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": "https://wpcopperchimney.com",
+"lat": 37.781637,
+"lon": -122.396019
+},
+{
+"name": "Crab Station",
+"kind": "fast_food",
+"cuisine": "seafood",
+"website": null,
+"lat": 37.808414,
+"lon": -122.416003
+},
+{
+"name": "Credo",
+"kind": "restaurant",
+"cuisine": "italian",
+"website": null,
+"lat": 37.792091,
+"lon": -122.402016
+},
+{
+"name": "Crown Burger",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": null,
+"lat": 37.741063,
+"lon": -122.38875
+},
+{
+"name": "Cuppa",
+"kind": "cafe",
+"cuisine": "tea",
+"website": null,
+"lat": 37.734289,
+"lon": -122.434059
+},
+{
+"name": "Curry Pizza House",
+"kind": "restaurant",
+"cuisine": "pizza;wings",
+"website": null,
+"lat": 37.720665,
+"lon": -122.476772
+},
+{
+"name": "D&N Hot Wings",
+"kind": "fast_food",
+"cuisine": "wings",
+"website": null,
+"lat": 37.789408,
+"lon": -122.394693
+},
+{
+"name": "D'Maize",
+"kind": "cafe",
+"cuisine": "salvadoran",
+"website": "https://dmaize.com/",
+"lat": 37.72536,
+"lon": -122.452851
+},
+{
+"name": "Daeho",
+"kind": "fast_food",
+"cuisine": "korean",
+"website": null,
+"lat": 37.710241,
+"lon": -122.467679
+},
+{
+"name": "David's Delicatessen & Diner",
+"kind": "restaurant",
+"cuisine": "deli",
+"website": null,
+"lat": 37.787158,
+"lon": -122.411026
+},
+{
+"name": "Delah Coffee",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": null,
+"lat": 37.794743,
+"lon": -122.40126
+},
+{
+"name": "Delarosa",
+"kind": "restaurant",
+"cuisine": "pizza",
+"website": null,
+"lat": 37.785663,
+"lon": -122.404441
+},
+{
+"name": "Deli Board",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": "https://www.deliboardsf.com",
+"lat": 37.777589,
+"lon": -122.407036
+},
+{
+"name": "DeliShack",
+"kind": "cafe",
+"cuisine": "arab;deli;ice_cream;sandwich",
+"website": null,
+"lat": 37.782117,
+"lon": -122.417175
+},
+{
+"name": "Dim Sum Bistro",
+"kind": "restaurant",
+"cuisine": "chinese;dumpling",
+"website": "https://dim-sum-bistro.com/",
+"lat": 37.797575,
+"lon": -122.408061
+},
+{
+"name": "Dim the Way",
+"kind": "restaurant",
+"cuisine": "chinese;dim_sum",
+"website": "https://www.dimtheway.com/",
+"lat": 37.723386,
+"lon": -122.454417
+},
+{
+"name": "Diwali Indian Cuisine",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": null,
+"lat": 37.749022,
+"lon": -122.420208
+},
+{
+"name": "Domino's",
+"kind": "fast_food",
+"cuisine": "pizza",
+"website": "https://pizza.dominos.com/california/san-francisco/320-bayshore-blvd",
+"lat": 37.742804,
+"lon": -122.405751
+},
+{
+"name": "Domino's",
+"kind": "fast_food",
+"cuisine": "pizza",
+"website": "https://pizza.dominos.com/california/san-francisco/3116-noriega-street",
+"lat": 37.75349,
+"lon": -122.497158
+},
+{
+"name": "Domino's",
+"kind": "fast_food",
+"cuisine": "pizza",
+"website": "https://pizza.dominos.com/california/san-francisco/5200-geary-blvd-ste-d",
+"lat": 37.780787,
+"lon": -122.475681
+},
+{
+"name": "Donaji Restaurant",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.752338,
+"lon": -122.415493
+},
+{
+"name": "Donut Time",
+"kind": "fast_food",
+"cuisine": "donut",
+"website": null,
+"lat": 37.753546,
+"lon": -122.489499
+},
+{
+"name": "Double Shot Coffee",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": null,
+"lat": 37.769061,
+"lon": -122.390001
+},
+{
+"name": "Dough",
+"kind": "fast_food",
+"cuisine": "donut",
+"website": null,
+"lat": 37.775636,
+"lon": -122.418171
+},
+{
+"name": "Dupont Thai",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": null,
+"lat": 37.799543,
+"lon": -122.407282
+},
+{
+"name": "EA Cafe",
+"kind": "cafe",
+"cuisine": "ice_cream;poke;coffee_shop",
+"website": null,
+"lat": 37.778574,
+"lon": -122.392176
+},
+{
+"name": "Earl of Sandwich",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": null,
+"lat": 37.777621,
+"lon": -122.391949
+},
+{
+"name": "Eat Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.771744,
+"lon": -122.414432
+},
+{
+"name": "Ebisu",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": "https://ebisusushi.com/",
+"lat": 37.764448,
+"lon": -122.46652
+},
+{
+"name": "El Burger",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://www.elburgersf.com/",
+"lat": 37.761002,
+"lon": -122.421375
+},
+{
+"name": "El Burrito Express",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": "www.ebxsf.com",
+"lat": 37.742592,
+"lon": -122.483349
+},
+{
+"name": "El Burrito Express",
+"kind": "cafe",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.786428,
+"lon": -122.439962
+},
+{
+"name": "El Capitan Taqueria",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://www.elcapitantaqueriasf.com/",
+"lat": 37.775169,
+"lon": -122.410073
+},
+{
+"name": "El Castillito Taqueria",
+"kind": "fast_food",
+"cuisine": "burrito",
+"website": null,
+"lat": 37.768785,
+"lon": -122.429266
+},
+{
+"name": "El Castillito Taqueria",
+"kind": "fast_food",
+"cuisine": "mexican;tacos;burrito",
+"website": null,
+"lat": 37.781886,
+"lon": -122.41473
+},
+{
+"name": "El Jacal Mexican Grill",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://eljacal-mexicangrill.com",
+"lat": 37.738789,
+"lon": -122.414467
+},
+{
+"name": "El Rancho Grande",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://elranchograndeca.com",
+"lat": 37.777556,
+"lon": -122.43849
+},
+{
+"name": "El Rincon Yucateco",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.785728,
+"lon": -122.412769
+},
+{
+"name": "El Super Burrito",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.787886,
+"lon": -122.42002
+},
+{
+"name": "Elephant Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.777941,
+"lon": -122.423355
+},
+{
+"name": "Elephant Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": "https://elephantsushi.com/",
+"lat": 37.798649,
+"lon": -122.41881
+},
+{
+"name": "Enjoy Vegetarian",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": "https://enjoyveggie.com/",
+"lat": 37.795852,
+"lon": -122.405244
+},
+{
+"name": "Enjoy Vegetarian Restaurant",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": "https://www.enjoyveggie.com/",
+"lat": 37.760318,
+"lon": -122.469124
+},
+{
+"name": "Eric's Chinese Restaurant",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.746773,
+"lon": -122.427137
+},
+{
+"name": "Escape from New York Pizza",
+"kind": "fast_food",
+"cuisine": "pizza",
+"website": null,
+"lat": 37.769323,
+"lon": -122.451411
+},
+{
+"name": "Escape from New York Pizza",
+"kind": "restaurant",
+"cuisine": "pizza",
+"website": null,
+"lat": 37.790761,
+"lon": -122.40288
+},
+{
+"name": "Esposto's",
+"kind": "restaurant",
+"cuisine": "italian;sandwich",
+"website": null,
+"lat": 37.76688,
+"lon": -122.393176
+},
+{
+"name": "Falafel City",
+"kind": "restaurant",
+"cuisine": "mediterranean",
+"website": "https://fcorner.com",
+"lat": 37.784692,
+"lon": -122.413265
+},
+{
+"name": "Fanoos",
+"kind": "fast_food",
+"cuisine": "mediterranean",
+"website": null,
+"lat": 37.789042,
+"lon": -122.409162
+},
+{
+"name": "Farmhouse Kitchen",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "http://farmhousesf.com",
+"lat": 37.760159,
+"lon": -122.411087
+},
+{
+"name": "Feng Ze Yuan",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.775183,
+"lon": -122.506055
+},
+{
+"name": "Fin Thai Eatery",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "https://finthaisf.com/",
+"lat": 37.798309,
+"lon": -122.422389
+},
+{
+"name": "Fiorella Clement",
+"kind": "restaurant",
+"cuisine": "pizza",
+"website": "http://www.fiorella-sf.com/",
+"lat": 37.781915,
+"lon": -122.484518
+},
+{
+"name": "Fish & Farm",
+"kind": "restaurant",
+"cuisine": "fish",
+"website": "https://www.fishandfarmsf.com/",
+"lat": 37.795111,
+"lon": -122.400647
+},
+{
+"name": "Fisherman’s Wharf Chowder and Crab Sidewalk Stands",
+"kind": "restaurant",
+"cuisine": "seafood",
+"website": null,
+"lat": 37.808071,
+"lon": -122.415964
+},
+{
+"name": "Fishmandu Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": "https://www.fishmandusushi.com/",
+"lat": 37.786315,
+"lon": -122.417264
+},
+{
+"name": "Five Rivers Indian Cuisine",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": "https://www.5riversindian.com/",
+"lat": 37.700674,
+"lon": -122.483388
+},
+{
+"name": "Flipper's Gourmet Burgers",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://www.flippersgourmetburger.com/",
+"lat": 37.790089,
+"lon": -122.420461
+},
+{
+"name": "Flippin' Burger",
+"kind": "restaurant",
+"cuisine": "burger;sandwich;fries;american",
+"website": "https://eatatflippinburger.com/",
+"lat": 37.770059,
+"lon": -122.445795
+},
+{
+"name": "Flour + Water Pizzeria",
+"kind": "restaurant",
+"cuisine": "italian;pizza",
+"website": "https://www.fwpizzeria.com/",
+"lat": 37.800052,
+"lon": -122.40958
+},
+{
+"name": "Foghorn Taproom",
+"kind": "restaurant",
+"cuisine": "grill",
+"website": "https://www.foghorntaproom.com/",
+"lat": 37.777527,
+"lon": -122.438133
+},
+{
+"name": "Frankie's Crab Stand",
+"kind": "fast_food",
+"cuisine": "seafood;burger;fish_and_chips",
+"website": "https://frankiespier43.com/",
+"lat": 37.809051,
+"lon": -122.414539
+},
+{
+"name": "Freshroll",
+"kind": "fast_food",
+"cuisine": "vietnamese",
+"website": "https://www.eatatfreshroll.com/",
+"lat": 37.784036,
+"lon": -122.403459
+},
+{
+"name": "Fueling Station",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": null,
+"lat": 37.799314,
+"lon": -122.422311
+},
+{
+"name": "Fuku Ramen",
+"kind": "restaurant",
+"cuisine": "noodle;japanese",
+"website": null,
+"lat": 37.782263,
+"lon": -122.481951
+},
+{
+"name": "Fumi Curry & Ramen",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": null,
+"lat": 37.74405,
+"lon": -122.420727
+},
+{
+"name": "Fuwa Dumpling",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.775832,
+"lon": -122.497609
+},
+{
+"name": "Gallardo's",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.762165,
+"lon": -122.415972
+},
+{
+"name": "Gangnam Korean BBQ",
+"kind": "fast_food",
+"cuisine": "korean",
+"website": null,
+"lat": 37.728021,
+"lon": -122.476828
+},
+{
+"name": "Gelato Classico Italian",
+"kind": "fast_food",
+"cuisine": "ice_cream",
+"website": null,
+"lat": 37.80061,
+"lon": -122.408889
+},
+{
+"name": "Genki Ramen",
+"kind": "restaurant",
+"cuisine": "japanese;ramen",
+"website": "http://genkiramen.com",
+"lat": 37.7813,
+"lon": -122.462515
+},
+{
+"name": "Godzila Sushi",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": null,
+"lat": 37.786302,
+"lon": -122.439935
+},
+{
+"name": "Gola",
+"kind": "restaurant",
+"cuisine": "tunisian",
+"website": null,
+"lat": 37.759767,
+"lon": -122.421264
+},
+{
+"name": "Golden Chariot Bakery & Restaurant",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.775979,
+"lon": -122.494375
+},
+{
+"name": "Golden Gate Pizza & Indian",
+"kind": "restaurant",
+"cuisine": "pizza;indian",
+"website": null,
+"lat": 37.760706,
+"lon": -122.505447
+},
+{
+"name": "Golden Goat Coffee",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": "https://www.goldengoatcoffee.com/",
+"lat": 37.780468,
+"lon": -122.39441
+},
+{
+"name": "Golden King Vietnamese Restaurant",
+"kind": "restaurant",
+"cuisine": "vietnamese",
+"website": null,
+"lat": 37.794259,
+"lon": -122.405821
+},
+{
+"name": "Golden Star Vietnamese Restaurant",
+"kind": "restaurant",
+"cuisine": "vietnamese",
+"website": null,
+"lat": 37.794534,
+"lon": -122.405833
+},
+{
+"name": "Good Luck Dim Sum",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": "https://goodluckdimsum.store/",
+"lat": 37.782956,
+"lon": -122.467183
+},
+{
+"name": "Gordo Taqueria",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.765217,
+"lon": -122.466585
+},
+{
+"name": "Gordo Taqueria",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://gordotaqueria.co/",
+"lat": 37.780587,
+"lon": -122.478079
+},
+{
+"name": "Gordo Taqueria",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.782197,
+"lon": -122.483617
+},
+{
+"name": "Gourmet Carousel",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.789091,
+"lon": -122.423891
+},
+{
+"name": "Great Dim Sum",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.795941,
+"lon": -122.405937
+},
+{
+"name": "HD Rice Noodle",
+"kind": "restaurant",
+"cuisine": "chinese;noodle",
+"website": null,
+"lat": 37.754027,
+"lon": -122.478481
+},
+{
+"name": "Hahn's Hibachi",
+"kind": "restaurant",
+"cuisine": "korean",
+"website": null,
+"lat": 37.764044,
+"lon": -122.463711
+},
+{
+"name": "Hakashi Japanese Sushi Bar & Grill",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": "https://hakashisushi.com/",
+"lat": 37.781474,
+"lon": -122.396327
+},
+{
+"name": "Hamano Sushi",
+"kind": "restaurant",
+"cuisine": "japanese;sushi;omakase",
+"website": "https://hamanosushi.com/",
+"lat": 37.750794,
+"lon": -122.434201
+},
+{
+"name": "Happy Bakery / Dim Sum To Go",
+"kind": "cafe",
+"cuisine": "dim_sum;chinese",
+"website": null,
+"lat": 37.763218,
+"lon": -122.482279
+},
+{
+"name": "Happy Donut",
+"kind": "fast_food",
+"cuisine": "donut;chicken",
+"website": null,
+"lat": 37.781909,
+"lon": -122.410126
+},
+{
+"name": "Happy King Pizza",
+"kind": "fast_food",
+"cuisine": "pizza",
+"website": null,
+"lat": 37.777015,
+"lon": -122.392644
+},
+{
+"name": "Hawker Alley",
+"kind": "fast_food",
+"cuisine": "asian",
+"website": "https://www.hawkeralley.com/",
+"lat": 37.741898,
+"lon": -122.403567
+},
+{
+"name": "Haystack Pizza Italian Restaurant",
+"kind": "restaurant",
+"cuisine": "italian",
+"website": null,
+"lat": 37.751499,
+"lon": -122.429208
+},
+{
+"name": "Healthy U",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": null,
+"lat": 37.72216,
+"lon": -122.478676
+},
+{
+"name": "Hello!",
+"kind": "fast_food",
+"cuisine": "vietnamese;sandwich",
+"website": null,
+"lat": 37.781892,
+"lon": -122.417122
+},
+{
+"name": "Henry's Hunan Restaurant",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": "https://www.henryshunanrestaurant.com/",
+"lat": 37.786958,
+"lon": -122.399278
+},
+{
+"name": "Heroic Italian",
+"kind": "restaurant",
+"cuisine": "italian",
+"website": null,
+"lat": 37.759737,
+"lon": -122.43513
+},
+{
+"name": "Hinodeya Ramen & Bar",
+"kind": "restaurant",
+"cuisine": "noodle;ramen",
+"website": "https://hinodeyaramen.com/",
+"lat": 37.786284,
+"lon": -122.408395
+},
+{
+"name": "Hippie Thai Street Food",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": null,
+"lat": 37.77028,
+"lon": -122.445788
+},
+{
+"name": "Hollow",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": null,
+"lat": 37.763609,
+"lon": -122.473425
+},
+{
+"name": "Homegrown",
+"kind": "cafe",
+"cuisine": "sandwich",
+"website": null,
+"lat": 37.793671,
+"lon": -122.399916
+},
+{
+"name": "Hon's Wun-Tun House 洪記面家",
+"kind": "restaurant",
+"cuisine": "chinese;noodle",
+"website": "https://honswuntunhouse-sf.com/",
+"lat": 37.763671,
+"lon": -122.477756
+},
+{
+"name": "Honey Bar",
+"kind": "fast_food",
+"cuisine": "açaí",
+"website": null,
+"lat": 37.728001,
+"lon": -122.476745
+},
+{
+"name": "Hot Sauce and Panko",
+"kind": "fast_food",
+"cuisine": "wings;chicken;sandwich;fish_and_chips",
+"website": "https://hotsauceandpanko.com/",
+"lat": 37.794509,
+"lon": -122.417982
+},
+{
+"name": "House of Dim Sum",
+"kind": "restaurant",
+"cuisine": "asian",
+"website": "https://www.whadaphosf.com/",
+"lat": 37.755498,
+"lon": -122.419389
+},
+{
+"name": "House of Sushi Teriyaki & Tempura",
+"kind": "restaurant",
+"cuisine": "asian",
+"website": null,
+"lat": 37.796706,
+"lon": -122.422077
+},
+{
+"name": "House of Tadu",
+"kind": "restaurant",
+"cuisine": "ethiopian",
+"website": null,
+"lat": 37.773896,
+"lon": -122.391698
+},
+{
+"name": "House of Thai",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "https://www.houseofthaisf.com/",
+"lat": 37.7862,
+"lon": -122.418277
+},
+{
+"name": "House of Thai 2",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": null,
+"lat": 37.772251,
+"lon": -122.430226
+},
+{
+"name": "House of Xian Dumpling",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.79654,
+"lon": -122.405369
+},
+{
+"name": "Hummus Mediterranean Kitchen",
+"kind": "restaurant",
+"cuisine": "mediterranean",
+"website": null,
+"lat": 37.79681,
+"lon": -122.421809
+},
+{
+"name": "Hunan Cafe #2",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.773581,
+"lon": -122.50668
+},
+{
+"name": "Iggy's Burger",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": null,
+"lat": 37.760875,
+"lon": -122.436938
+},
+{
+"name": "Iggy's Place",
+"kind": "restaurant",
+"cuisine": "american",
+"website": "http://www.cassavasf.com/#home-hero",
+"lat": 37.775599,
+"lon": -122.496612
+},
+{
+"name": "Ike's Kitchen",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": "https://www.ikeskitchensf.com/",
+"lat": 37.783047,
+"lon": -122.420622
+},
+{
+"name": "Ike's Love and Sandwiches",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": "http://ilikeikesplace.com",
+"lat": 37.722107,
+"lon": -122.478686
+},
+{
+"name": "Ike's Love and Sandwiches",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": null,
+"lat": 37.775233,
+"lon": -122.389713
+},
+{
+"name": "Ike's Love and Sandwiches",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": "https://locations.ikessandwich.com/ca/san-francisco/122/",
+"lat": 37.785153,
+"lon": -122.419763
+},
+{
+"name": "Il Borgo",
+"kind": "restaurant",
+"cuisine": "italian",
+"website": null,
+"lat": 37.775633,
+"lon": -122.426267
+},
+{
+"name": "Il Casaro Pizzeria",
+"kind": "restaurant",
+"cuisine": "italian;pizza;napoletana",
+"website": "https://www.ilcasaropizzeria.com/",
+"lat": 37.798506,
+"lon": -122.407369
+},
+{
+"name": "Il Pollaio",
+"kind": "restaurant",
+"cuisine": "chicken",
+"website": "https://www.ilpollaiosf.com",
+"lat": 37.799959,
+"lon": -122.410012
+},
+{
+"name": "In-N-Out Burger",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://locations.in-n-out.com/154",
+"lat": 37.807767,
+"lon": -122.418467
+},
+{
+"name": "Indian Clay Oven",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": null,
+"lat": 37.782117,
+"lon": -122.485616
+},
+{
+"name": "Indian Oven",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": "https://indianovensf.com/",
+"lat": 37.771696,
+"lon": -122.430522
+},
+{
+"name": "International Smoke",
+"kind": "restaurant",
+"cuisine": "barbecue",
+"website": "https://www.michaelmina.net/restaurants/san-francisco-bay-area/international-smoke/",
+"lat": 37.790536,
+"lon": -122.396377
+},
+{
+"name": "Irving Pizza",
+"kind": "fast_food",
+"cuisine": "pizza",
+"website": "https://www.irvingpizza.com/",
+"lat": 37.786137,
+"lon": -122.418765
+},
+{
+"name": "Izumi Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": "https://www.izumikaitensushi.com/",
+"lat": 37.785319,
+"lon": -122.430431
+},
+{
+"name": "J. Georgie's Donuts Teriyaki & Hamburger",
+"kind": "fast_food",
+"cuisine": "donut;chinese",
+"website": null,
+"lat": 37.765193,
+"lon": -122.415113
+},
+{
+"name": "Jack in the Box",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://locations.jackinthebox.com/us/ca/san-francisco/400-geary-st",
+"lat": 37.787253,
+"lon": -122.410065
+},
+{
+"name": "Jack's",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": null,
+"lat": 37.793624,
+"lon": -122.403492
+},
+{
+"name": "Jake’s Steaks",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": null,
+"lat": 37.763661,
+"lon": -122.421612
+},
+{
+"name": "Jamba",
+"kind": "fast_food",
+"cuisine": "juice",
+"website": "https://locations.jamba.com/ca/san-francisco/3251-20th-ave",
+"lat": 37.727506,
+"lon": -122.476946
+},
+{
+"name": "Jamba",
+"kind": "fast_food",
+"cuisine": "juice",
+"website": "https://locations.jamba.com/ca/san-francisco/170-ofarrell-st",
+"lat": 37.787168,
+"lon": -122.407561
+},
+{
+"name": "Jay's Grill",
+"kind": "fast_food",
+"cuisine": "mediterranean",
+"website": "https://jaysgrills.com/",
+"lat": 37.776432,
+"lon": -122.417997
+},
+{
+"name": "Jenny's Burger",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": null,
+"lat": 37.765302,
+"lon": -122.466589
+},
+{
+"name": "Jeong's K-Food",
+"kind": "fast_food",
+"cuisine": "korean",
+"website": null,
+"lat": 37.7102,
+"lon": -122.467735
+},
+{
+"name": "Jin Mi Korean Cuisine",
+"kind": "restaurant",
+"cuisine": "korean",
+"website": "https://www.jinmikoreancuisine.com/",
+"lat": 37.781629,
+"lon": -122.416681
+},
+{
+"name": "Johnny Doughnuts",
+"kind": "fast_food",
+"cuisine": "donut",
+"website": null,
+"lat": 37.788993,
+"lon": -122.434207
+},
+{
+"name": "Joyride Pizza",
+"kind": "fast_food",
+"cuisine": "pizza",
+"website": "https://www.joyridepizza.com/mission-district",
+"lat": 37.766318,
+"lon": -122.421873
+},
+{
+"name": "Ju-ni Sushi Bar",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.77667,
+"lon": -122.438854
+},
+{
+"name": "Juice Shop",
+"kind": "fast_food",
+"cuisine": "juice",
+"website": null,
+"lat": 37.776463,
+"lon": -122.424143
+},
+{
+"name": "KFC",
+"kind": "fast_food",
+"cuisine": "chicken",
+"website": "https://locations.kfc.com/ca/san-francisco/4150-geary-boulevard",
+"lat": 37.781235,
+"lon": -122.464168
+},
+{
+"name": "KFC",
+"kind": "fast_food",
+"cuisine": "chicken",
+"website": "https://locations.kfc.com/ca/san-francisco/691-eddy-street",
+"lat": 37.782967,
+"lon": -122.419019
+},
+{
+"name": "Kama Sushi",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": "http://www.kama-sushi.com/",
+"lat": 37.747031,
+"lon": -122.426855
+},
+{
+"name": "Kayma",
+"kind": "restaurant",
+"cuisine": "algerian;african",
+"website": null,
+"lat": 37.781781,
+"lon": -122.415954
+},
+{
+"name": "Kevin's Noodle House",
+"kind": "restaurant",
+"cuisine": "vietnamese",
+"website": "http://kevinnoodlehouse.com/",
+"lat": 37.763417,
+"lon": -122.477771
+},
+{
+"name": "Khan Toke Thai House",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "https://www.khantokethaisf.com/",
+"lat": 37.779978,
+"lon": -122.483211
+},
+{
+"name": "Khao Tiew",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "http://www.chaiyathairestaurant.com/",
+"lat": 37.741056,
+"lon": -122.46502
+},
+{
+"name": "Kiku Sushi & Vegetarian",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": null,
+"lat": 37.764272,
+"lon": -122.42199
+},
+{
+"name": "Kim Son",
+"kind": "restaurant",
+"cuisine": "vietnamese",
+"website": null,
+"lat": 37.775826,
+"lon": -122.497695
+},
+{
+"name": "King of Noodles",
+"kind": "restaurant",
+"cuisine": "chinese;noodle",
+"website": "https://kingofnoodlessf.com",
+"lat": 37.763507,
+"lon": -122.475728
+},
+{
+"name": "King of Thai Noodle",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": null,
+"lat": 37.742462,
+"lon": -122.482832
+},
+{
+"name": "King’s Thai Cuisine #2",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": null,
+"lat": 37.783129,
+"lon": -122.463104
+},
+{
+"name": "Kio Ramen",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": "https://www.kioramen.com",
+"lat": 37.775869,
+"lon": -122.496779
+},
+{
+"name": "Kirimachi Ramen",
+"kind": "restaurant",
+"cuisine": "ramen",
+"website": "http://kirimachi.com/",
+"lat": 37.795231,
+"lon": -122.397552
+},
+{
+"name": "Kiss My Seoul",
+"kind": "restaurant",
+"cuisine": "burger;korean",
+"website": "https://www.kissmyseoul.com/",
+"lat": 37.774979,
+"lon": -122.403286
+},
+{
+"name": "Kiss of Matcha",
+"kind": "cafe",
+"cuisine": "bubble_tea",
+"website": "http://www.kissofmatcha.com/",
+"lat": 37.782946,
+"lon": -122.467446
+},
+{
+"name": "Korean Soul Chicken",
+"kind": "restaurant",
+"cuisine": "korean;chicken",
+"website": "https://koreansoulchicken.com/",
+"lat": 37.792592,
+"lon": -122.420959
+},
+{
+"name": "Korean Village Wooden Charcoal",
+"kind": "restaurant",
+"cuisine": "korean",
+"website": null,
+"lat": 37.780638,
+"lon": -122.46884
+},
+{
+"name": "Krispy Krunchy Chicken",
+"kind": "fast_food",
+"cuisine": "chicken",
+"website": null,
+"lat": 37.763534,
+"lon": -122.480853
+},
+{
+"name": "Krispy Krunchy Chicken",
+"kind": "fast_food",
+"cuisine": "chicken",
+"website": null,
+"lat": 37.808225,
+"lon": -122.413981
+},
+{
+"name": "Kuma Sushi + Sake",
+"kind": "restaurant",
+"cuisine": "japanese;sushi",
+"website": "https://www.kumasf.com/",
+"lat": 37.786691,
+"lon": -122.419764
+},
+{
+"name": "Kura Sushi",
+"kind": "fast_food",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.727967,
+"lon": -122.477148
+},
+{
+"name": "L & G Vietnamese Sandwich",
+"kind": "fast_food",
+"cuisine": "vietnamese;sandwich",
+"website": null,
+"lat": 37.783374,
+"lon": -122.417843
+},
+{
+"name": "L&L Hawaiian Barbecue",
+"kind": "fast_food",
+"cuisine": "hawaiian",
+"website": "http://www.sanfranciscolandl.com/",
+"lat": 37.791039,
+"lon": -122.403979
+},
+{
+"name": "La Azteca Taqueria",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.729451,
+"lon": -122.392872
+},
+{
+"name": "La Ciccia",
+"kind": "restaurant",
+"cuisine": "italian",
+"website": "https://www.laciccia.com/",
+"lat": 37.741999,
+"lon": -122.426657
+},
+{
+"name": "La Corneta Taqueria",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.734078,
+"lon": -122.434117
+},
+{
+"name": "La Mediterranée",
+"kind": "restaurant",
+"cuisine": "mediterranean",
+"website": null,
+"lat": 37.790101,
+"lon": -122.433983
+},
+{
+"name": "La Palma Mexicatessen",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": "http://www.lapalmasf.com",
+"lat": 37.752852,
+"lon": -122.409955
+},
+{
+"name": "La Playa Taqueria",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://laplayataqueriaca.com/",
+"lat": 37.752856,
+"lon": -122.504693
+},
+{
+"name": "La Taqueria",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://lataqueriasf.com/",
+"lat": 37.750874,
+"lon": -122.418158
+},
+{
+"name": "Ladle & Leaf",
+"kind": "fast_food",
+"cuisine": "soup",
+"website": "https://ladleandleaf.com/locations/275-Battery-Street/",
+"lat": 37.794032,
+"lon": -122.400293
+},
+{
+"name": "Lapats",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": null,
+"lat": 37.783406,
+"lon": -122.417704
+},
+{
+"name": "Larkin Restaurant",
+"kind": "restaurant",
+"cuisine": "vietnamese;chinese;pho",
+"website": null,
+"lat": 37.783486,
+"lon": -122.417717
+},
+{
+"name": "Las Brisas de Acapulco",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.747125,
+"lon": -122.418745
+},
+{
+"name": "Lava Java",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": null,
+"lat": 37.766645,
+"lon": -122.452866
+},
+{
+"name": "Le Sandwich",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": "https://www.lesandwichsf.com",
+"lat": 37.801726,
+"lon": -122.412023
+},
+{
+"name": "Lers Ros Thai",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "https://www.lersros.com/",
+"lat": 37.784712,
+"lon": -122.417596
+},
+{
+"name": "Limoncello",
+"kind": "cafe",
+"cuisine": "coffee_shop;sandwich;pizza",
+"website": null,
+"lat": 37.77887,
+"lon": -122.417152
+},
+{
+"name": "Little Garden",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.798612,
+"lon": -122.409527
+},
+{
+"name": "Little Sushi Bar",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": null,
+"lat": 37.783873,
+"lon": -122.482739
+},
+{
+"name": "Live Sushi Bar",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.764606,
+"lon": -122.403686
+},
+{
+"name": "Local Diner",
+"kind": "restaurant",
+"cuisine": "coffee_shop;italian;burger;seafood",
+"website": null,
+"lat": 37.778246,
+"lon": -122.415677
+},
+{
+"name": "Lori's Diner",
+"kind": "restaurant",
+"cuisine": "american",
+"website": null,
+"lat": 37.789317,
+"lon": -122.408792
+},
+{
+"name": "Los Cilantros",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "http://loscilantrossf.com/",
+"lat": 37.781814,
+"lon": -122.415836
+},
+{
+"name": "Los Hermanos Taqueria",
+"kind": "fast_food",
+"cuisine": "mexican;burger",
+"website": "https://loshermanosonline.com/",
+"lat": 37.786298,
+"lon": -122.417663
+},
+{
+"name": "Los Planes de Renderos",
+"kind": "restaurant",
+"cuisine": "salvadoran",
+"website": null,
+"lat": 37.722862,
+"lon": -122.43566
+},
+{
+"name": "Lou's Cafe",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": "http://www.louscafesf.com/100-pine-st",
+"lat": 37.792783,
+"lon": -122.398963
+},
+{
+"name": "Lucky Creation",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.795116,
+"lon": -122.407404
+},
+{
+"name": "Mango Crazy",
+"kind": "fast_food",
+"cuisine": "juice",
+"website": null,
+"lat": 37.80842,
+"lon": -122.413119
+},
+{
+"name": "Manna Korean Cuisine",
+"kind": "restaurant",
+"cuisine": "korean",
+"website": "https://mannasf.com/",
+"lat": 37.763884,
+"lon": -122.467251
+},
+{
+"name": "Manora`s Thai Cuisine",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "https://www.manorathai.com/",
+"lat": 37.770854,
+"lon": -122.415214
+},
+{
+"name": "Marcela's Taqueria",
+"kind": "fast_food",
+"cuisine": "mexican;burrito",
+"website": null,
+"lat": 37.786666,
+"lon": -122.412965
+},
+{
+"name": "Marcello's Pizza",
+"kind": "restaurant",
+"cuisine": "pizza",
+"website": "https://marcellospizzasf.com/",
+"lat": 37.762099,
+"lon": -122.435309
+},
+{
+"name": "Marco Polo Italian Ice Cream",
+"kind": "cafe",
+"cuisine": "ice_cream",
+"website": "https://www.facebook.com/pages/Marco-Polo-Italian-Ice-Cream/111697748858718",
+"lat": 37.742646,
+"lon": -122.481859
+},
+{
+"name": "Marina Submarine",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": "https://www.facebook.com/marinasub",
+"lat": 37.796801,
+"lon": -122.436967
+},
+{
+"name": "Marlowe",
+"kind": "restaurant",
+"cuisine": "american",
+"website": "https://marlowesf.getbento.com/",
+"lat": 37.778354,
+"lon": -122.396798
+},
+{
+"name": "Marnee Thai",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": null,
+"lat": 37.763236,
+"lon": -122.481874
+},
+{
+"name": "Marnee Thai",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "https://www.marneethaisf.com/",
+"lat": 37.76513,
+"lon": -122.466581
+},
+{
+"name": "Maru Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.789624,
+"lon": -122.408938
+},
+{
+"name": "Marufuku Ramen",
+"kind": "restaurant",
+"cuisine": "ramen",
+"website": "https://www.marufukuramen.com/sanfrancisco",
+"lat": 37.785128,
+"lon": -122.431998
+},
+{
+"name": "Marugame Udon",
+"kind": "fast_food",
+"cuisine": "noodle",
+"website": "https://www.marugameudon.com/",
+"lat": 37.727518,
+"lon": -122.476497
+},
+{
+"name": "Matcha Cafe Maiko",
+"kind": "cafe",
+"cuisine": "bubble_tea;ice_cream",
+"website": "https://www.matchacafe-maiko.com/eng/",
+"lat": 37.78488,
+"lon": -122.431719
+},
+{
+"name": "Matsuyama Shabu House",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": null,
+"lat": 37.786051,
+"lon": -122.429798
+},
+{
+"name": "McDonald's",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://www.mcdonalds.com/us/en-us/location/8021.html",
+"lat": 37.70662,
+"lon": -122.415342
+},
+{
+"name": "McDonald's",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://www.mcdonalds.com/us/en-us/location/10179.html",
+"lat": 37.713138,
+"lon": -122.444576
+},
+{
+"name": "McDonald's",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://www.mcdonalds.com/us/en-us/location/1782.html",
+"lat": 37.723501,
+"lon": -122.455487
+},
+{
+"name": "McDonald's",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://www.mcdonalds.com/us/en-us/location/7413.html",
+"lat": 37.742156,
+"lon": -122.405235
+},
+{
+"name": "McDonald's",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://www.mcdonalds.com/us/en-us/location/3228.html",
+"lat": 37.752078,
+"lon": -122.418132
+},
+{
+"name": "Mediterranean Aroma",
+"kind": "fast_food",
+"cuisine": "mediterranean",
+"website": "https://www.mediterraneanaroma.com/",
+"lat": 37.766663,
+"lon": -122.395538
+},
+{
+"name": "Mehfil Indian Restaurant",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": "https://mehfilsf.com",
+"lat": 37.788144,
+"lon": -122.400181
+},
+{
+"name": "Mel's Kitchen",
+"kind": "restaurant",
+"cuisine": "american;breakfast",
+"website": "https://melsdrive-in.com/locations/northern-california/mels-kitchen-now-open/",
+"lat": 37.785607,
+"lon": -122.421134
+},
+{
+"name": "Mensho Ramen",
+"kind": "restaurant",
+"cuisine": "ramen;japanese",
+"website": "https://menshogroup.com/",
+"lat": 37.7867,
+"lon": -122.414315
+},
+{
+"name": "Menya Kanemaru",
+"kind": "restaurant",
+"cuisine": "japanese;ramen",
+"website": "https://www.menya-kanemaru.com/",
+"lat": 37.770353,
+"lon": -122.422608
+},
+{
+"name": "Metro Milk Tea Hong Kong Dessert",
+"kind": "cafe",
+"cuisine": "bubble_tea;chinese",
+"website": null,
+"lat": 37.79444,
+"lon": -122.407869
+},
+{
+"name": "Mi Morena",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.781812,
+"lon": -122.415961
+},
+{
+"name": "Mijoté",
+"kind": "restaurant",
+"cuisine": "french",
+"website": "https://www.mijotesf.com/",
+"lat": 37.758906,
+"lon": -122.412698
+},
+{
+"name": "Mikado Sushi",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": "https://www.mikadosushisf.com/",
+"lat": 37.76587,
+"lon": -122.410691
+},
+{
+"name": "Milan Pizza",
+"kind": "fast_food",
+"cuisine": "pizza",
+"website": "http://milanpizzasf.com/",
+"lat": 37.786821,
+"lon": -122.413475
+},
+{
+"name": "Ming Hui Dim Sum",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.730509,
+"lon": -122.404673
+},
+{
+"name": "Mission Chinese Food",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": "https://www.missionchinesefood.com/",
+"lat": 37.761197,
+"lon": -122.419473
+},
+{
+"name": "Mission Curry House",
+"kind": "restaurant",
+"cuisine": "curry",
+"website": null,
+"lat": 37.75804,
+"lon": -122.41917
+},
+{
+"name": "Mister Jiu's",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.793717,
+"lon": -122.406662
+},
+{
+"name": "Miyabi Sushi",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": null,
+"lat": 37.805383,
+"lon": -122.413376
+},
+{
+"name": "Miyabiya Sushi and Grill",
+"kind": "restaurant",
+"cuisine": "japanese;sushi",
+"website": "https://www.miyabiyasf.com/",
+"lat": 37.785717,
+"lon": -122.408949
+},
+{
+"name": "Moki's Sushi & Pacific Grill",
+"kind": "restaurant",
+"cuisine": "seafood",
+"website": "https://www.mokisf.com",
+"lat": 37.739068,
+"lon": -122.415592
+},
+{
+"name": "Mongkok Dim Sum & Restaurant",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.753776,
+"lon": -122.490045
+},
+{
+"name": "Montesacro",
+"kind": "restaurant",
+"cuisine": "italian",
+"website": "https://montesacro.com/sanfrancisco",
+"lat": 37.78157,
+"lon": -122.410094
+},
+{
+"name": "Morning Vibes Cafe & Deli",
+"kind": "cafe",
+"cuisine": "coffee_shop;sandwich;american;salad;breakfast",
+"website": null,
+"lat": 37.76241,
+"lon": -122.466071
+},
+{
+"name": "Mozzarella di Bufala",
+"kind": "restaurant",
+"cuisine": "italian;brazilian;pizza",
+"website": "https://dibufala.com/",
+"lat": 37.739969,
+"lon": -122.466388
+},
+{
+"name": "Mr. Báhn Mì",
+"kind": "cafe",
+"cuisine": "vietnamese",
+"website": null,
+"lat": 37.775565,
+"lon": -122.497552
+},
+{
+"name": "Mr. Charlie's TMS",
+"kind": "fast_food",
+"cuisine": "burger;fast_food",
+"website": "https://mrcharlies.co/",
+"lat": 37.789471,
+"lon": -122.407563
+},
+{
+"name": "Mr. East Kitchen",
+"kind": "fast_food",
+"cuisine": "chinese;breakfast",
+"website": "https://www.mreastkitchen.com",
+"lat": 37.780392,
+"lon": -122.403859
+},
+{
+"name": "Mr. Mahjong",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.790585,
+"lon": -122.403868
+},
+{
+"name": "Mr. Pickle's Sandwich Shop",
+"kind": "restaurant",
+"cuisine": "sandwich",
+"website": "http://www.sfmrpickles.com/",
+"lat": 37.758887,
+"lon": -122.416736
+},
+{
+"name": "Mustafio's Pizza",
+"kind": "fast_food",
+"cuisine": "pizza",
+"website": null,
+"lat": 37.787064,
+"lon": -122.419817
+},
+{
+"name": "Muu Kara Thai Charcoal BBQ",
+"kind": "restaurant",
+"cuisine": "korean;barbecue",
+"website": null,
+"lat": 37.780819,
+"lon": -122.464661
+},
+{
+"name": "Mythic Pizza",
+"kind": "fast_food",
+"cuisine": "pizza",
+"website": null,
+"lat": 37.771906,
+"lon": -122.431281
+},
+{
+"name": "Nakama Sushi",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": "https://www.nakamasushisf.com",
+"lat": 37.774823,
+"lon": -122.421026
+},
+{
+"name": "Naked Fish Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.800782,
+"lon": -122.437928
+},
+{
+"name": "Nakorn Thai",
+"kind": "fast_food",
+"cuisine": "thai",
+"website": "https://www.nakornthaisf.com/",
+"lat": 37.782753,
+"lon": -122.466199
+},
+{
+"name": "Namaste Indian Cuisine",
+"kind": "restaurant",
+"cuisine": "indian;nepalese;curry",
+"website": "https://namasteindianbistro.com",
+"lat": 37.754515,
+"lon": -122.409151
+},
+{
+"name": "Native Burger",
+"kind": "restaurant",
+"cuisine": "burger",
+"website": null,
+"lat": 37.781618,
+"lon": -122.456055
+},
+{
+"name": "Nepa Indian & Nepalese Cuisine",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": "https://nepaindiancusine.com",
+"lat": 37.774391,
+"lon": -122.437871
+},
+{
+"name": "Nepalese Indian Cusine",
+"kind": "restaurant",
+"cuisine": "indian;nepali",
+"website": null,
+"lat": 37.777854,
+"lon": -122.416278
+},
+{
+"name": "New Castillito Taqueria",
+"kind": "restaurant",
+"cuisine": "taqueria",
+"website": null,
+"lat": 37.763608,
+"lon": -122.4197
+},
+{
+"name": "New Thai Elephant",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": null,
+"lat": 37.805531,
+"lon": -122.413423
+},
+{
+"name": "New Woey Loy Goey",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.795969,
+"lon": -122.406503
+},
+{
+"name": "Next Level Burger",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://locations.nextlevelburger.com/next-level-burger-potrero-hill-a801018e135e",
+"lat": 37.764632,
+"lon": -122.402948
+},
+{
+"name": "Nick The Greek",
+"kind": "fast_food",
+"cuisine": "greek",
+"website": null,
+"lat": 37.784083,
+"lon": -122.403514
+},
+{
+"name": "Nick The Greek",
+"kind": "fast_food",
+"cuisine": "greek",
+"website": null,
+"lat": 37.791917,
+"lon": -122.39295
+},
+{
+"name": "Ninniku",
+"kind": "fast_food",
+"cuisine": "sushi;japanese",
+"website": null,
+"lat": 37.785698,
+"lon": -122.433007
+},
+{
+"name": "Noah's Bagels",
+"kind": "fast_food",
+"cuisine": "bagel",
+"website": null,
+"lat": 37.732534,
+"lon": -122.4899
+},
+{
+"name": "Noe Indian Kitchen",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": null,
+"lat": 37.751301,
+"lon": -122.435596
+},
+{
+"name": "Nojo Ramen Tavern",
+"kind": "restaurant",
+"cuisine": "japanese;ramen",
+"website": "https://nojosframen.com/",
+"lat": 37.776812,
+"lon": -122.421441
+},
+{
+"name": "Noodle In A Haystack",
+"kind": "restaurant",
+"cuisine": "noodle",
+"website": "https://www.exploretock.com/noodleinahaystack",
+"lat": 37.780641,
+"lon": -122.468711
+},
+{
+"name": "Noodle Stop",
+"kind": "cafe",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.754051,
+"lon": -122.478034
+},
+{
+"name": "Noodle Time",
+"kind": "restaurant",
+"cuisine": "noodle",
+"website": null,
+"lat": 37.796954,
+"lon": -122.400872
+},
+{
+"name": "North Beach Pizza",
+"kind": "fast_food",
+"cuisine": "pizza",
+"website": null,
+"lat": 37.767226,
+"lon": -122.452995
+},
+{
+"name": "Northern China BBQ",
+"kind": "restaurant",
+"cuisine": "barbecue;chinese",
+"website": null,
+"lat": 37.773813,
+"lon": -122.411927
+},
+{
+"name": "OTD",
+"kind": "restaurant",
+"cuisine": "fusion",
+"website": null,
+"lat": 37.78714,
+"lon": -122.434113
+},
+{
+"name": "Oasis Grill",
+"kind": "fast_food",
+"cuisine": "greek",
+"website": null,
+"lat": 37.787086,
+"lon": -122.403829
+},
+{
+"name": "Oasis Grill",
+"kind": "fast_food",
+"cuisine": "mediterranean",
+"website": "https://oasisgrill.com",
+"lat": 37.794354,
+"lon": -122.396729
+},
+{
+"name": "Ocean Indian Cuisine",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": "https://www.oceanindiancuisine.com/",
+"lat": 37.779885,
+"lon": -122.485255
+},
+{
+"name": "Oh Dessert Cafe",
+"kind": "cafe",
+"cuisine": "dessert",
+"website": null,
+"lat": 37.763384,
+"lon": -122.478515
+},
+{
+"name": "Oishinbo Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": "https://oishinbosushi.menu11.com/",
+"lat": 37.783217,
+"lon": -122.461415
+},
+{
+"name": "Oki Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.743111,
+"lon": -122.426804
+},
+{
+"name": "Okina Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.775721,
+"lon": -122.458293
+},
+{
+"name": "Old Skool Cafe",
+"kind": "cafe",
+"cuisine": "american",
+"website": "https://www.oldskoolcafe.org/",
+"lat": 37.734237,
+"lon": -122.390519
+},
+{
+"name": "Om Indian Cuisine",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": "https://omsanfrancisco,com",
+"lat": 37.769772,
+"lon": -122.449725
+},
+{
+"name": "Oma Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": "https://www.omasushisf.com/",
+"lat": 37.786266,
+"lon": -122.410371
+},
+{
+"name": "Ono Hawaiian BBQ",
+"kind": "fast_food",
+"cuisine": "hawaiian",
+"website": "https://www.onohawaiianbbq.com/",
+"lat": 37.733791,
+"lon": -122.489375
+},
+{
+"name": "Oodle Yunnan Rice Noodle",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": "https://oodlesf.square.site",
+"lat": 37.775912,
+"lon": -122.495591
+},
+{
+"name": "Oriental Seafood Restaurant",
+"kind": "restaurant",
+"cuisine": "chinese;fish",
+"website": null,
+"lat": 37.753783,
+"lon": -122.490808
+},
+{
+"name": "Original Joe's",
+"kind": "restaurant",
+"cuisine": "italian;burger;pasta;steak",
+"website": "https://originaljoes.com/",
+"lat": 37.800326,
+"lon": -122.409326
+},
+{
+"name": "Osha Thai",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "https://www.oshathaimontgomery.com/",
+"lat": 37.791812,
+"lon": -122.402422
+},
+{
+"name": "Osmanthus Dim Sum Lounge",
+"kind": "restaurant",
+"cuisine": "chinese;dim_sum",
+"website": "https://www.osmanthusdimsum.com/",
+"lat": 37.798115,
+"lon": -122.405699
+},
+{
+"name": "Outta Sight Pizza",
+"kind": "fast_food",
+"cuisine": "pizza",
+"website": null,
+"lat": 37.781838,
+"lon": -122.41711
+},
+{
+"name": "Outta Sight Pizza II",
+"kind": "restaurant",
+"cuisine": "pizza",
+"website": "https://www.thatsouttasight.com/",
+"lat": 37.794499,
+"lon": -122.403867
+},
+{
+"name": "Oyugu Sushi",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": null,
+"lat": 37.775622,
+"lon": -122.502221
+},
+{
+"name": "PPQ (Phở Phú Quốc) Beef Noodle House",
+"kind": "restaurant",
+"cuisine": "vietnamese",
+"website": null,
+"lat": 37.763679,
+"lon": -122.477577
+},
+{
+"name": "Paik's Noodle",
+"kind": "fast_food",
+"cuisine": "korean;noodle",
+"website": null,
+"lat": 37.710232,
+"lon": -122.467757
+},
+{
+"name": "Panchitas",
+"kind": "fast_food",
+"cuisine": "salvadoran",
+"website": "https://www.panchitaspupuseria.com/",
+"lat": 37.764814,
+"lon": -122.421632
+},
+{
+"name": "Panda Express",
+"kind": "fast_food",
+"cuisine": "chinese",
+"website": "https://www.pandaexpress.com/locations/ca/san-francisco/3557",
+"lat": 37.74157,
+"lon": -122.387356
+},
+{
+"name": "Papalote Mexican Grill",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://papalote-sf.com/",
+"lat": 37.751991,
+"lon": -122.421051
+},
+{
+"name": "Pasta Panino",
+"kind": "restaurant",
+"cuisine": "italian",
+"website": "https://www.pastapanino.com/",
+"lat": 37.760943,
+"lon": -122.43599
+},
+{
+"name": "Peet's Coffee",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": null,
+"lat": 37.740327,
+"lon": -122.466612
+},
+{
+"name": "Per Diem",
+"kind": "restaurant",
+"cuisine": "californian",
+"website": "https://www.perdiemsf.com/",
+"lat": 37.788707,
+"lon": -122.397521
+},
+{
+"name": "Per Diem",
+"kind": "restaurant",
+"cuisine": "italian",
+"website": "https://www.perdiemsf.com/",
+"lat": 37.790037,
+"lon": -122.401297
+},
+{
+"name": "Pharaohs Mediterranean Sandwiches",
+"kind": "restaurant",
+"cuisine": "mediterranean;egyptian",
+"website": "http://pharaohssf.com",
+"lat": 37.786811,
+"lon": -122.413561
+},
+{
+"name": "Phat Thai",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "https://www.phatthaisf.com/",
+"lat": 37.799429,
+"lon": -122.440682
+},
+{
+"name": "Phillies",
+"kind": "fast_food",
+"cuisine": "burger;cheesesteaks;hoagies",
+"website": "https://philliessf.square.site/",
+"lat": 37.716049,
+"lon": -122.440669
+},
+{
+"name": "Pho #1",
+"kind": "restaurant",
+"cuisine": "asian",
+"website": null,
+"lat": 37.729446,
+"lon": -122.404122
+},
+{
+"name": "Pho 2000",
+"kind": "restaurant",
+"cuisine": "vietnamese",
+"website": null,
+"lat": 37.783879,
+"lon": -122.417799
+},
+{
+"name": "Pho 808",
+"kind": "restaurant",
+"cuisine": "vietnamese",
+"website": null,
+"lat": 37.786392,
+"lon": -122.416749
+},
+{
+"name": "Pho Day",
+"kind": "restaurant",
+"cuisine": "vietnamese;pho",
+"website": null,
+"lat": 37.742201,
+"lon": -122.423133
+},
+{
+"name": "Pho De Nguyen",
+"kind": "restaurant",
+"cuisine": "vietnamese",
+"website": null,
+"lat": 37.77605,
+"lon": -122.402276
+},
+{
+"name": "Pho Huong Viet",
+"kind": "restaurant",
+"cuisine": "vietnamese",
+"website": null,
+"lat": 37.780062,
+"lon": -122.481082
+},
+{
+"name": "Pho Huynh Hiep 2 - Kevin's Noodle House",
+"kind": "restaurant",
+"cuisine": "vietnamese",
+"website": "https://www.kevinsnoodlehouse.com",
+"lat": 37.763312,
+"lon": -122.477763
+},
+{
+"name": "Pho Huynh Sang",
+"kind": "restaurant",
+"cuisine": "vietnamese",
+"website": null,
+"lat": 37.78296,
+"lon": -122.461898
+},
+{
+"name": "Pho Tan Hoa",
+"kind": "restaurant",
+"cuisine": "vietnamese",
+"website": null,
+"lat": 37.785351,
+"lon": -122.413044
+},
+{
+"name": "Pho Vietnam",
+"kind": "restaurant",
+"cuisine": "vietnamese",
+"website": null,
+"lat": 37.789829,
+"lon": -122.420428
+},
+{
+"name": "Piccino",
+"kind": "restaurant",
+"cuisine": "italian",
+"website": null,
+"lat": 37.75773,
+"lon": -122.390025
+},
+{
+"name": "Piccolo Italia",
+"kind": "restaurant",
+"cuisine": "pizza",
+"website": null,
+"lat": 37.785098,
+"lon": -122.417784
+},
+{
+"name": "Pie Punks",
+"kind": "restaurant",
+"cuisine": "pizza",
+"website": null,
+"lat": 37.787517,
+"lon": -122.398936
+},
+{
+"name": "Pinecrest Diner",
+"kind": "restaurant",
+"cuisine": "american",
+"website": "https://pinecrestdiner.com/",
+"lat": 37.787004,
+"lon": -122.409993
+},
+{
+"name": "Pizza Zone N Grill",
+"kind": "restaurant",
+"cuisine": "pizza",
+"website": "https://www.pizzazonegrill.com/",
+"lat": 37.770285,
+"lon": -122.422604
+},
+{
+"name": "Plaj",
+"kind": "restaurant",
+"cuisine": "scandinavian",
+"website": null,
+"lat": 37.778747,
+"lon": -122.422249
+},
+{
+"name": "Poke Bar",
+"kind": "fast_food",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.792198,
+"lon": -122.403741
+},
+{
+"name": "Pollo Campero",
+"kind": "fast_food",
+"cuisine": "chicken",
+"website": null,
+"lat": 37.808118,
+"lon": -122.415086
+},
+{
+"name": "Pop's Sandwich Shop",
+"kind": "restaurant",
+"cuisine": "sandwich",
+"website": null,
+"lat": 37.743957,
+"lon": -122.453586
+},
+{
+"name": "Popeyes",
+"kind": "fast_food",
+"cuisine": "chicken",
+"website": "https://locations.popeyes.com/ca/san-francisco/599-divisadero-st/",
+"lat": 37.77486,
+"lon": -122.437958
+},
+{
+"name": "Pressed Juicery",
+"kind": "fast_food",
+"cuisine": "juice",
+"website": null,
+"lat": 37.790213,
+"lon": -122.397883
+},
+{
+"name": "Proper Food",
+"kind": "fast_food",
+"cuisine": "salad",
+"website": null,
+"lat": 37.792187,
+"lon": -122.403802
+},
+{
+"name": "Publico Urban Taqueria",
+"kind": "fast_food",
+"cuisine": "tex-mex",
+"website": null,
+"lat": 37.770961,
+"lon": -122.407404
+},
+{
+"name": "Pupuseria El Golazo",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.713618,
+"lon": -122.429982
+},
+{
+"name": "Q's Sandwich Shop",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": "https://www.qssandwichshop.com",
+"lat": 37.771542,
+"lon": -122.436954
+},
+{
+"name": "Queen Mediterranean Pizzeria",
+"kind": "fast_food",
+"cuisine": "pizza",
+"website": null,
+"lat": 37.805224,
+"lon": -122.423303
+},
+{
+"name": "Quickly",
+"kind": "cafe",
+"cuisine": "bubble_tea",
+"website": "http://quicklyusa.com/sfsfsu.html",
+"lat": 37.722627,
+"lon": -122.478827
+},
+{
+"name": "Quê Huong Vietnamese Deli",
+"kind": "restaurant",
+"cuisine": "vietnamese",
+"website": null,
+"lat": 37.763527,
+"lon": -122.481023
+},
+{
+"name": "Ramen Hiroshi",
+"kind": "restaurant",
+"cuisine": "ramen;japanese",
+"website": "http://ramenhiroshi.com/san-francisco",
+"lat": 37.791248,
+"lon": -122.403939
+},
+{
+"name": "Ramen Izakaya Goku",
+"kind": "restaurant",
+"cuisine": "ramen",
+"website": null,
+"lat": 37.764857,
+"lon": -122.424936
+},
+{
+"name": "Ramen Sho Ryu",
+"kind": "restaurant",
+"cuisine": "ramen",
+"website": null,
+"lat": 37.796304,
+"lon": -122.421996
+},
+{
+"name": "Ramen Yamadaya",
+"kind": "restaurant",
+"cuisine": "japanese;ramen",
+"website": "https://www.ramen-yamadaya.com/san-francisco",
+"lat": 37.786042,
+"lon": -122.429769
+},
+{
+"name": "Ramenwell",
+"kind": "restaurant",
+"cuisine": "japanese;ramen",
+"website": "https://www.ramenwell.com/",
+"lat": 37.762014,
+"lon": -122.418868
+},
+{
+"name": "Ravi",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": null,
+"lat": 37.796218,
+"lon": -122.404589
+},
+{
+"name": "Red Jade",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.766851,
+"lon": -122.42875
+},
+{
+"name": "Red's Java House",
+"kind": "restaurant",
+"cuisine": "burger",
+"website": "https://www.redsjavahouse.com/",
+"lat": 37.787208,
+"lon": -122.387321
+},
+{
+"name": "Regent Thai",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "https://www.regentthaisf.com/",
+"lat": 37.743595,
+"lon": -122.426843
+},
+{
+"name": "Rin's Thai",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "https://rinthaisf.com/",
+"lat": 37.750923,
+"lon": -122.438608
+},
+{
+"name": "Riverside Seafood Restaurant",
+"kind": "restaurant",
+"cuisine": "chinese;dim_sum",
+"website": null,
+"lat": 37.739011,
+"lon": -122.479865
+},
+{
+"name": "Rocket Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.772637,
+"lon": -122.422105
+},
+{
+"name": "Rolling Dumpling",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": null,
+"lat": 37.784058,
+"lon": -122.402708
+},
+{
+"name": "Rose Indian Cusine",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": "https://roseindiansf.com",
+"lat": 37.763447,
+"lon": -122.466169
+},
+{
+"name": "Roti India Bistro",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": null,
+"lat": 37.740182,
+"lon": -122.466242
+},
+{
+"name": "Royal Indian Cuisine",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": "https://royalindiancusine.com/",
+"lat": 37.785801,
+"lon": -122.433079
+},
+{
+"name": "Rural Ramen Bar",
+"kind": "restaurant",
+"cuisine": "ramen;thai",
+"website": "https://ruralramenbar.com/",
+"lat": 37.794525,
+"lon": -122.40983
+},
+{
+"name": "S & E Cafe",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.742841,
+"lon": -122.475444
+},
+{
+"name": "SAJJ Mediterranean",
+"kind": "restaurant",
+"cuisine": "mediterranean",
+"website": "https://www.sajjstreeteats.com/location/san-francisco-soma/",
+"lat": 37.781301,
+"lon": -122.391668
+},
+{
+"name": "SAJJ Mediterranean",
+"kind": "restaurant",
+"cuisine": "mediterranean",
+"website": "https://www.sajjstreeteats.com/location/san-francisco-fidi-at-88-belden-place/",
+"lat": 37.791642,
+"lon": -122.403804
+},
+{
+"name": "SF Kebab",
+"kind": "fast_food",
+"cuisine": "mediterranean",
+"website": null,
+"lat": 37.767314,
+"lon": -122.389973
+},
+{
+"name": "SF Pizza",
+"kind": "fast_food",
+"cuisine": "pizza",
+"website": null,
+"lat": 37.776758,
+"lon": -122.414354
+},
+{
+"name": "SF Wraps",
+"kind": "fast_food",
+"cuisine": "gyros;falafel",
+"website": null,
+"lat": 37.790538,
+"lon": -122.404151
+},
+{
+"name": "Sai Jai Thai",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": null,
+"lat": 37.785138,
+"lon": -122.417417
+},
+{
+"name": "Sai's Vietnamese Restaurant",
+"kind": "restaurant",
+"cuisine": "vietnamese;noodle;pho;sandwich",
+"website": "https://saisvietnameserestaurant.com/",
+"lat": 37.796246,
+"lon": -122.404099
+},
+{
+"name": "Saigon BBQ Noodle House",
+"kind": "restaurant",
+"cuisine": "vietnamese",
+"website": null,
+"lat": 37.763621,
+"lon": -122.478897
+},
+{
+"name": "Saigon Sandwich",
+"kind": "fast_food",
+"cuisine": "vietnamese;sandwich",
+"website": null,
+"lat": 37.78311,
+"lon": -122.417356
+},
+{
+"name": "Saiwalks",
+"kind": "fast_food",
+"cuisine": "vietnamese",
+"website": "http://www.saiwalks.com/",
+"lat": 37.800374,
+"lon": -122.437697
+},
+{
+"name": "Sakesan Sushi & Robata",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": null,
+"lat": 37.72434,
+"lon": -122.457469
+},
+{
+"name": "Sanppo Sushi",
+"kind": "restaurant",
+"cuisine": "sushi;japanese",
+"website": "https://sanpposushisf.com/",
+"lat": 37.785655,
+"lon": -122.430044
+},
+{
+"name": "Sawaii Ramen",
+"kind": "cafe",
+"cuisine": "japanese",
+"website": null,
+"lat": 37.763478,
+"lon": -122.482133
+},
+{
+"name": "Seafood Station",
+"kind": "restaurant",
+"cuisine": "seafood",
+"website": "https://www.seafoodstationsf.com/",
+"lat": 37.738975,
+"lon": -122.41447
+},
+{
+"name": "Seniore's Pizza",
+"kind": "fast_food",
+"cuisine": "pizza",
+"website": "https://seniorespizza.com/",
+"lat": 37.772307,
+"lon": -122.42974
+},
+{
+"name": "Shake Shack",
+"kind": "fast_food",
+"cuisine": "burger;pastry",
+"website": null,
+"lat": 37.727401,
+"lon": -122.47635
+},
+{
+"name": "Shake Shack",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://www.shakeshack.com/location/cow-hollow-san-francisco-ca/",
+"lat": 37.797918,
+"lon": -122.435503
+},
+{
+"name": "Shanghai Dumpling King",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": "https://www.shanghaidumplingkingsf.com/",
+"lat": 37.731691,
+"lon": -122.450987
+},
+{
+"name": "Shaska",
+"kind": "cafe",
+"cuisine": "peruvian",
+"website": null,
+"lat": 37.749118,
+"lon": -122.418551
+},
+{
+"name": "Shihlin Taiwan Street Snacks",
+"kind": "fast_food",
+"cuisine": "taiwanese",
+"website": null,
+"lat": 37.727788,
+"lon": -122.476609
+},
+{
+"name": "Shoshin Sushi",
+"kind": "restaurant",
+"cuisine": "japanese;sushi",
+"website": "https://www.shoshinsushi.com",
+"lat": 37.782111,
+"lon": -122.48582
+},
+{
+"name": "Sichuan House",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.78041,
+"lon": -122.473524
+},
+{
+"name": "Sidewalk Juice",
+"kind": "cafe",
+"cuisine": "juice",
+"website": "https://sidewalkjuice.com/locations/haight-st/",
+"lat": 37.771409,
+"lon": -122.435141
+},
+{
+"name": "Sightglass",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": null,
+"lat": 37.772304,
+"lon": -122.437424
+},
+{
+"name": "Soup Freaks",
+"kind": "fast_food",
+"cuisine": "soup",
+"website": null,
+"lat": 37.786776,
+"lon": -122.400939
+},
+{
+"name": "Spice of India",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": "http://www.spiceofindia.com",
+"lat": 37.782086,
+"lon": -122.417175
+},
+{
+"name": "Split Bread",
+"kind": "restaurant",
+"cuisine": "sandwich;salad",
+"website": null,
+"lat": 37.789039,
+"lon": -122.399452
+},
+{
+"name": "Spruce",
+"kind": "restaurant",
+"cuisine": "american;californian;wine_bar",
+"website": "https://www.sprucesf.com/",
+"lat": 37.787672,
+"lon": -122.452755
+},
+{
+"name": "Sri Thai Cuisine",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "https://www.srithaisf.com/",
+"lat": 37.76396,
+"lon": -122.507808
+},
+{
+"name": "Sriracha Thai Cuisine",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "http://srirachathaicuisine.com",
+"lat": 37.763635,
+"lon": -122.466446
+},
+{
+"name": "Stable Cafe",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": "https://www.stablecafe.com/",
+"lat": 37.763247,
+"lon": -122.415287
+},
+{
+"name": "Starbucks",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": "https://www.starbucks.com/store-locator/store/16566/675-portola-miraloma-675-portola-drive-san-francisco-ca-941271207-us",
+"lat": 37.744636,
+"lon": -122.452674
+},
+{
+"name": "Starbucks",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": "https://www.starbucks.com/store-locator/store/13355/5455-geary-blvd-wfb-5455-geary-blvd-san-francisco-ca-941212306-us",
+"lat": 37.7802,
+"lon": -122.478001
+},
+{
+"name": "Starbucks",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": "https://www.starbucks.com/store-locator/store/1040470/powell-o-farrell-201-powell-street-san-francisco-ca-941022205-us",
+"lat": 37.786535,
+"lon": -122.408196
+},
+{
+"name": "Starbucks",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": "https://www.starbucks.com/store-locator/store/11766/bush-van-ness-s-f-1401-van-ness-avenue-san-francisco-ca-941094607-us",
+"lat": 37.788581,
+"lon": -122.422205
+},
+{
+"name": "Starbucks",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": "https://www.starbucks.com/store-locator/store/9037/polk-street-2165-polk-street-san-francisco-ca-941092506-us",
+"lat": 37.796757,
+"lon": -122.422118
+},
+{
+"name": "Stone Korean Kitchen",
+"kind": "restaurant",
+"cuisine": "korean",
+"website": null,
+"lat": 37.795396,
+"lon": -122.395872
+},
+{
+"name": "Street Taco",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": "https://streettacosf.com/",
+"lat": 37.766656,
+"lon": -122.396085
+},
+{
+"name": "StreetTaco",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": "https://streettacosf.com/",
+"lat": 37.769652,
+"lon": -122.448988
+},
+{
+"name": "Studio Aurora",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": null,
+"lat": 37.767975,
+"lon": -122.42235
+},
+{
+"name": "Suavecito Birria & Tacos",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": "https://www.sfsuavecito.com/",
+"lat": 37.788548,
+"lon": -122.414835
+},
+{
+"name": "Subway",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": "https://restaurants.subway.com/united-states/ca/san-francisco/3911-alemany-blvd",
+"lat": 37.710954,
+"lon": -122.466976
+},
+{
+"name": "Subway",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": "https://restaurants.subway.com/united-states/ca/san-francisco/750-font-blvd",
+"lat": 37.723317,
+"lon": -122.482221
+},
+{
+"name": "Subway",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": "https://restaurants.subway.com/united-states/ca/san-francisco/595-buckingham-way",
+"lat": 37.73026,
+"lon": -122.476282
+},
+{
+"name": "Subway",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": "https://restaurants.subway.com/united-states/ca/san-francisco/3801-3rd-st",
+"lat": 37.741642,
+"lon": -122.387347
+},
+{
+"name": "Subway",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": "https://restaurants.subway.com/united-states/ca/san-francisco/5650-geary-blvd",
+"lat": 37.780483,
+"lon": -122.480258
+},
+{
+"name": "Subway",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": "https://restaurants.subway.com/united-states/ca/san-francisco/425-bush-st",
+"lat": 37.790593,
+"lon": -122.404509
+},
+{
+"name": "Subway",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": "https://restaurants.subway.com/united-states/ca/san-francisco/350-bay-street",
+"lat": 37.806221,
+"lon": -122.412718
+},
+{
+"name": "Suki Sushi",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": null,
+"lat": 37.737412,
+"lon": -122.470129
+},
+{
+"name": "Sum Dim Sum",
+"kind": "restaurant",
+"cuisine": "dumpling;chinese;noodle",
+"website": null,
+"lat": 37.79259,
+"lon": -122.406091
+},
+{
+"name": "Sunflower Hawaiian Barbecue",
+"kind": "restaurant",
+"cuisine": "hawaiian;barbecue;vietnamese",
+"website": null,
+"lat": 37.764779,
+"lon": -122.422308
+},
+{
+"name": "Sunset Cantina",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://sunsetcantinasf.com/",
+"lat": 37.760875,
+"lon": -122.498818
+},
+{
+"name": "Sunset Indian Cusine",
+"kind": "restaurant",
+"cuisine": "indian;himalayan",
+"website": null,
+"lat": 37.764247,
+"lon": -122.464909
+},
+{
+"name": "Super Duper Burger",
+"kind": "restaurant",
+"cuisine": "burger;chicken;sandwich;salad;ice_cream",
+"website": null,
+"lat": 37.792796,
+"lon": -122.394162
+},
+{
+"name": "Super Duper Burger",
+"kind": "fast_food",
+"cuisine": "burger",
+"website": "https://www.superdupersf.com/",
+"lat": 37.800285,
+"lon": -122.439701
+},
+{
+"name": "Super Duper Burgers",
+"kind": "fast_food",
+"cuisine": "burger;sandwich;salad;ice_cream;tea;chicken",
+"website": "https://www.superduperburgers.com/location/metreon-super-duper/",
+"lat": 37.784868,
+"lon": -122.403546
+},
+{
+"name": "Supreme Crab",
+"kind": "restaurant",
+"cuisine": "seafood",
+"website": null,
+"lat": 37.80795,
+"lon": -122.41651
+},
+{
+"name": "Sushi Bistro @ 6th&B",
+"kind": "restaurant",
+"cuisine": "sushi;japanese",
+"website": "https://sushibistro.com",
+"lat": 37.777361,
+"lon": -122.463872
+},
+{
+"name": "Sushi Boat Restaurant",
+"kind": "restaurant",
+"cuisine": "japanese;sushi",
+"website": null,
+"lat": 37.793478,
+"lon": -122.406051
+},
+{
+"name": "Sushi Chef",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": null,
+"lat": 37.797297,
+"lon": -122.406113
+},
+{
+"name": "Sushi Easy",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.75582,
+"lon": -122.420857
+},
+{
+"name": "Sushi GoGo",
+"kind": "fast_food",
+"cuisine": "sushi",
+"website": "www.sushigogo11.com",
+"lat": 37.807152,
+"lon": -122.415775
+},
+{
+"name": "Sushi Hashiri",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.783044,
+"lon": -122.407671
+},
+{
+"name": "Sushi Kazu",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": null,
+"lat": 37.763889,
+"lon": -122.467113
+},
+{
+"name": "Sushi Kinta",
+"kind": "fast_food",
+"cuisine": "japanese",
+"website": null,
+"lat": 37.794634,
+"lon": -122.395668
+},
+{
+"name": "Sushi Sheng",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.73954,
+"lon": -122.467502
+},
+{
+"name": "Sushi Time",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.764565,
+"lon": -122.432004
+},
+{
+"name": "Sushi Uma",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": "https://www.thesushiuma.com/",
+"lat": 37.763521,
+"lon": -122.481148
+},
+{
+"name": "Sushi Uma",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": "https://www.thesushiuma.com/",
+"lat": 37.76358,
+"lon": -122.479804
+},
+{
+"name": "Sushi on North Beach - Katsu",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": null,
+"lat": 37.801363,
+"lon": -122.411926
+},
+{
+"name": "Sushirrito",
+"kind": "fast_food",
+"cuisine": "sushi;burrito",
+"website": "https://www.sushirrito.com/",
+"lat": 37.790217,
+"lon": -122.403797
+},
+{
+"name": "Suzu Noodle House",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": null,
+"lat": 37.785111,
+"lon": -122.431836
+},
+{
+"name": "Sweet Basil Thai Cuisine",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "http://sf.sweetbasilthai.net/",
+"lat": 37.74521,
+"lon": -122.419971
+},
+{
+"name": "Sweet greens",
+"kind": "fast_food",
+"cuisine": "salad",
+"website": null,
+"lat": 37.787267,
+"lon": -122.39865
+},
+{
+"name": "Swensen's Ice Cream",
+"kind": "cafe",
+"cuisine": "ice_cream",
+"website": "https://swensensofsf.com/",
+"lat": 37.799075,
+"lon": -122.419178
+},
+{
+"name": "Swiss Louis",
+"kind": "restaurant",
+"cuisine": "italian;seafood",
+"website": null,
+"lat": 37.810166,
+"lon": -122.410708
+},
+{
+"name": "TUR",
+"kind": "restaurant",
+"cuisine": "asian;fusion;brunch",
+"website": null,
+"lat": 37.740616,
+"lon": -122.465671
+},
+{
+"name": "Taco Bar",
+"kind": "fast_food",
+"cuisine": "tex-mex",
+"website": "https://www.visitthemarket.com/food/taco-bar/",
+"lat": 37.776424,
+"lon": -122.4169
+},
+{
+"name": "Taco Bell",
+"kind": "fast_food",
+"cuisine": "tex-mex",
+"website": "https://locations.tacobell.com/ca/san-francisco/691-eddy-street.html",
+"lat": 37.783006,
+"lon": -122.419029
+},
+{
+"name": "Taco Cantina",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.80988,
+"lon": -122.410244
+},
+{
+"name": "Tacobar",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://www.tacobarsf.com/",
+"lat": 37.788751,
+"lon": -122.433981
+},
+{
+"name": "Tacos El Patron",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.749062,
+"lon": -122.416152
+},
+{
+"name": "Taishan Cuisine",
+"kind": "fast_food",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.723418,
+"lon": -122.454646
+},
+{
+"name": "Taj Indian Cuisine",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": null,
+"lat": 37.780113,
+"lon": -122.480576
+},
+{
+"name": "Takara Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.760667,
+"lon": -122.436861
+},
+{
+"name": "Tanglad",
+"kind": "restaurant",
+"cuisine": "vietnamese",
+"website": "https://tangladsf.webflow.io/",
+"lat": 37.761478,
+"lon": -122.434918
+},
+{
+"name": "Tanguito",
+"kind": "fast_food",
+"cuisine": "argentinian",
+"website": null,
+"lat": 37.807341,
+"lon": -122.417191
+},
+{
+"name": "Taqueria Can-Cún",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.745336,
+"lon": -122.419892
+},
+{
+"name": "Taqueria Can-Cún",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.781977,
+"lon": -122.410284
+},
+{
+"name": "Taqueria Cancun",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://taqueriacancunsf.net",
+"lat": 37.760463,
+"lon": -122.419399
+},
+{
+"name": "Taqueria Castillo",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.781073,
+"lon": -122.413391
+},
+{
+"name": "Taqueria Cazadores",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "http://taqueriacazadores.net/",
+"lat": 37.772787,
+"lon": -122.418865
+},
+{
+"name": "Taqueria Chapala",
+"kind": "cafe",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.753945,
+"lon": -122.479834
+},
+{
+"name": "Taqueria Dos Charros",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://ordertaqueriadoscharros.com/",
+"lat": 37.717907,
+"lon": -122.474085
+},
+{
+"name": "Taqueria El Buen Sabor",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://www.taqueriaelbuensabor.com",
+"lat": 37.761816,
+"lon": -122.421448
+},
+{
+"name": "Taqueria El Castillo",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.781625,
+"lon": -122.416715
+},
+{
+"name": "Taqueria El Farolito",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://elfarolitosf.com/",
+"lat": 37.752643,
+"lon": -122.418312
+},
+{
+"name": "Taqueria El Farolito",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": "https://elfarolitosf.com/",
+"lat": 37.752779,
+"lon": -122.411132
+},
+{
+"name": "Taqueria El Farolito",
+"kind": "cafe",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.807516,
+"lon": -122.414901
+},
+{
+"name": "Taqueria Gonzalez",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.724244,
+"lon": -122.457071
+},
+{
+"name": "Taqueria Gonzalez",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.729763,
+"lon": -122.404371
+},
+{
+"name": "Taqueria Guadalajara",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.721311,
+"lon": -122.437542
+},
+{
+"name": "Taqueria Guadalajara",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.752565,
+"lon": -122.415008
+},
+{
+"name": "Taqueria La Cumbre",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://www.tlctaco.com/",
+"lat": 37.764573,
+"lon": -122.421714
+},
+{
+"name": "Taqueria La Iguana Azul",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.716077,
+"lon": -122.440729
+},
+{
+"name": "Taqueria La Laguna",
+"kind": "fast_food",
+"cuisine": "tacos",
+"website": null,
+"lat": 37.74156,
+"lon": -122.388537
+},
+{
+"name": "Taqueria Los Altos",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.751742,
+"lon": -122.418584
+},
+{
+"name": "Taqueria Los Cayotes",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.765144,
+"lon": -122.420432
+},
+{
+"name": "Taqueria Los Mayas",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://www.taquerialosmayassf.com/",
+"lat": 37.782914,
+"lon": -122.462821
+},
+{
+"name": "Taqueria Mana",
+"kind": "restaurant",
+"cuisine": "mexican;american",
+"website": "http://taqueriamanasf.net/",
+"lat": 37.790112,
+"lon": -122.40724
+},
+{
+"name": "Taqueria Miraloma",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.743841,
+"lon": -122.453721
+},
+{
+"name": "Taqueria San Francisco",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.752985,
+"lon": -122.408078
+},
+{
+"name": "Taqueria San Jose",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.751592,
+"lon": -122.418233
+},
+{
+"name": "Taqueria Vallarta",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.752481,
+"lon": -122.412564
+},
+{
+"name": "Taqueria Zorro",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://www.taqueriazorro.com/",
+"lat": 37.798134,
+"lon": -122.406826
+},
+{
+"name": "Taquería Estrella",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.771936,
+"lon": -122.431021
+},
+{
+"name": "Tara Indian Cuisine",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": null,
+"lat": 37.765312,
+"lon": -122.431432
+},
+{
+"name": "Taste of Fusion Kitchen",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.775653,
+"lon": -122.496113
+},
+{
+"name": "Tazaki Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": "https://tazakisushisf.com",
+"lat": 37.760872,
+"lon": -122.498902
+},
+{
+"name": "Teazzert Pho You",
+"kind": "restaurant",
+"cuisine": "vietnamese",
+"website": "https://enjoyteazzert.com/",
+"lat": 37.716874,
+"lon": -122.441531
+},
+{
+"name": "Tenglong Chinese Restaurant",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.783197,
+"lon": -122.46148
+},
+{
+"name": "Tenmatsu Grab and Go",
+"kind": "fast_food",
+"cuisine": "japanese",
+"website": null,
+"lat": 37.791286,
+"lon": -122.404036
+},
+{
+"name": "Tenroku Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.785103,
+"lon": -122.431644
+},
+{
+"name": "Thai Cottage Restaurant",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": null,
+"lat": 37.76032,
+"lon": -122.505555
+},
+{
+"name": "Thai Curry",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "https://www.thaicurrysf.com/",
+"lat": 37.781061,
+"lon": -122.413579
+},
+{
+"name": "Thai House Express",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": null,
+"lat": 37.759407,
+"lon": -122.43472
+},
+{
+"name": "Thai Spice",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "https://www.thaispiceonpolkstreet.com/new/",
+"lat": 37.792815,
+"lon": -122.421008
+},
+{
+"name": "Thai Time",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": null,
+"lat": 37.78254,
+"lon": -122.466681
+},
+{
+"name": "Thanh Long",
+"kind": "restaurant",
+"cuisine": "vietnamese",
+"website": null,
+"lat": 37.760288,
+"lon": -122.506065
+},
+{
+"name": "That's Amore SF",
+"kind": "restaurant",
+"cuisine": "pizza",
+"website": null,
+"lat": 37.72519,
+"lon": -122.462462
+},
+{
+"name": "The Bird",
+"kind": "restaurant",
+"cuisine": "sandwich",
+"website": "https://www.thebirdsf.com/",
+"lat": 37.787235,
+"lon": -122.40007
+},
+{
+"name": "The Center SF Tea House",
+"kind": "cafe",
+"cuisine": "tea",
+"website": null,
+"lat": 37.774525,
+"lon": -122.430648
+},
+{
+"name": "The City Taqueria",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.786726,
+"lon": -122.440024
+},
+{
+"name": "The City Taqueria #2",
+"kind": "fast_food",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.742067,
+"lon": -122.421986
+},
+{
+"name": "The Grove",
+"kind": "restaurant",
+"cuisine": "american",
+"website": "https://thegrovesf.com/",
+"lat": 37.786522,
+"lon": -122.401973
+},
+{
+"name": "The Halal Guys",
+"kind": "fast_food",
+"cuisine": "chicken;falafel;gyros",
+"website": "https://thehalalguys.com/locations/336-ofarrell-street-san-francisco/",
+"lat": 37.786264,
+"lon": -122.410432
+},
+{
+"name": "The Hook",
+"kind": "restaurant",
+"cuisine": "asian",
+"website": null,
+"lat": 37.809234,
+"lon": -122.410093
+},
+{
+"name": "The Italian Homemade Company",
+"kind": "restaurant",
+"cuisine": "italian",
+"website": "https://italianhomemade.com/",
+"lat": 37.774392,
+"lon": -122.420941
+},
+{
+"name": "The Italian Homemade Company",
+"kind": "restaurant",
+"cuisine": "italian",
+"website": "https://italianhomemade.com",
+"lat": 37.801597,
+"lon": -122.411833
+},
+{
+"name": "The Salad Place",
+"kind": "restaurant",
+"cuisine": "salad;sandwich",
+"website": "https://thesaladplace.weebly.com/",
+"lat": 37.722736,
+"lon": -122.435402
+},
+{
+"name": "The Salad Place & Rotisserie",
+"kind": "restaurant",
+"cuisine": "sandwich;salad;coffee;breakfast",
+"website": "https://www.thesaladplacenrotisserie.com/",
+"lat": 37.713783,
+"lon": -122.443759
+},
+{
+"name": "The Sandwich Boss at EPC",
+"kind": "cafe",
+"cuisine": "sandwich",
+"website": null,
+"lat": 37.784449,
+"lon": -122.395747
+},
+{
+"name": "The Sandwich Place",
+"kind": "restaurant",
+"cuisine": "sandwich",
+"website": null,
+"lat": 37.764513,
+"lon": -122.419461
+},
+{
+"name": "The Sunset's Best Seafood Restaurant",
+"kind": "restaurant",
+"cuisine": "seafood",
+"website": null,
+"lat": 37.742153,
+"lon": -122.499121
+},
+{
+"name": "Thái Nghiệp Ký Mì Gia",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.753987,
+"lon": -122.479107
+},
+{
+"name": "Tia Margarita",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": null,
+"lat": 37.782181,
+"lon": -122.478285
+},
+{
+"name": "Tin",
+"kind": "restaurant",
+"cuisine": "vietnamese",
+"website": "https://www.tinkearny.com/",
+"lat": 37.791552,
+"lon": -122.404087
+},
+{
+"name": "Tiny Sushi - Oh Baby",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": "http://ohbabysushi.com/",
+"lat": 37.701277,
+"lon": -122.481977
+},
+{
+"name": "Tokyo Express",
+"kind": "fast_food",
+"cuisine": "japanese",
+"website": null,
+"lat": 37.727736,
+"lon": -122.476734
+},
+{
+"name": "Toma Mexican Restaurant",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://www.tomasf.com/",
+"lat": 37.800045,
+"lon": -122.43763
+},
+{
+"name": "Tommy’s Mexican Restaurant",
+"kind": "restaurant",
+"cuisine": "mexican",
+"website": "https://www.tommystequila.com/",
+"lat": 37.779984,
+"lon": -122.483129
+},
+{
+"name": "Tomo Sushi & Teriyaki",
+"kind": "restaurant",
+"cuisine": "sushi;japanese",
+"website": null,
+"lat": 37.70212,
+"lon": -122.470584
+},
+{
+"name": "Ton Ton Japanese Ramen House",
+"kind": "restaurant",
+"cuisine": "ramen;japanese",
+"website": null,
+"lat": 37.787213,
+"lon": -122.410351
+},
+{
+"name": "Tony's Coal Fired Pizza & Slice House",
+"kind": "fast_food",
+"cuisine": "pizza",
+"website": "https://www.tonyscoalfired.com/",
+"lat": 37.800236,
+"lon": -122.409036
+},
+{
+"name": "Tony's Pizza Napoletana",
+"kind": "restaurant",
+"cuisine": "pizza",
+"website": "https://tonyspizzanapoletana.com/",
+"lat": 37.800333,
+"lon": -122.409051
+},
+{
+"name": "Toppu Ramen & Dim Sum House",
+"kind": "restaurant",
+"cuisine": "noodle",
+"website": null,
+"lat": 37.796712,
+"lon": -122.405402
+},
+{
+"name": "Torraku Ramen",
+"kind": "restaurant",
+"cuisine": "ramen;japanese",
+"website": "https://torrakuramen.com/",
+"lat": 37.800971,
+"lon": -122.42547
+},
+{
+"name": "Tower Burger",
+"kind": "restaurant",
+"cuisine": "burger",
+"website": "http://www.towerburgersf.com/",
+"lat": 37.743956,
+"lon": -122.453458
+},
+{
+"name": "Toy Soldier",
+"kind": "restaurant",
+"cuisine": "california;comfort_food",
+"website": "https://www.toysoldiersf.com/",
+"lat": 37.791429,
+"lon": -122.403755
+},
+{
+"name": "Troya Mediterranean Kitchen",
+"kind": "restaurant",
+"cuisine": "mediterranean",
+"website": "https://www.troyasf.com/home",
+"lat": 37.789428,
+"lon": -122.434082
+},
+{
+"name": "Tsing’s Chinese Restaurant",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.737091,
+"lon": -122.469822
+},
+{
+"name": "Tsubasa Sushi",
+"kind": "restaurant",
+"cuisine": "sushi;japanese",
+"website": null,
+"lat": 37.777278,
+"lon": -122.423212
+},
+{
+"name": "Tín Vietnamese Cuisine",
+"kind": "fast_food",
+"cuisine": "vietnamese;sandwich",
+"website": "https://www.tinsf.com/",
+"lat": 37.791551,
+"lon": -122.404085
+},
+{
+"name": "Una Pizza Napoletana",
+"kind": "restaurant",
+"cuisine": "pizza",
+"website": "https://unapizza.com/home",
+"lat": 37.772875,
+"lon": -122.41555
+},
+{
+"name": "Underdogs Cantina",
+"kind": "restaurant",
+"cuisine": "tacos;bar_and_grill;mexican",
+"website": "https://underdogscantina.com/",
+"lat": 37.77945,
+"lon": -122.390513
+},
+{
+"name": "Urban Ritual",
+"kind": "cafe",
+"cuisine": "bubble_tea",
+"website": null,
+"lat": 37.775669,
+"lon": -122.425855
+},
+{
+"name": "Ushi Taro Ramen",
+"kind": "restaurant",
+"cuisine": "ramen",
+"website": null,
+"lat": 37.774625,
+"lon": -122.409393
+},
+{
+"name": "Ushio Ramen",
+"kind": "restaurant",
+"cuisine": "ramen",
+"website": null,
+"lat": 37.765009,
+"lon": -122.422714
+},
+{
+"name": "Vanida Thai Kitchen",
+"kind": "restaurant",
+"cuisine": "thai",
+"website": "http://www.vanidataraval.com/",
+"lat": 37.742158,
+"lon": -122.499011
+},
+{
+"name": "Vasquez Coffee Company",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": null,
+"lat": 37.744021,
+"lon": -122.384349
+},
+{
+"name": "Victor's Pizzeria & Restaurant",
+"kind": "restaurant",
+"cuisine": "italian;pizza",
+"website": null,
+"lat": 37.789863,
+"lon": -122.420698
+},
+{
+"name": "Villa",
+"kind": "fast_food",
+"cuisine": "italian",
+"website": null,
+"lat": 37.727998,
+"lon": -122.476658
+},
+{
+"name": "Wanpo",
+"kind": "cafe",
+"cuisine": "bubble_tea",
+"website": null,
+"lat": 37.727893,
+"lon": -122.477214
+},
+{
+"name": "Waraku",
+"kind": "restaurant",
+"cuisine": "ramen",
+"website": "https://www.ramenwaraku.com/",
+"lat": 37.785832,
+"lon": -122.42877
+},
+{
+"name": "Warakubune Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.765944,
+"lon": -122.428655
+},
+{
+"name": "West Coast Sourdough",
+"kind": "fast_food",
+"cuisine": "sandwich",
+"website": "https://www.wcsourdough.com/",
+"lat": 37.783972,
+"lon": -122.403377
+},
+{
+"name": "What the Cluck",
+"kind": "fast_food",
+"cuisine": "thai",
+"website": "https://www.whatthecluckus.com/",
+"lat": 37.786145,
+"lon": -122.417019
+},
+{
+"name": "Wing Lee B.B.Q. Restaurant",
+"kind": "fast_food",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.782808,
+"lon": -122.464568
+},
+{
+"name": "Wings Plus",
+"kind": "fast_food",
+"cuisine": "wings;chicken",
+"website": null,
+"lat": 37.786308,
+"lon": -122.413235
+},
+{
+"name": "Wingstop",
+"kind": "fast_food",
+"cuisine": "wings",
+"website": null,
+"lat": 37.733571,
+"lon": -122.48955
+},
+{
+"name": "Wooden Coffeehouse",
+"kind": "cafe",
+"cuisine": "coffee_shop",
+"website": "http://www.woodencoffeehouse.com/",
+"lat": 37.765934,
+"lon": -122.449872
+},
+{
+"name": "Y & Y",
+"kind": "restaurant",
+"cuisine": "vietnamese",
+"website": null,
+"lat": 37.782862,
+"lon": -122.469107
+},
+{
+"name": "Yama Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.72197,
+"lon": -122.462105
+},
+{
+"name": "Yemeni Kebab & Mediterranean",
+"kind": "restaurant",
+"cuisine": "mediterranean",
+"website": "https://www.yemenikababnmediterranean.com/",
+"lat": 37.782773,
+"lon": -122.410839
+},
+{
+"name": "Ying Hui Chinese Restaurant",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.716787,
+"lon": -122.440592
+},
+{
+"name": "Yogi Sushi House",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": "http://www.sushishoh.com",
+"lat": 37.747324,
+"lon": -122.459445
+},
+{
+"name": "You See Sushi",
+"kind": "restaurant",
+"cuisine": "japanese",
+"website": "https://www.youseesushi.com/",
+"lat": 37.762458,
+"lon": -122.462736
+},
+{
+"name": "Yuet Lee Seafood Restaurant",
+"kind": "restaurant",
+"cuisine": "chinese",
+"website": null,
+"lat": 37.7978,
+"lon": -122.408504
+},
+{
+"name": "Zaika Indian Cuisine",
+"kind": "restaurant",
+"cuisine": "indian",
+"website": "https://zaikasf.com/",
+"lat": 37.77853,
+"lon": -122.392122
+},
+{
+"name": "Zante Pizza & Indian Cuisine",
+"kind": "restaurant",
+"cuisine": "pizza;indian",
+"website": "https://www.zantespizza.com/",
+"lat": 37.741141,
+"lon": -122.422591
+},
+{
+"name": "Zazang Korean Noodles",
+"kind": "restaurant",
+"cuisine": "noodle;korean",
+"website": null,
+"lat": 37.783207,
+"lon": -122.44187
+},
+{
+"name": "Zenpo Sushi",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.778068,
+"lon": -122.422202
+},
+{
+"name": "Zentarou Sushi & Sake Bar",
+"kind": "restaurant",
+"cuisine": "sushi",
+"website": null,
+"lat": 37.762625,
+"lon": -122.466099
+},
+{
+"name": "hi City",
+"kind": "fast_food",
+"cuisine": "hawaiian",
+"website": null,
+"lat": 37.79125,
+"lon": -122.401232
+},
+{
+"name": "iCafe Chinatown",
+"kind": "cafe",
+"cuisine": "bubble_tea",
+"website": null,
+"lat": 37.794652,
+"lon": -122.407
+},
+{
+"name": "iKU Sushi",
+"kind": "fast_food",
+"cuisine": "sushi;japanese",
+"website": "https://www.ikusushi.com/",
+"lat": 37.790406,
+"lon": -122.402128
+}
+]
+}

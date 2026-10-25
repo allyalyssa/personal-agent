@@ -6,13 +6,13 @@ create table if not exists taste (kind text not null, key text not null, alpha r
 create table if not exists ratings (id integer primary key autoincrement, case_id text, recipe_id integer not null, stars integer not null, at text not null);
 `)
 
-export type Rated = { id: number, cuisines: string[], main: string }
+export type Rated = { id: number, cuisines: string[], main: string | null }
 
 // Thompson sampling with fractional Bernoulli rewards: 5 stars is a full like, 1 a full dislike, 3 half of each.
 export function rate(caseId: string | null, recipe: Rated, stars: number) {
   const s = Math.min(5, Math.max(1, Math.round(stars)))
   const up = db.prepare('insert into taste (kind, key, alpha, beta) values (?, ?, 1 + ?, 1 + ?) on conflict(kind, key) do update set alpha = alpha + excluded.alpha - 1, beta = beta + excluded.beta - 1')
-  for (const [kind, key] of [...recipe.cuisines.map(c => ['cuisine', c]), ['main', recipe.main]]) up.run(kind, key, (s - 1) / 4, (5 - s) / 4)
+  for (const [kind, key] of [...recipe.cuisines.map(c => ['cuisine', c]), ...(recipe.main ? [['main', recipe.main]] : [])]) up.run(kind, key, (s - 1) / 4, (5 - s) / 4)
   db.prepare('insert into ratings (case_id, recipe_id, stars, at) values (?, ?, ?, ?)').run(caseId, recipe.id, s, now().toISOString())
 }
 
@@ -66,5 +66,5 @@ export function tasteSampler(random: () => number) {
     }
     return drawn.get(k)!
   }
-  return (r: Rated) => Math.max(...r.cuisines.map(c => draw('cuisine', c))) * draw('main', r.main)
+  return (r: Rated) => Math.max(...r.cuisines.map(c => draw('cuisine', c))) * (r.main ? draw('main', r.main) : 1)
 }
